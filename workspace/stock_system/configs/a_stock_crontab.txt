@@ -1,4 +1,6 @@
-15 09 * * 1-5 cd /Users/thinkway/.openclaw/workspace && python3 wechat_a_stock.py 2>/dev/null
-35 11 * * 1-5 cd /Users/thinkway/.openclaw/workspace && python3 wechat_a_stock.py 2>/dev/null
-05 15 * * 1-5 cd /Users/thinkway/.openclaw/workspace && python3 wechat_a_stock.py 2>/dev/null
-00 20 * * 0 cd /Users/thinkway/.openclaw/workspace && python3 a_stock_analysis.py 2>/dev/null
+# 示例 crontab（真实行情 pipeline）
+
+15 09 * * 1-5 cd /Users/thinkway/.openclaw/workspace/stock_system && python3 refactored/openclaw_cron_analyzer.py morning 2>/dev/null
+35 11 * * 1-5 cd /Users/thinkway/.openclaw/workspace/stock_system && python3 refactored/openclaw_cron_analyzer.py afternoon 2>/dev/null
+05 15 * * 1-5 cd /Users/thinkway/.openclaw/workspace/stock_system && python3 refactored/openclaw_cron_analyzer.py afternoon 2>/dev/null
+00 20 * * 0 cd /Users/thinkway/.openclaw/workspace/stock_system && python3 refactored/openclaw_cron_analyzer.py weekly 2>/dev/null

@@ -1,4 +1,7 @@
-10 09 * * 1-5 cd /Users/thinkway/.openclaw/workspace && python3 a_stock_final_system.py >> /Users/thinkway/.openclaw/workspace/a_stock_professional.log 2>&1
-10 15 * * 1-5 cd /Users/thinkway/.openclaw/workspace && python3 a_stock_final_system.py evening >> /Users/thinkway/.openclaw/workspace/a_stock_professional.log 2>&1
-00 20 * * 0 cd /Users/thinkway/.openclaw/workspace && python3 a_stock_final_system.py weekly >> /Users/thinkway/.openclaw/workspace/a_stock_professional.log 2>&1
-00 08 * * 1-5 cd /Users/thinkway/.openclaw/workspace && python3 a_stock_final_system.py morning_brief >> /Users/thinkway/.openclaw/workspace/a_stock_professional.log 2>&1
+# 示例 crontab：请把路径中的用户目录换成本机 OPENCLAW_HOME/workspace/stock_system
+# 日志目录需存在：stock_system/logs
+
+10 09 * * 1-5 cd /Users/thinkway/.openclaw/workspace/stock_system && python3 refactored/openclaw_cron_analyzer.py morning >> /Users/thinkway/.openclaw/workspace/stock_system/logs/cron_morning.log 2>&1
+10 15 * * 1-5 cd /Users/thinkway/.openclaw/workspace/stock_system && python3 refactored/openclaw_cron_analyzer.py afternoon >> /Users/thinkway/.openclaw/workspace/stock_system/logs/cron_afternoon.log 2>&1
+00 16 * * 1-5 cd /Users/thinkway/.openclaw/workspace/stock_system && python3 refactored/openclaw_cron_analyzer.py evening >> /Users/thinkway/.openclaw/workspace/stock_system/logs/cron_evening.log 2>&1
+00 20 * * 0 cd /Users/thinkway/.openclaw/workspace/stock_system && python3 refactored/openclaw_cron_analyzer.py weekly >> /Users/thinkway/.openclaw/workspace/stock_system/logs/cron_weekly.log 2>&1

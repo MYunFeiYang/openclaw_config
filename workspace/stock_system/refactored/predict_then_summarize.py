@@ -6,12 +6,13 @@ A股分析系统 - 符合"先预测再总结"理念的重构版本
 
 import json
 import os
-import random
 from datetime import datetime, timedelta
 from dataclasses import dataclass, asdict
 from typing import List, Dict, Optional, Tuple
 from enum import Enum
 from pathlib import Path
+
+from data_providers import StockDataProvider, get_default_provider
 
 
 def _default_stock_system_root() -> str:
@@ -55,6 +56,7 @@ class PredictionResult:
     confidence: int
     reasons: List[str]
     prediction_time: datetime
+    data_provenance: str = "openclaw_agent_web"
     
     def to_dict(self) -> Dict:
         return {
@@ -69,7 +71,8 @@ class PredictionResult:
             'signal': self.signal,
             'confidence': self.confidence,
             'reasons': self.reasons,
-            'prediction_time': self.prediction_time.isoformat()
+            'prediction_time': self.prediction_time.isoformat(),
+            'data_provenance': self.data_provenance,
         }
 
 
@@ -105,39 +108,35 @@ class SummaryReport:
 class PredictionEngine:
     """预测引擎 - 核心预测逻辑"""
     
-    def __init__(self):
-        self.data_generator = DataGenerator()
+    def __init__(self, data_provider: Optional[StockDataProvider] = None):
+        self._provider = data_provider or get_default_provider()
         self.scoring_engine = ScoringEngine()
         self.signal_generator = SignalGenerator()
     
     def predict_stock(self, stock: StockConfig) -> PredictionResult:
         """对单只股票进行预测"""
         
-        # 1. 生成基础数据
-        price_data = self.data_generator.generate_price_data(stock)
-        technical_data = self.data_generator.generate_technical_data()
-        fundamental_data = self.data_generator.generate_fundamental_data(stock)
-        sentiment_data = self.data_generator.generate_sentiment_data()
-        sector_data = self.data_generator.generate_sector_data()
+        inputs = self._provider.fetch(stock)
         
-        # 2. 计算各项评分
-        technical_score = self.scoring_engine.calculate_technical_score(technical_data)
-        fundamental_score = self.scoring_engine.calculate_fundamental_score(fundamental_data, stock.sector)
-        sentiment_score = self.scoring_engine.calculate_sentiment_score(sentiment_data)
-        sector_score = self.scoring_engine.calculate_sector_score(sector_data)
+        technical_score = self.scoring_engine.calculate_technical_score(inputs.technical)
+        fundamental_score = self.scoring_engine.calculate_fundamental_score(
+            inputs.fundamental, stock.sector
+        )
+        sentiment_score = self.scoring_engine.calculate_sentiment_score(inputs.sentiment)
+        sector_score = self.scoring_engine.calculate_sector_score(inputs.sector)
         
-        # 3. 计算综合评分
         final_score = self.scoring_engine.calculate_final_score(
             technical_score, fundamental_score, sentiment_score, sector_score
         )
         
-        # 4. 生成信号和理由
-        signal, confidence, reasons = self.signal_generator.generate_signal(final_score, stock)
+        signal, confidence, reasons = self.signal_generator.generate_signal(
+            final_score, stock, inputs.technical
+        )
         
         return PredictionResult(
             stock=stock,
-            current_price=price_data[0],
-            change_percent=price_data[1],
+            current_price=inputs.current_price,
+            change_percent=inputs.change_percent,
             technical_score=technical_score,
             fundamental_score=fundamental_score,
             sentiment_score=sentiment_score,
@@ -146,7 +145,8 @@ class PredictionEngine:
             signal=signal,
             confidence=confidence,
             reasons=reasons,
-            prediction_time=datetime.now()
+            prediction_time=datetime.now(),
+            data_provenance=inputs.provenance,
         )
     
     def predict_portfolio(self, stocks: List[StockConfig]) -> List[PredictionResult]:
@@ -160,65 +160,6 @@ class PredictionEngine:
         # 按综合评分排序
         results.sort(key=lambda x: x.final_score, reverse=True)
         return results
-
-
-# ==================== 数据生成器 ====================
-
-class DataGenerator:
-    """数据生成器 - 模拟真实市场数据"""
-    
-    @staticmethod
-    def generate_price_data(stock: StockConfig) -> Tuple[float, float]:
-        """生成价格数据"""
-        base_price = 100 + stock.weight * 50
-        price_change = random.uniform(-0.03, 0.03)
-        current_price = base_price * (1 + price_change)
-        return round(current_price, 2), round(price_change * 100, 2)
-    
-    @staticmethod
-    def generate_technical_data() -> Dict:
-        """生成技术指标数据"""
-        return {
-            'rsi': random.randint(20, 80),
-            'macd_signal': random.choice(['金叉', '死叉', '中性']),
-            'bollinger_position': random.uniform(-2, 2),
-            'volume_ratio': random.uniform(0.6, 1.8),
-            'momentum_5d': random.uniform(-0.05, 0.05)
-        }
-    
-    @staticmethod
-    def generate_fundamental_data(stock: StockConfig) -> Dict:
-        """生成基本面数据"""
-        sector_benchmarks = ConfigManager.get_sector_benchmark(stock.sector)
-        
-        return {
-            'pe_ratio': random.uniform(sector_benchmarks['pe_avg'] * 0.7, sector_benchmarks['pe_avg'] * 1.3),
-            'pb_ratio': random.uniform(sector_benchmarks['pb_avg'] * 0.7, sector_benchmarks['pb_avg'] * 1.3),
-            'roe': random.uniform(sector_benchmarks['roe_avg'] * 0.8, sector_benchmarks['roe_avg'] * 1.2),
-            'growth_rate': random.uniform(sector_benchmarks['growth_avg'] * 0.5, sector_benchmarks['growth_avg'] * 1.5),
-            'debt_ratio': random.uniform(0.2, 0.7),
-            'dividend_yield': random.uniform(0.5, 4.0)
-        }
-    
-    @staticmethod
-    def generate_sentiment_data() -> Dict:
-        """生成情绪数据"""
-        return {
-            'market_heat': random.randint(1, 10),
-            'institution_attention': random.randint(1, 10),
-            'retail_sentiment': random.choice(['恐慌', '谨慎', '中性', '乐观', '狂热']),
-            'news_sentiment': random.choice(['负面', '中性', '正面'])
-        }
-    
-    @staticmethod
-    def generate_sector_data() -> Dict:
-        """生成行业数据"""
-        return {
-            'prosperity': random.randint(3, 9),
-            'policy_support': random.randint(3, 9),
-            'capital_flow': random.randint(2, 9),
-            'rotation_position': random.randint(3, 9)
-        }
 
 
 # ==================== 评分引擎 ====================
@@ -304,30 +245,46 @@ class ScoringEngine:
 
 # ==================== 信号生成器 ====================
 
+def _confidence_from_score_and_technical(final_score: float, technical: Dict) -> int:
+    """由综合分与 RSI 偏离度推导信心（可复现，非随机）。"""
+    th = ConfigManager.SIGNAL_THRESHOLDS
+    dist_to_edges = [
+        abs(final_score - th["strong_buy"]),
+        abs(final_score - th["buy"]),
+        abs(final_score - th["hold"]),
+        abs(final_score - th["sell"]),
+    ]
+    margin = min(dist_to_edges)
+    base = int(42 + final_score * 4.5)
+    rsi = float(technical.get("rsi", 50))
+    rsi_bump = int(min(10, abs(rsi - 50) / 5.0))
+    margin_bump = int(min(10, margin * 2.5))
+    return max(40, min(91, base + (rsi_bump + margin_bump) // 2))
+
+
 class SignalGenerator:
     """信号生成器 - 生成交易信号和理由"""
     
-    def generate_signal(self, final_score: float, stock: StockConfig) -> Tuple[str, int, List[str]]:
+    def generate_signal(
+        self, final_score: float, stock: StockConfig, technical_data: Optional[Dict] = None
+    ) -> Tuple[str, int, List[str]]:
         """生成交易信号"""
         
+        technical_data = technical_data or {}
         thresholds = ConfigManager.SIGNAL_THRESHOLDS
         
         if final_score >= thresholds['strong_buy']:
             signal = SignalType.STRONG_BUY
-            confidence = random.randint(85, 95)
         elif final_score >= thresholds['buy']:
             signal = SignalType.BUY
-            confidence = random.randint(70, 85)
         elif final_score >= thresholds['hold']:
             signal = SignalType.HOLD
-            confidence = random.randint(50, 70)
         elif final_score >= thresholds['sell']:
             signal = SignalType.SELL
-            confidence = random.randint(60, 75)
         else:
             signal = SignalType.STRONG_SELL
-            confidence = random.randint(75, 90)
         
+        confidence = _confidence_from_score_and_technical(final_score, technical_data)
         reasons = self._generate_reasons(final_score, stock)
         
         return signal.value, confidence, reasons
@@ -360,7 +317,9 @@ class SignalGenerator:
         }
         
         if stock.sector in sector_reasons:
-            reasons.extend(random.sample(sector_reasons[stock.sector], 1))
+            opts = sector_reasons[stock.sector]
+            pick = opts[abs(hash(stock.symbol)) % len(opts)]
+            reasons.append(pick)
         
         return reasons[:2]  # 限制为2个理由
 
@@ -506,8 +465,10 @@ class SummaryEngine:
 class ConfigManager:
     """配置管理器"""
     
-    # 股票池配置
-    CORE_STOCKS = [
+    _core_stocks_cache: Optional[List[StockConfig]] = None
+    _analysis_limits_cache: Optional[Dict[str, int]] = None
+    
+    _DEFAULT_CORE_STOCKS = [
         StockConfig('贵州茅台', '600519', '白酒', 0.9),
         StockConfig('宁德时代', '300750', '新能源', 0.8),
         StockConfig('招商银行', '600036', '银行', 0.7),
@@ -519,6 +480,65 @@ class ConfigManager:
         StockConfig('万科A', '000002', '地产', 0.1),
         StockConfig('京东方A', '000725', '面板', 0.0)
     ]
+    
+    # 兼容旧代码引用
+    CORE_STOCKS = _DEFAULT_CORE_STOCKS
+    
+    @classmethod
+    def _stock_pool_path(cls) -> Path:
+        root = Path(_default_stock_system_root())
+        return root / "config" / "stock_pool.json"
+    
+    @classmethod
+    def reload_stock_pool(cls) -> None:
+        """从 config/stock_pool.json 重新加载；文件不存在则用内置默认。"""
+        cls._core_stocks_cache = None
+        cls._analysis_limits_cache = None
+    
+    @classmethod
+    def get_core_stocks(cls) -> List[StockConfig]:
+        if cls._core_stocks_cache is not None:
+            return cls._core_stocks_cache
+        path = cls._stock_pool_path()
+        if not path.is_file():
+            cls._core_stocks_cache = list(cls._DEFAULT_CORE_STOCKS)
+            cls._analysis_limits_cache = {"morning": 5, "default": 10}
+            return cls._core_stocks_cache
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                data = json.load(f)
+            stocks_raw = data.get("stocks") or []
+            out: List[StockConfig] = []
+            for i, row in enumerate(stocks_raw):
+                out.append(
+                    StockConfig(
+                        name=row["name"],
+                        symbol=row["symbol"],
+                        sector=row["sector"],
+                        weight=float(row.get("weight", 1.0 - i * 0.1)),
+                    )
+                )
+            cls._core_stocks_cache = out if out else list(cls._DEFAULT_CORE_STOCKS)
+            lim = data.get("analysis_limits") or {}
+            cls._analysis_limits_cache = {
+                "morning": int(lim.get("morning", 5)),
+                "afternoon": int(lim.get("afternoon", lim.get("default", 10))),
+                "evening": int(lim.get("evening", lim.get("default", 10))),
+                "weekly": int(lim.get("weekly", lim.get("default", 10))),
+                "default": int(lim.get("default", 10)),
+            }
+        except (OSError, ValueError, KeyError, TypeError):
+            cls._core_stocks_cache = list(cls._DEFAULT_CORE_STOCKS)
+            cls._analysis_limits_cache = {"morning": 5, "default": 10}
+        return cls._core_stocks_cache
+    
+    @classmethod
+    def get_analysis_stock_slice(cls, analysis_type: str) -> List[StockConfig]:
+        stocks = cls.get_core_stocks()
+        lims = cls._analysis_limits_cache or {"morning": 5, "default": 10}
+        n = lims.get(analysis_type, lims.get("default", len(stocks)))
+        n = max(1, min(n, len(stocks)))
+        return stocks[:n]
     
     # 行业基准配置
     SECTOR_BENCHMARKS = {
@@ -654,6 +674,7 @@ class ReportGenerator:
         prediction_data = {
             'timestamp': datetime.now().isoformat(),
             'analysis_type': analysis_type,
+            'data_provider': 'openclaw',
             'predictions': [pred.to_dict() for pred in predictions],
             'prediction_count': len(predictions)
         }
@@ -788,9 +809,14 @@ class ReportGenerator:
 class StockAnalyzer:
     """股票分析器 - 遵循"先预测再总结"理念"""
     
-    def __init__(self, base_dir: Optional[str] = None):
+    def __init__(
+        self,
+        base_dir: Optional[str] = None,
+        data_provider: Optional[StockDataProvider] = None,
+    ):
         root = base_dir or _default_stock_system_root()
-        self.prediction_engine = PredictionEngine()
+        ConfigManager.reload_stock_pool()
+        self.prediction_engine = PredictionEngine(data_provider=data_provider)
         self.summary_engine = SummaryEngine()
         self.report_generator = ReportGenerator(root)
         self.base_dir = Path(root)
@@ -801,8 +827,9 @@ class StockAnalyzer:
         print(f"🚀 开始{self._get_analysis_type_name(analysis_type)}分析...")
         print("📊 第一步: 生成个股预测...")
         
-        # 第一步: 预测阶段 - 对每只股票进行独立预测
-        predictions = self.prediction_engine.predict_portfolio(ConfigManager.CORE_STOCKS)
+        # 第一步: 预测阶段 - 对每只股票进行独立预测（股票池见 config/stock_pool.json）
+        universe = ConfigManager.get_analysis_stock_slice(analysis_type)
+        predictions = self.prediction_engine.predict_portfolio(universe)
         
         print(f"✅ 预测完成，共{len(predictions)}只股票")
         print("📋 第二步: 生成总结报告...")

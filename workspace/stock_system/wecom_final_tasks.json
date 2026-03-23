@@ -4,7 +4,7 @@
       "id": "wecom_morning_prediction",
       "name": "A股早盘预测",
       "schedule": "0 8 * * 1-5",
-      "command": "cd /Users/thinkway/.openclaw/workspace/stock_system && python3 wecom_final_cron_simple.py morning",
+      "command": "cd /Users/thinkway/.openclaw/workspace/stock_system && python3 wecom_cron_analyzer.py morning",
       "enabled": true,
       "description": "工作日08:00生成A股早盘个股预测，企业微信格式"
     },
@@ -12,7 +12,7 @@
       "id": "wecom_afternoon_prediction", 
       "name": "A股午盘预测",
       "schedule": "0 15 * * 1-5",
-      "command": "cd /Users/thinkway/.openclaw/workspace/stock_system && python3 wecom_final_cron_simple.py afternoon",
+      "command": "cd /Users/thinkway/.openclaw/workspace/stock_system && python3 wecom_cron_analyzer.py afternoon",
       "enabled": true,
       "description": "工作日15:00生成A股午盘个股预测，企业微信格式"
     },
@@ -20,7 +20,7 @@
       "id": "wecom_evening_summary",
       "name": "A股收盘总结", 
       "schedule": "0 16 * * 1-5",
-      "command": "cd /Users/thinkway/.openclaw/workspace/stock_system && python3 wecom_final_cron_simple.py evening",
+      "command": "cd /Users/thinkway/.openclaw/workspace/stock_system && python3 wecom_cron_analyzer.py evening",
       "enabled": true,
       "description": "工作日16:00基于早盘+午盘预测生成A股收盘总结，企业微信格式"
     },
@@ -28,7 +28,7 @@
       "id": "wecom_weekly_summary",
       "name": "A股周度总结",
       "schedule": "0 20 * * 0", 
-      "command": "cd /Users/thinkway/.openclaw/workspace/stock_system && python3 wecom_final_cron_simple.py weekly",
+      "command": "cd /Users/thinkway/.openclaw/workspace/stock_system && python3 wecom_cron_analyzer.py weekly",
       "enabled": true,
       "description": "周日20:00基于本周早盘+午盘预测生成A股周度总结，企业微信格式"
     }

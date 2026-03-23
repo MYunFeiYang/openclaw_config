@@ -7,13 +7,19 @@
 import os
 import sys
 import json
+import sqlite3
 import schedule
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
 
-# 添加stock_system目录到路径
-sys.path.append('/Users/thinkway/.openclaw/workspace/stock_system')
+_STOCK_ROOT = Path(
+    os.environ.get(
+        "STOCK_SYSTEM_ROOT",
+        str(Path(__file__).resolve().parent),
+    )
+)
+sys.path.insert(0, str(_STOCK_ROOT))
 
 try:
     from prediction_cycle_system import PredictionCycleSystem
@@ -26,7 +32,7 @@ class StockPredictionAutomation:
     
     def __init__(self):
         self.system = PredictionCycleSystem()
-        self.log_dir = Path("/Users/thinkway/.openclaw/workspace/stock_system/logs")
+        self.log_dir = _STOCK_ROOT / "logs"
         self.log_dir.mkdir(exist_ok=True)
         
         # 核心股票池
@@ -223,33 +229,48 @@ class StockPredictionAutomation:
             self.send_wechat_notification(report_content, pred_type)
     
     def generate_validation_report(self):
-        """生成验证报告"""
-        
-        # 这里应该查询数据库获取验证结果
-        # 现在用简化版本
+        """生成验证报告（基于 predictions.db 中已写入的验证字段）"""
+
         report_lines = []
         report_lines.append("【预测验证报告】")
         report_lines.append("=" * 50)
         report_lines.append(f"验证时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         report_lines.append("=" * 50)
-        
-        # 模拟验证结果
-        report_lines.append("\n📊 验证结果摘要:")
-        report_lines.append("• 总验证预测数: 15")
-        report_lines.append("• 方向正确: 10 (66.7%)")
-        report_lines.append("• 部分正确: 3 (20.0%)")
-        report_lines.append("• 方向错误: 2 (13.3%)")
-        report_lines.append("• 综合准确率: 76.7%")
-        
-        report_lines.append("\n🔍 准确性分析:")
-        report_lines.append("• 买入信号准确率: 80.0%")
-        report_lines.append("• 卖出信号准确率: 75.0%")
-        report_lines.append("• 持有信号准确率: 70.0%")
-        
-        report_lines.append("\n⚠️ 需要关注的问题:")
-        report_lines.append("• 大盘震荡期间准确率下降")
-        report_lines.append("• 政策突发消息影响预测效果")
-        report_lines.append("• 建议加强政策因子权重")
+
+        db_path = self.system.db.db_path
+        conn = None
+        try:
+            conn = sqlite3.connect(db_path)
+            cur = conn.cursor()
+            cur.execute(
+                "SELECT COUNT(*) FROM predictions WHERE validation_time IS NOT NULL"
+            )
+            total_val = cur.fetchone()[0] or 0
+            if total_val == 0:
+                report_lines.append(
+                    "\n暂无已验证记录：请先运行 prediction_cycle_system 的批量验证或相关任务。"
+                )
+            else:
+                cur.execute(
+                    """
+                    SELECT accuracy_result, COUNT(*)
+                    FROM predictions
+                    WHERE accuracy_result IS NOT NULL
+                    GROUP BY accuracy_result
+                    """
+                )
+                breakdown = dict(cur.fetchall())
+                report_lines.append("\n📊 验证结果摘要:")
+                report_lines.append(f"• 总验证预测数: {total_val}")
+                for label in ("正确", "部分正确", "错误"):
+                    n = breakdown.get(label, 0)
+                    pct = (n / total_val * 100) if total_val else 0
+                    report_lines.append(f"• {label}: {n} ({pct:.1f}%)")
+        except Exception as e:
+            report_lines.append(f"\n读取验证数据失败: {e}")
+        finally:
+            if conn is not None:
+                conn.close()
         
         report_content = "\n".join(report_lines)
         

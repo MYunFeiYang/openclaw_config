@@ -10,7 +10,7 @@ import json
 import time
 import psutil
 import signal
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 import subprocess
 from typing import Dict, List, Optional
@@ -19,7 +19,12 @@ class StockPredictionMonitor:
     """股票预测系统监控器"""
     
     def __init__(self):
-        self.system_dir = Path("/Users/thinkway/.openclaw/workspace/stock_system")
+        self.system_dir = Path(
+            os.environ.get(
+                "STOCK_SYSTEM_ROOT",
+                str(Path(__file__).resolve().parent),
+            )
+        )
         self.log_dir = self.system_dir / "logs"
         self.pid_dir = self.system_dir / "pids"
         self.report_dir = self.system_dir / "reports"
@@ -166,36 +171,54 @@ class StockPredictionMonitor:
         return status
     
     def get_recent_predictions(self) -> List[Dict]:
-        """获取最近的预测记录"""
+        """从 data/predictions_*.json 读取最近若干次运行记录"""
         try:
-            # 这里应该查询数据库，现在用模拟数据
-            return [
-                {
-                    "time": (datetime.now() - timedelta(hours=2)).isoformat(),
-                    "type": "morning",
-                    "stocks": 5,
-                    "status": "completed"
-                },
-                {
-                    "time": (datetime.now() - timedelta(hours=12)).isoformat(),
-                    "type": "closing", 
-                    "stocks": 10,
-                    "status": "completed"
-                }
-            ]
+            data_dir = self.system_dir / "data"
+            if not data_dir.is_dir():
+                return []
+            files = sorted(data_dir.glob("predictions_*.json"))[-8:]
+            out: List[Dict] = []
+            for fp in reversed(files):
+                try:
+                    with open(fp, "r", encoding="utf-8") as f:
+                        b = json.load(f)
+                    out.append(
+                        {
+                            "time": b.get("timestamp"),
+                            "type": b.get("analysis_type"),
+                            "stocks": b.get(
+                                "prediction_count", len(b.get("predictions") or [])
+                            ),
+                            "status": "completed",
+                            "file": fp.name,
+                        }
+                    )
+                except Exception:
+                    continue
+            return out
         except Exception:
             return []
     
     def get_accuracy_metrics(self) -> Dict:
-        """获取准确性指标"""
+        """从 data/validation_metrics_*.json 读取最近一次验证桥输出"""
         try:
-            # 这里应该查询数据库，现在用模拟数据
+            data_dir = self.system_dir / "data"
+            if not data_dir.is_dir():
+                return {}
+            files = sorted(data_dir.glob("validation_metrics_*.json"))
+            if not files:
+                return {}
+            with open(files[-1], "r", encoding="utf-8") as f:
+                m = json.load(f)
+            acc = float(m.get("direction_accuracy") or 0)
+            if acc <= 1.0:
+                acc *= 100.0
             return {
-                "direction_accuracy": 68.5,
-                "magnitude_accuracy": 52.3,
-                "confidence_calibration": 71.2,
-                "total_predictions": 156,
-                "last_updated": (datetime.now() - timedelta(minutes=30)).isoformat()
+                "direction_accuracy": round(acc, 2),
+                "total_predictions": int(m.get("total") or 0),
+                "direction_matches": int(m.get("direction_matches") or 0),
+                "last_updated": m.get("evaluated_at"),
+                "source_file": m.get("source_file"),
             }
         except Exception:
             return {}

@@ -85,7 +85,17 @@ python3 prediction_automation.py
 
 ```
 stock_system/
-├── prediction_cycle_system.py    # 核心循环引擎
+├── config/
+│   └── stock_pool.json           # 股票池与各分析类型数量上限（可编辑）
+├── refactored/
+│   ├── openclaw_cron_analyzer.py # Cron/OpenClaw 推荐入口
+│   ├── predict_then_summarize.py # 预测+总结主逻辑
+│   ├── data_providers.py         # 仅 OpenClaw Agent 数据源入口
+│   ├── openclaw_search_provider.py # `openclaw agent` 网页搜索/浏览取价
+│   └── validation_bridge.py      # 读取最新 predictions_*.json 写方向准确率指标
+├── scripts/
+│   └── run_stock_cron.sh         # 直跑分析（内部仍调 openclaw agent），供 crontab 使用
+├── prediction_cycle_system.py    # 核心循环引擎（SQLite predictions.db）
 ├── prediction_automation.py      # 自动化调度
 ├── system_manager.py            # 系统管理器
 ├── start_system.sh              # 启动脚本
@@ -93,7 +103,35 @@ stock_system/
 ├── logs/                       # 运行日志
 ├── reports/                    # 分析报告
 ├── pids/                       # 进程ID文件
-└── data/                       # 数据文件
+└── data/                       # 数据文件（含 validation_metrics_*.json）
+```
+
+### Refactored 流水线与环境变量
+
+| 变量 | 说明 |
+|------|------|
+| `STOCK_SYSTEM_ROOT` | `stock_system` 目录绝对路径（未设则从脚本位置推断） |
+| `OPENCLAW_BIN` | `openclaw` 可执行文件（可选，默认 PATH） |
+| `OPENCLAW_STOCK_AGENT_ID` | Agent id（默认 `main`） |
+| `OPENCLAW_AGENT_LOCAL` | `1`（默认）使用 `openclaw agent --local`；`0` 走已登录的 Gateway |
+| `OPENCLAW_AGENT_TIMEOUT` | 单次 Agent 调用超时秒数（默认 `600`）；与 `openclaw.json` 中 `agents.defaults.timeoutSeconds` 对齐调大 |
+| `STOCK_OPENCLAW_CACHE_SEC` | 单股行情缓存秒数（默认 `90`），减轻重复调用 |
+
+**数据源**：仅 **OpenClaw Agent**（`openclaw agent`）通过网页搜索/浏览拉取现价与涨跌幅（`data_provenance` / `provenance` 为 `openclaw_agent_web`）。每只股票约一次 Agent 调用，**较慢、耗 Token**；需 shell 中能执行 `openclaw`，并在 `openclaw.json` 等为 agent 配置可用的浏览/搜索类工具。技术面由涨跌幅粗估，基本面为板块中性占位。
+
+依赖：`pip install -r requirements.txt`（**不含 akshare**）；另需本机安装并登录可用的 OpenClaw CLI 与模型。
+
+验证最新一次 refactored 输出（方向一致性，用于结构回归）：
+
+```bash
+cd "$STOCK_SYSTEM_ROOT"
+python3 refactored/validation_bridge.py morning
+```
+
+系统 crontab 直跑（替代依赖模型执行 shell 的路径）：
+
+```bash
+STOCK_SYSTEM_ROOT=/path/to/stock_system /path/to/stock_system/scripts/run_stock_cron.sh morning
 ```
 
 ## 📈 性能监控

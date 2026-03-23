@@ -16,7 +16,6 @@ class StockSystemManager:
     
     def __init__(self):
         self.base_dir = Path(__file__).parent
-        self.original_dir = self.base_dir / "original"
         self.refactored_dir = self.base_dir / "refactored"
         self.configs_dir = self.base_dir / "configs"
         self.data_dir = self.base_dir / "data"
@@ -31,7 +30,6 @@ class StockSystemManager:
         
         # 检查目录结构
         directories = {
-            "原始版本": self.original_dir,
             "重构版本": self.refactored_dir,
             "配置文件": self.configs_dir,
             "历史数据": self.data_dir,
@@ -47,9 +45,9 @@ class StockSystemManager:
         
         # 检查主要程序
         main_programs = {
+            "定时入口": self.refactored_dir / "openclaw_cron_analyzer.py",
             "精修版": self.refactored_dir / "refined_stock_system.py",
             "简洁版": self.refactored_dir / "clean_stock_system.py",
-            "原始版": self.original_dir / "a_stock_final_system.py"
         }
         
         print("\n📁 主要程序状态:")
@@ -103,34 +101,36 @@ class StockSystemManager:
         except Exception as e:
             print(f"❌ 检查定时任务时出错: {e}")
     
-    def run_system(self, version="refined", save_report=True):
-        """运行指定版本的系统"""
-        
+    def run_system(self, version="refined", save_report=True, analysis_type="evening"):
+        """运行指定版本的系统（cron 入口需传 analysis_type：morning/afternoon/evening/weekly）"""
+
         if version == "refined":
             script_path = self.refactored_dir / "refined_stock_system.py"
+            cmd = [sys.executable, str(script_path)]
         elif version == "clean":
             script_path = self.refactored_dir / "clean_stock_system.py"
-        elif version == "original":
-            script_path = self.original_dir / "a_stock_final_system.py"
+            cmd = [sys.executable, str(script_path)]
+        elif version == "cron":
+            script_path = self.refactored_dir / "openclaw_cron_analyzer.py"
+            cmd = [sys.executable, str(script_path), analysis_type]
         else:
             print(f"❌ 未知版本: {version}")
             return False
-        
+
         if not script_path.exists():
             print(f"❌ 脚本不存在: {script_path}")
             return False
-        
+
         print(f"🚀 运行 {version} 版本...")
         print(f"📍 脚本路径: {script_path}")
-        
+
         try:
-            # 运行脚本
             result = subprocess.run(
-                [sys.executable, str(script_path)],
+                cmd,
                 cwd=str(script_path.parent),
                 capture_output=True,
                 text=True,
-                encoding='utf-8'
+                encoding="utf-8",
             )
             
             if result.returncode == 0:
@@ -254,9 +254,9 @@ class StockSystemManager:
         print("=" * 50)
         
         versions = {
-            "原始版": self.original_dir / "a_stock_final_system.py",
-            "简洁版": self.refactored_dir / "clean_stock_system.py", 
-            "精修版": self.refactored_dir / "refined_stock_system.py"
+            "定时入口": self.refactored_dir / "openclaw_cron_analyzer.py",
+            "简洁版": self.refactored_dir / "clean_stock_system.py",
+            "精修版": self.refactored_dir / "refined_stock_system.py",
         }
         
         for name, path in versions.items():
@@ -291,7 +291,7 @@ OpenClaw股票系统管理器
 
 命令列表:
     status              显示系统状态（包括OpenClaw定时任务）
-    run [版本]          运行指定版本 (refined/clean/original)
+    run [版本] [类型]   运行指定版本：refined / clean / cron（可选 morning|afternoon|evening|weekly，默认 evening）
     setup-cron          设置OpenClaw定时任务
     clean [天数]        清理旧数据 (默认30天)
     compare             对比不同版本
@@ -304,6 +304,7 @@ OpenClaw定时任务:
 示例:
     python manage_stock_system.py status
     python manage_stock_system.py run refined
+    python manage_stock_system.py run cron morning
     python manage_stock_system.py setup-cron
     python manage_stock_system.py clean 15
     python manage_stock_system.py compare
@@ -329,7 +330,8 @@ def main():
     
     elif command == "run":
         version = sys.argv[2] if len(sys.argv) > 2 else "refined"
-        manager.run_system(version)
+        analysis_type = sys.argv[3] if len(sys.argv) > 3 else "evening"
+        manager.run_system(version, analysis_type=analysis_type)
     
     elif command == "setup-cron":
         manager.setup_openclaw_cron()

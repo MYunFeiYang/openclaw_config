@@ -5,13 +5,33 @@
 """
 
 import json
-import random
-import pandas as pd
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
-from dataclasses import dataclass, asdict
-import sqlite3
 import os
+import sqlite3
+import sys
+from dataclasses import dataclass, asdict
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+
+_SYMBOL_SECTOR: Dict[str, str] = {
+    "600519": "白酒",
+    "300750": "新能源",
+    "600036": "银行",
+    "000858": "白酒",
+    "600276": "医药",
+    "002594": "新能源",
+    "002415": "科技",
+    "600887": "消费",
+    "000002": "地产",
+    "000725": "面板",
+}
+
+
+def _ensure_refactored_import_path() -> None:
+    r = Path(__file__).resolve().parent / "refactored"
+    s = str(r)
+    if s not in sys.path:
+        sys.path.insert(0, s)
 
 @dataclass
 class PredictionRecord:
@@ -45,11 +65,18 @@ class ModelPerformance:
     avg_score: float
     last_updated: datetime
 
+def _default_predictions_db_path() -> str:
+    root = os.environ.get("STOCK_SYSTEM_ROOT")
+    if root:
+        return str(Path(root) / "predictions.db")
+    return str(Path(__file__).resolve().parent / "predictions.db")
+
+
 class PredictionDatabase:
     """预测数据库管理"""
     
-    def __init__(self, db_path: str = "/Users/thinkway/.openclaw/workspace/stock_system/predictions.db"):
-        self.db_path = db_path
+    def __init__(self, db_path: Optional[str] = None):
+        self.db_path = db_path or _default_predictions_db_path()
         self.init_database()
     
     def init_database(self):
@@ -250,7 +277,6 @@ class PredictionValidator:
         
         validated_count = 0
         for pred_id, symbol, predicted_change in predictions_to_validate:
-            # 这里应该获取实际价格变化，现在用模拟数据
             actual_change = self.get_actual_price_change(symbol)
             
             result, score = self.validate_prediction(
@@ -274,10 +300,17 @@ class PredictionValidator:
         return validated_count
     
     def get_actual_price_change(self, symbol: str) -> float:
-        """获取实际价格变化（模拟）"""
-        # 这里应该连接真实数据源
-        # 现在返回模拟数据
-        return random.uniform(-0.05, 0.05)
+        """与主 pipeline 一致：经 OpenClaw Agent 取该代码涨跌幅（百分比点数）。"""
+        _ensure_refactored_import_path()
+        from data_providers import get_default_provider
+        from predict_then_summarize import StockConfig
+
+        s = str(symbol).strip()
+        stock = StockConfig(name=s, symbol=s, sector="消费", weight=0.5)
+        try:
+            return float(get_default_provider().fetch(stock).change_percent)
+        except Exception:
+            return 0.0
 
 class ModelOptimizer:
     """模型优化器"""
@@ -412,36 +445,37 @@ class PredictionCycleSystem:
         self.optimizer = ModelOptimizer(self.db)
         self.current_model_version = "2.0"
     
-    def make_prediction(self, stock_symbol: str, stock_name: str, 
-                       prediction_type: str) -> PredictionRecord:
-        """生成预测"""
-        
-        # 这里应该调用实际的预测模型，现在用模拟数据
-        predicted_score = random.uniform(4.0, 9.0)
-        predicted_change = (predicted_score - 5.0) * 0.01  # 评分转换为价格变化预测
-        confidence = int(min(95, max(50, predicted_score * 10 + random.randint(-10, 10))))
-        
-        # 生成信号
-        if predicted_score >= 7.5:
-            signal = "买入"
-        elif predicted_score >= 5.0:
-            signal = "持有"
-        else:
-            signal = "卖出"
-        
+    def make_prediction(
+        self,
+        stock_symbol: str,
+        stock_name: str,
+        prediction_type: str,
+        sector: Optional[str] = None,
+        weight: float = 0.5,
+    ) -> PredictionRecord:
+        """生成预测（与 refactored PredictionEngine + 真实行情一致）"""
+        _ensure_refactored_import_path()
+        from data_providers import get_default_provider
+        from predict_then_summarize import PredictionEngine, StockConfig
+
+        sec = sector or _SYMBOL_SECTOR.get(stock_symbol.strip(), "消费")
+        stock = StockConfig(
+            name=stock_name, symbol=stock_symbol, sector=sec, weight=weight
+        )
+        engine = PredictionEngine(get_default_provider())
+        r = engine.predict_stock(stock)
         prediction = PredictionRecord(
             prediction_id=f"{stock_symbol}_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
             stock_symbol=stock_symbol,
             stock_name=stock_name,
-            prediction_time=datetime.now(),
+            prediction_time=r.prediction_time,
             prediction_type=prediction_type,
-            predicted_signal=signal,
-            predicted_score=predicted_score,
-            confidence=confidence,
-            predicted_change_percent=predicted_change,
-            model_version=self.current_model_version
+            predicted_signal=r.signal,
+            predicted_score=r.final_score,
+            confidence=r.confidence,
+            predicted_change_percent=float(r.change_percent),
+            model_version=self.current_model_version,
         )
-        
         self.db.save_prediction(prediction)
         return prediction
     
@@ -540,7 +574,7 @@ def main():
     for pred in predictions:
         print(f"预测 {pred.stock_name}: {pred.predicted_signal} (信心度: {pred.confidence}%)")
     
-    # 2. 验证预测（模拟）
+    # 2. 验证预测（快照涨跌幅）
     print("\n2️⃣ 验证预测...")
     validated_count = system.validate_recent_predictions()
     print(f"验证了 {validated_count} 个预测")
@@ -555,7 +589,8 @@ def main():
     print(report)
     
     # 保存报告
-    report_file = f"/Users/thinkway/.openclaw/workspace/stock_system/improvement_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+    _base = Path(os.environ.get("STOCK_SYSTEM_ROOT", Path(__file__).resolve().parent))
+    report_file = str(_base / f"improvement_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt")
     with open(report_file, 'w', encoding='utf-8') as f:
         f.write(report)
     

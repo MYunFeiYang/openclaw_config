@@ -62,7 +62,7 @@ pip install -r requirements.txt
 python3 refactored/openclaw_cron_analyzer.py morning
 ```
 
-可选：`export STOCK_SYSTEM_ROOT="/绝对路径/workspace/stock_system"` 覆盖数据目录。
+股票分析**仅通过 OpenClaw**：Python 脚本内调用 `openclaw agent`，由 Agent 使用网页搜索/浏览取价（较慢、耗模型 Token，见 `workspace/stock_system/README.md`）。需本机可执行 `openclaw` 且模型/工具已配置。历史 `original/` 已移除。监控可读 `data/predictions_*.json`、`validation_metrics_*.json` 或 `predictions.db`。可选：`export STOCK_SYSTEM_ROOT=...`。
 
 ## 5. 自动化与 Cron
 
@@ -82,6 +82,8 @@ python3 refactored/openclaw_cron_analyzer.py morning
    ```
    或在 systemd/launchd 等服务配置里写入同一变量。
 3. **兜底**：若环境变量与 shell 展开不可靠，可直接把 `cron/jobs.json` 里对应 `message` 中的路径改成**本机绝对路径**（团队各自维护或使用内网模板生成）。
+
+4. **直跑脚本（推荐作 crontab 备选）**：`workspace/stock_system/scripts/run_stock_cron.sh` 会 `cd` 到 `STOCK_SYSTEM_ROOT`（或 `OPENCLAW_HOME/workspace/stock_system`）并执行 `refactored/openclaw_cron_analyzer.py`，不经过 OpenClaw `agentTurn`。系统 crontab 可调用该脚本，分析结果仍写入 `stock_system/data/` 与 `reports/`。
 
 ## 6. 本地环境文件（不提交）
 
