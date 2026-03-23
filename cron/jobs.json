@@ -21,7 +21,7 @@
         "message": "执行A股早盘分析：cd \"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace/stock_system\" && python3 refactored/openclaw_cron_analyzer.py morning",
         "model": "oneapi/kimi-k2-250905",
         "thinking": "off",
-        "timeoutSeconds": 300
+        "timeoutSeconds": 1200
       },
       "delivery": {
         "mode": "announce",
@@ -46,7 +46,7 @@
       "name": "股票收盘分析",
       "enabled": true,
       "createdAtMs": 1773886636323,
-      "updatedAtMs": 1773993616671,
+      "updatedAtMs": 1774253383302,
       "schedule": {
         "kind": "cron",
         "expr": "0 16 * * 1-5",
@@ -58,7 +58,7 @@
         "kind": "agentTurn",
         "message": "执行A股收盘分析：cd \"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace/stock_system\" && python3 refactored/openclaw_cron_analyzer.py evening",
         "thinking": "off",
-        "timeoutSeconds": 300,
+        "timeoutSeconds": 1200,
         "model": "oneapi/kimi-k2-250905"
       },
       "delivery": {
@@ -67,11 +67,11 @@
         "to": "thinkway"
       },
       "state": {
-        "nextRunAtMs": 1774252800000,
-        "lastRunAtMs": 1773993600005,
+        "nextRunAtMs": 1774339200000,
+        "lastRunAtMs": 1774253237153,
         "lastRunStatus": "ok",
         "lastStatus": "ok",
-        "lastDurationMs": 16666,
+        "lastDurationMs": 146149,
         "lastDelivered": true,
         "lastDeliveryStatus": "delivered",
         "consecutiveErrors": 0
@@ -96,7 +96,7 @@
         "kind": "agentTurn",
         "message": "执行A股周度分析（先预测再总结）：cd \"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace/stock_system\" && python3 refactored/openclaw_cron_analyzer.py weekly",
         "thinking": "off",
-        "timeoutSeconds": 300,
+        "timeoutSeconds": 1200,
         "model": "oneapi/kimi-k2-250905"
       },
       "delivery": {
@@ -134,7 +134,7 @@
         "kind": "agentTurn",
         "message": "清理股票系统旧日志：cd \"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace/stock_system\" && find logs/ -name \"*.log\" -mtime +7 -delete && find data/ -name \"*.txt\" -mtime +30 -delete && echo \"日志清理完成\"",
         "thinking": "off",
-        "timeoutSeconds": 60,
+        "timeoutSeconds": 180,
         "model": "oneapi/kimi-k2-250905"
       },
       "delivery": {
@@ -159,7 +159,7 @@
       "name": "股票午盘分析",
       "enabled": true,
       "createdAtMs": 1773889787156,
-      "updatedAtMs": 1773990016739,
+      "updatedAtMs": 1774253515967,
       "schedule": {
         "kind": "cron",
         "expr": "0 15 * * 1-5",
@@ -171,7 +171,7 @@
         "kind": "agentTurn",
         "message": "执行A股午盘分析：cd \"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace/stock_system\" && python3 refactored/openclaw_cron_analyzer.py afternoon",
         "thinking": "off",
-        "timeoutSeconds": 300,
+        "timeoutSeconds": 1200,
         "model": "oneapi/kimi-k2-250905"
       },
       "delivery": {
@@ -180,11 +180,11 @@
         "channel": "wecom"
       },
       "state": {
-        "nextRunAtMs": 1774249200000,
-        "lastRunAtMs": 1773990000065,
+        "nextRunAtMs": 1774335600000,
+        "lastRunAtMs": 1774253383302,
         "lastRunStatus": "ok",
         "lastStatus": "ok",
-        "lastDurationMs": 16674,
+        "lastDurationMs": 132665,
         "lastDelivered": true,
         "lastDeliveryStatus": "delivered",
         "consecutiveErrors": 0
