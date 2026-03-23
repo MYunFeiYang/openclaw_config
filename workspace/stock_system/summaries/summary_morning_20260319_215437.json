@@ -1,0 +1,186 @@
+{
+  "report_time": "2026-03-19T21:54:37.596715",
+  "analysis_type": "morning",
+  "based_on_predictions": 10,
+  "buy_recommendations": [
+    {
+      "name": "贵州茅台",
+      "symbol": "600519",
+      "sector": "白酒",
+      "current_price": 141.3,
+      "change_percent": -2.55,
+      "final_score": 7.6,
+      "signal": "买入",
+      "confidence": 77,
+      "analysis_type": "morning",
+      "prediction_time": "2026-03-19T21:54:37.595862",
+      "reasons": [
+        "技术面有所改善",
+        "估值相对合理"
+      ]
+    },
+    {
+      "name": "宁德时代",
+      "symbol": "300750",
+      "sector": "新能源",
+      "current_price": 138.96,
+      "change_percent": -0.74,
+      "final_score": 7.6,
+      "signal": "买入",
+      "confidence": 79,
+      "analysis_type": "morning",
+      "prediction_time": "2026-03-19T21:54:37.595925",
+      "reasons": [
+        "技术面有所改善",
+        "估值相对合理"
+      ]
+    },
+    {
+      "name": "招商银行",
+      "symbol": "600036",
+      "sector": "银行",
+      "current_price": 136.51,
+      "change_percent": 1.12,
+      "final_score": 7.1,
+      "signal": "买入",
+      "confidence": 73,
+      "analysis_type": "morning",
+      "prediction_time": "2026-03-19T21:54:37.595952",
+      "reasons": [
+        "技术面有所改善",
+        "估值相对合理"
+      ]
+    }
+  ],
+  "sell_recommendations": [
+    {
+      "name": "京东方A",
+      "symbol": "000725",
+      "sector": "面板",
+      "current_price": 97.49,
+      "change_percent": -2.51,
+      "final_score": 4.8,
+      "signal": "卖出",
+      "confidence": 73,
+      "analysis_type": "morning",
+      "prediction_time": "2026-03-19T21:54:37.596116",
+      "reasons": [
+        "处于震荡整理阶段",
+        "等待明确方向"
+      ]
+    }
+  ],
+  "hold_recommendations": [
+    {
+      "name": "五粮液",
+      "symbol": "000858",
+      "sector": "白酒",
+      "current_price": 126.42,
+      "change_percent": -2.76,
+      "final_score": 6.7,
+      "signal": "持有",
+      "confidence": 68,
+      "analysis_type": "morning",
+      "prediction_time": "2026-03-19T21:54:37.595976",
+      "reasons": [
+        "技术面有所改善",
+        "估值相对合理"
+      ]
+    },
+    {
+      "name": "恒瑞医药",
+      "symbol": "600276",
+      "sector": "医药",
+      "current_price": 121.62,
+      "change_percent": -2.71,
+      "final_score": 6.7,
+      "signal": "持有",
+      "confidence": 53,
+      "analysis_type": "morning",
+      "prediction_time": "2026-03-19T21:54:37.595998",
+      "reasons": [
+        "技术面有所改善",
+        "估值相对合理"
+      ]
+    }
+  ],
+  "market_overview": {
+    "total_stocks_analyzed": 10,
+    "buy_count": 3,
+    "sell_count": 1,
+    "hold_count": 2,
+    "avg_buy_score": 7.4,
+    "avg_sell_score": 4.8,
+    "avg_hold_score": 6.7,
+    "buy_sectors": [
+      "新能源",
+      "白酒",
+      "银行"
+    ],
+    "sell_sectors": [
+      "面板"
+    ],
+    "hold_sectors": [
+      "白酒",
+      "医药"
+    ],
+    "market_sentiment": "乐观",
+    "analysis_basis": "基于10只股票的预测结果"
+  },
+  "sector_analysis": {
+    "白酒": {
+      "avg_score": 7.2,
+      "stock_count": 2,
+      "trend": "强势",
+      "top_stock": "贵州茅台"
+    },
+    "新能源": {
+      "avg_score": 6.9,
+      "stock_count": 2,
+      "trend": "强势",
+      "top_stock": "宁德时代"
+    },
+    "银行": {
+      "avg_score": 7.1,
+      "stock_count": 1,
+      "trend": "强势",
+      "top_stock": "招商银行"
+    },
+    "医药": {
+      "avg_score": 6.7,
+      "stock_count": 1,
+      "trend": "强势",
+      "top_stock": "恒瑞医药"
+    },
+    "科技": {
+      "avg_score": 6.2,
+      "stock_count": 1,
+      "trend": "强势",
+      "top_stock": "海康威视"
+    },
+    "消费": {
+      "avg_score": 5.7,
+      "stock_count": 1,
+      "trend": "震荡",
+      "top_stock": "伊利股份"
+    },
+    "地产": {
+      "avg_score": 5.0,
+      "stock_count": 1,
+      "trend": "震荡",
+      "top_stock": "万科A"
+    },
+    "面板": {
+      "avg_score": 4.8,
+      "stock_count": 1,
+      "trend": "震荡",
+      "top_stock": "京东方A"
+    }
+  },
+  "risk_alerts": [],
+  "next_actions": [
+    "关注开盘后的量价配合情况",
+    "观察昨夜美股对A股的影响",
+    "留意早盘资金流入方向"
+  ]
+}

@@ -1,0 +1,49 @@
+# Local env (optional; keep out of repo if you add secrets here)
+.env
+.env.*
+!.env.example
+
+# Backup configs
+openclaw.json.bak*
+
+# Secrets / device / TLS material
+identity/
+devices/
+ssl/
+
+# Runtime logs and app state
+logs/
+memory/
+media/
+delivery-queue/
+exec-approvals.json
+update-check.json
+
+# Agent conversation transcripts
+agents/**/sessions/
+subagents/
+
+# Cron execution logs (runtime)
+cron/runs/
+cron/jobs.json.bak
+
+# WeChat Work runtime maps (regenerated)
+wecom/
+
+# Dependencies and Python
+**/node_modules/
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# OS
+.DS_Store
+
+# Stock system generated artifacts
+workspace/stock_system/data/
+workspace/stock_system/logs/
+workspace/stock_system/reports/
+workspace/stock_system/pids/
+workspace/stock_system/*.txt
+workspace/stock_system/predictions.db

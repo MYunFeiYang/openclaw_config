@@ -1,0 +1,194 @@
+{
+  "version": 1,
+  "jobs": [
+    {
+      "id": "ca38d074-c454-4f80-adbe-f10b8c2fc3ed",
+      "agentId": "main",
+      "sessionKey": "agent:main:wecom:direct:thinkway",
+      "name": "股票早盘分析",
+      "enabled": true,
+      "createdAtMs": 1773886616628,
+      "updatedAtMs": 1774224008963,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 8 * * 1-5",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "执行A股早盘分析：cd \"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace/stock_system\" && python3 refactored/openclaw_cron_analyzer.py morning",
+        "model": "oneapi/kimi-k2-250905",
+        "thinking": "off",
+        "timeoutSeconds": 300
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "wecom",
+        "to": "thinkway"
+      },
+      "state": {
+        "nextRunAtMs": 1774310400000,
+        "lastRunAtMs": 1774224000005,
+        "lastRunStatus": "ok",
+        "lastStatus": "ok",
+        "lastDurationMs": 8958,
+        "lastDelivered": true,
+        "lastDeliveryStatus": "delivered",
+        "consecutiveErrors": 0
+      }
+    },
+    {
+      "id": "edacb5be-4121-4104-833e-c99826860225",
+      "agentId": "main",
+      "sessionKey": "agent:main:wecom:direct:thinkway",
+      "name": "股票收盘分析",
+      "enabled": true,
+      "createdAtMs": 1773886636323,
+      "updatedAtMs": 1773993616671,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 16 * * 1-5",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "执行A股收盘分析：cd \"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace/stock_system\" && python3 refactored/openclaw_cron_analyzer.py evening",
+        "thinking": "off",
+        "timeoutSeconds": 300,
+        "model": "oneapi/kimi-k2-250905"
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "wecom",
+        "to": "thinkway"
+      },
+      "state": {
+        "nextRunAtMs": 1774252800000,
+        "lastRunAtMs": 1773993600005,
+        "lastRunStatus": "ok",
+        "lastStatus": "ok",
+        "lastDurationMs": 16666,
+        "lastDelivered": true,
+        "lastDeliveryStatus": "delivered",
+        "consecutiveErrors": 0
+      }
+    },
+    {
+      "id": "314640cc-f4f3-4308-b5fa-656071097473",
+      "agentId": "main",
+      "sessionKey": "agent:main:wecom:direct:thinkway",
+      "name": "股票周度分析",
+      "enabled": true,
+      "createdAtMs": 1773886643404,
+      "updatedAtMs": 1774180811966,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 20 * * 0",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "执行A股周度分析（先预测再总结）：cd \"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace/stock_system\" && python3 refactored/openclaw_cron_analyzer.py weekly",
+        "thinking": "off",
+        "timeoutSeconds": 300,
+        "model": "oneapi/kimi-k2-250905"
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "wecom",
+        "to": "thinkway"
+      },
+      "state": {
+        "nextRunAtMs": 1774785600000,
+        "lastRunAtMs": 1774180800005,
+        "lastRunStatus": "ok",
+        "lastStatus": "ok",
+        "lastDurationMs": 11961,
+        "lastDelivered": true,
+        "lastDeliveryStatus": "delivered",
+        "consecutiveErrors": 0
+      }
+    },
+    {
+      "id": "cf7fa95f-64c0-4dec-b430-493bab61a45f",
+      "agentId": "main",
+      "sessionKey": "agent:main:wecom:direct:thinkway",
+      "name": "股票系统日志清理",
+      "enabled": true,
+      "createdAtMs": 1773886651960,
+      "updatedAtMs": 1774202404038,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 2 * * *",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "清理股票系统旧日志：cd \"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace/stock_system\" && find logs/ -name \"*.log\" -mtime +7 -delete && find data/ -name \"*.txt\" -mtime +30 -delete && echo \"日志清理完成\"",
+        "thinking": "off",
+        "timeoutSeconds": 60,
+        "model": "oneapi/kimi-k2-250905"
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "webchat"
+      },
+      "state": {
+        "nextRunAtMs": 1774288800000,
+        "lastRunAtMs": 1774202400005,
+        "lastRunStatus": "ok",
+        "lastStatus": "ok",
+        "lastDurationMs": 4033,
+        "lastDelivered": true,
+        "lastDeliveryStatus": "delivered",
+        "consecutiveErrors": 0
+      }
+    },
+    {
+      "id": "8cd7f57e-ab81-47d3-a04d-b2134f177e14",
+      "agentId": "main",
+      "sessionKey": "agent:main:wecom:direct:thinkway",
+      "name": "股票午盘分析",
+      "enabled": true,
+      "createdAtMs": 1773889787156,
+      "updatedAtMs": 1773990016739,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 15 * * 1-5",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "执行A股午盘分析：cd \"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace/stock_system\" && python3 refactored/openclaw_cron_analyzer.py afternoon",
+        "thinking": "off",
+        "timeoutSeconds": 300,
+        "model": "oneapi/kimi-k2-250905"
+      },
+      "delivery": {
+        "mode": "announce",
+        "to": "thinkway",
+        "channel": "wecom"
+      },
+      "state": {
+        "nextRunAtMs": 1774249200000,
+        "lastRunAtMs": 1773990000065,
+        "lastRunStatus": "ok",
+        "lastStatus": "ok",
+        "lastDurationMs": 16674,
+        "lastDelivered": true,
+        "lastDeliveryStatus": "delivered",
+        "consecutiveErrors": 0
+      }
+    }
+  ]
+}

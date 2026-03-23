@@ -1,0 +1,4 @@
+10 09 * * 1-5 cd /Users/thinkway/.openclaw/workspace && python3 a_stock_final_system.py >> /Users/thinkway/.openclaw/workspace/a_stock_professional.log 2>&1
+10 15 * * 1-5 cd /Users/thinkway/.openclaw/workspace && python3 a_stock_final_system.py evening >> /Users/thinkway/.openclaw/workspace/a_stock_professional.log 2>&1
+00 20 * * 0 cd /Users/thinkway/.openclaw/workspace && python3 a_stock_final_system.py weekly >> /Users/thinkway/.openclaw/workspace/a_stock_professional.log 2>&1
+00 08 * * 1-5 cd /Users/thinkway/.openclaw/workspace && python3 a_stock_final_system.py morning_brief >> /Users/thinkway/.openclaw/workspace/a_stock_professional.log 2>&1

@@ -1,0 +1,95 @@
+{
+  "version": "1.0",
+  "name": "A股智能分析系统",
+  "description": "专为A股优化的股票分析系统",
+  "market": "A股",
+  "timezone": "Asia/Shanghai",
+  "trading_hours": {
+    "morning": {
+      "start": "09:30",
+      "end": "11:30"
+    },
+    "afternoon": {
+      "start": "13:00",
+      "end": "15:00"
+    }
+  },
+  "analysis_schedule": [
+    {
+      "name": "盘前分析",
+      "time": "09:15",
+      "frequency": "daily",
+      "description": "开盘前15分钟分析，为当日交易做准备"
+    },
+    {
+      "name": "午盘分析",
+      "time": "11:35",
+      "frequency": "daily",
+      "description": "上午收盘后分析，评估上午市场表现"
+    },
+    {
+      "name": "收盘分析",
+      "time": "15:05",
+      "frequency": "daily",
+      "description": "下午收盘后分析，总结当日市场表现"
+    },
+    {
+      "name": "周度深度分析",
+      "time": "20:00",
+      "frequency": "weekly",
+      "description": "周日晚上深度分析，为下周做准备"
+    }
+  ],
+  "stock_pool": [
+    {
+      "symbol": "000001",
+      "name": "平安银行",
+      "industry": "银行",
+      "sector": "金融",
+      "weight": "normal"
+    },
+    {
+      "symbol": "000858",
+      "name": "五粮液",
+      "industry": "白酒",
+      "sector": "消费",
+      "weight": "high"
+    },
+    {
+      "symbol": "600519",
+      "name": "贵州茅台",
+      "industry": "白酒",
+      "sector": "消费",
+      "weight": "high"
+    },
+    {
+      "symbol": "600036",
+      "name": "招商银行",
+      "industry": "银行",
+      "sector": "金融",
+      "weight": "high"
+    }
+  ],
+  "analysis_factors": {
+    "technical": [
+      "RSI",
+      "MA",
+      "Volume"
+    ],
+    "fundamental": [
+      "PE",
+      "PB",
+      "ROE"
+    ],
+    "industry": [
+      "sector_trend",
+      "policy_impact"
+    ],
+    "market": [
+      "sentiment",
+      "liquidity"
+    ]
+  },
+  "created": "2026-03-18T20:16:08.561038",
+  "updated": "2026-03-18T20:16:08.561044"
+}

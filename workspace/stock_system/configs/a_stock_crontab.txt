@@ -1,0 +1,4 @@
+15 09 * * 1-5 cd /Users/thinkway/.openclaw/workspace && python3 wechat_a_stock.py 2>/dev/null
+35 11 * * 1-5 cd /Users/thinkway/.openclaw/workspace && python3 wechat_a_stock.py 2>/dev/null
+05 15 * * 1-5 cd /Users/thinkway/.openclaw/workspace && python3 wechat_a_stock.py 2>/dev/null
+00 20 * * 0 cd /Users/thinkway/.openclaw/workspace && python3 a_stock_analysis.py 2>/dev/null

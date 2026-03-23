@@ -1,0 +1,167 @@
+{
+  "timestamp": "2026-03-19T21:56:03.523889",
+  "analysis_type": "morning",
+  "prediction_count": 10,
+  "predictions": [
+    {
+      "name": "贵州茅台",
+      "symbol": "600519",
+      "sector": "白酒",
+      "current_price": 141.96,
+      "change_percent": -2.1,
+      "final_score": 7.5,
+      "signal": "买入",
+      "confidence": 81,
+      "analysis_type": "morning",
+      "prediction_time": "2026-03-19T21:56:03.523364",
+      "reasons": [
+        "技术面有所改善",
+        "估值相对合理"
+      ]
+    },
+    {
+      "name": "宁德时代",
+      "symbol": "300750",
+      "sector": "新能源",
+      "current_price": 139.69,
+      "change_percent": -0.22,
+      "final_score": 7.3,
+      "signal": "买入",
+      "confidence": 71,
+      "analysis_type": "morning",
+      "prediction_time": "2026-03-19T21:56:03.523499",
+      "reasons": [
+        "技术面有所改善",
+        "估值相对合理"
+      ]
+    },
+    {
+      "name": "招商银行",
+      "symbol": "600036",
+      "sector": "银行",
+      "current_price": 137.15,
+      "change_percent": 1.59,
+      "final_score": 6.8,
+      "signal": "持有",
+      "confidence": 64,
+      "analysis_type": "morning",
+      "prediction_time": "2026-03-19T21:56:03.523527",
+      "reasons": [
+        "技术面有所改善",
+        "估值相对合理"
+      ]
+    },
+    {
+      "name": "五粮液",
+      "symbol": "000858",
+      "sector": "白酒",
+      "current_price": 131.5,
+      "change_percent": 1.15,
+      "final_score": 6.6,
+      "signal": "持有",
+      "confidence": 64,
+      "analysis_type": "morning",
+      "prediction_time": "2026-03-19T21:56:03.523692",
+      "reasons": [
+        "技术面有所改善",
+        "估值相对合理"
+      ]
+    },
+    {
+      "name": "恒瑞医药",
+      "symbol": "600276",
+      "sector": "医药",
+      "current_price": 127.27,
+      "change_percent": 1.82,
+      "final_score": 6.3,
+      "signal": "持有",
+      "confidence": 57,
+      "analysis_type": "morning",
+      "prediction_time": "2026-03-19T21:56:03.523725",
+      "reasons": [
+        "技术面有所改善",
+        "估值相对合理"
+      ]
+    },
+    {
+      "name": "比亚迪",
+      "symbol": "002594",
+      "sector": "新能源",
+      "current_price": 121.16,
+      "change_percent": 0.97,
+      "final_score": 6.3,
+      "signal": "持有",
+      "confidence": 56,
+      "analysis_type": "morning",
+      "prediction_time": "2026-03-19T21:56:03.523751",
+      "reasons": [
+        "技术面有所改善",
+        "估值相对合理"
+      ]
+    },
+    {
+      "name": "海康威视",
+      "symbol": "002415",
+      "sector": "科技",
+      "current_price": 118.17,
+      "change_percent": 2.76,
+      "final_score": 6.1,
+      "signal": "持有",
+      "confidence": 66,
+      "analysis_type": "morning",
+      "prediction_time": "2026-03-19T21:56:03.523781",
+      "reasons": [
+        "技术面有所改善",
+        "估值相对合理"
+      ]
+    },
+    {
+      "name": "伊利股份",
+      "symbol": "600887",
+      "sector": "消费",
+      "current_price": 109.01,
+      "change_percent": -0.9,
+      "final_score": 5.7,
+      "signal": "持有",
+      "confidence": 66,
+      "analysis_type": "morning",
+      "prediction_time": "2026-03-19T21:56:03.523804",
+      "reasons": [
+        "处于震荡整理阶段",
+        "等待明确方向"
+      ]
+    },
+    {
+      "name": "万科A",
+      "symbol": "000002",
+      "sector": "地产",
+      "current_price": 104.74,
+      "change_percent": -0.24,
+      "final_score": 5.1,
+      "signal": "持有",
+      "confidence": 56,
+      "analysis_type": "morning",
+      "prediction_time": "2026-03-19T21:56:03.523826",
+      "reasons": [
+        "处于震荡整理阶段",
+        "等待明确方向"
+      ]
+    },
+    {
+      "name": "京东方A",
+      "symbol": "000725",
+      "sector": "面板",
+      "current_price": 101.69,
+      "change_percent": 1.69,
+      "final_score": 4.7,
+      "signal": "卖出",
+      "confidence": 60,
+      "analysis_type": "morning",
+      "prediction_time": "2026-03-19T21:56:03.523848",
+      "reasons": [
+        "处于震荡整理阶段",
+        "等待明确方向"
+      ]
+    }
+  ]
+}

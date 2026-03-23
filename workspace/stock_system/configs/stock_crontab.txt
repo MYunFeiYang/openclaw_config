@@ -1,0 +1,3 @@
+00 09 * * 1-5 cd /Users/thinkway/.openclaw/workspace && python3 wechat_daily_stock.py 2>/dev/null | head -20
+30 16 * * 1-5 cd /Users/thinkway/.openclaw/workspace && python3 wechat_daily_stock.py 2>/dev/null | head -20
+00 20 * * 0 cd /Users/thinkway/.openclaw/workspace && python3 wechat_daily_stock.py 2>/dev/null | head -20

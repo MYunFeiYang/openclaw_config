@@ -1,0 +1,30 @@
+{
+  "version": "1.0",
+  "name": "每日股票分析",
+  "description": "自动股票分析和推送服务",
+  "schedule": [
+    {
+      "name": "早盘分析",
+      "cron": "0 9 * * 1-5",
+      "command": "cd /Users/thinkway/.openclaw/workspace && python3 wechat_daily_stock.py",
+      "enabled": true,
+      "channel": "wecom"
+    },
+    {
+      "name": "收盘分析",
+      "cron": "30 16 * * 1-5",
+      "command": "cd /Users/thinkway/.openclaw/workspace && python3 wechat_daily_stock.py",
+      "enabled": true,
+      "channel": "wecom"
+    },
+    {
+      "name": "周度分析",
+      "cron": "0 20 * * 0",
+      "command": "cd /Users/thinkway/.openclaw/workspace && python3 wechat_daily_stock.py weekly",
+      "enabled": true,
+      "channel": "wecom"
+    }
+  ],
+  "created": "2026-03-18T20:10:02.379749",
+  "updated": "2026-03-18T20:10:02.379755"
+}

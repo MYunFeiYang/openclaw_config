@@ -1,0 +1,14 @@
+# 股票分析定时任务配置
+# 使用新的统一路径
+
+# 每天早上9:10执行专业版分析（美股开盘前）
+10 09 * * 1-5 cd /Users/thinkway/.openclaw/workspace/stock_system && python3 manage_stock_system.py run refined >> /Users/thinkway/.openclaw/workspace/stock_system/logs/cron.log 2>&1
+
+# 每天下午15:10执行专业版分析（美股收盘后）
+10 15 * * 1-5 cd /Users/thinkway/.openclaw/workspace/stock_system && python3 manage_stock_system.py run refined >> /Users/thinkway/.openclaw/workspace/stock_system/logs/cron.log 2>&1
+
+# 每周日晚上20:00执行周度分析
+00 20 * * 0 cd /Users/thinkway/.openclaw/workspace/stock_system && python3 manage_stock_system.py run refined >> /Users/thinkway/.openclaw/workspace/stock_system/logs/cron.log 2>&1
+
+# 每天早上8:00执行早间盘前分析
+00 08 * * 1-5 cd /Users/thinkway/.openclaw/workspace/stock_system && python3 manage_stock_system.py run refined >> /Users/thinkway/.openclaw/workspace/stock_system/logs/cron.log 2>&1
