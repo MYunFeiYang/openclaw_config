@@ -5,7 +5,7 @@
 ## 快速链接
 
 - [安装与运行说明](SETUP.md)
-- 主配置：`openclaw.json`（唯一主配置；含 `main` / `pm` / `dev` / `design` 等代理与工作区；路径已尽量使用 `~/.openclaw` / `~/.nvm`）
+- 主配置：`openclaw.json`（唯一主配置；当前仅 `main` 代理；路径已尽量使用 `~/.openclaw` / `~/.nvm`）
 - 股票定时分析：`cron/jobs.json`（命令里使用 `OPENCLAW_HOME` 或默认 `$HOME/.openclaw`）
 
 ## 目录说明（摘要）

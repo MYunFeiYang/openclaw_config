@@ -315,27 +315,6 @@
       {
         "id": "main",
         "model": "oneapi/kimi-k2-250905"
-      },
-      {
-        "id": "pm",
-        "name": "pm",
-        "workspace": "~/.openclaw/workspace-pm",
-        "agentDir": "~/.openclaw/agents/pm/agent",
-        "model": "oneapi/doubao-seed-1-6-250615"
-      },
-      {
-        "id": "dev",
-        "name": "dev",
-        "workspace": "~/.openclaw/workspace-dev",
-        "agentDir": "~/.openclaw/agents/dev/agent",
-        "model": "oneapi/doubao-seed-1-6-250615"
-      },
-      {
-        "id": "design",
-        "name": "design",
-        "workspace": "~/.openclaw/workspace-design",
-        "agentDir": "~/.openclaw/agents/design/agent",
-        "model": "oneapi/doubao-seed-1-6-250615"
       }
     ]
   },
