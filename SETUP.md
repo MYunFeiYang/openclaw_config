@@ -14,7 +14,7 @@ git clone <内网仓库 URL> ~/.openclaw
 export OPENCLAW_HOME="/path/to/clone"
 ```
 
-并确认 `openclaw.json` / `config.json` 中的 `workspace`、`plugins.load.paths` 等路径与你的 **Home**、**nvm Node 版本** 一致（已写成 `~/.openclaw`、`~/.nvm/...` 形式时，需保证 OpenClaw 能正确展开 `~`；若不能，改为绝对路径）。
+并确认 `openclaw.json` 中的 `workspace`、`plugins.load.paths` 等路径与你的 **Home**、**nvm Node 版本** 一致（已写成 `~/.openclaw`、`~/.nvm/...` 形式时，需保证 OpenClaw 能正确展开 `~`；若不能，改为绝对路径）。
 
 ## 2. 网络与密钥
 
