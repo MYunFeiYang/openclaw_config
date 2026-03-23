@@ -1,11 +1,11 @@
 {
   "meta": {
-    "lastTouchedVersion": "2026.3.13",
-    "lastTouchedAt": "2026-03-19T03:36:20.091Z"
+    "lastTouchedVersion": "2026.3.22",
+    "lastTouchedAt": "2026-03-23T12:24:00.821Z"
   },
   "wizard": {
-    "lastRunAt": "2026-03-17T06:47:11.651Z",
-    "lastRunVersion": "2026.3.13",
+    "lastRunAt": "2026-03-23T12:24:00.804Z",
+    "lastRunVersion": "2026.3.22",
     "lastRunCommand": "doctor",
     "lastRunMode": "local"
   },
@@ -286,6 +286,9 @@
       "model": {
         "primary": "oneapi/kimi-k2-250905"
       },
+      "imageGenerationModel": {
+        "primary": "google/gemini-3-pro-image-preview"
+      },
       "models": {
         "oneapi/doubao-seed-1-6-vision-250815": {},
         "oneapi/doubao-seed-1-6-flash-250828": {},
@@ -306,11 +309,11 @@
       "compaction": {
         "mode": "safeguard"
       },
+      "timeoutSeconds": 600,
       "maxConcurrent": 4,
       "subagents": {
         "maxConcurrent": 8
-      },
-      "timeoutSeconds": 600
+      }
     },
     "list": [
       {
@@ -432,9 +435,6 @@
       "imsg": {
         "enabled": false
       },
-      "nano-banana-pro": {
-        "enabled": false
-      },
       "nano-pdf": {
         "enabled": false
       },
@@ -507,7 +507,7 @@
     ],
     "load": {
       "paths": [
-        "~/.nvm/versions/node/v24.14.0/lib/node_modules/openclaw/extensions/acpx"
+        "~/.nvm/versions/node/v24.14.0/lib/node_modules/acpx"
       ]
     },
     "entries": {
@@ -522,8 +522,8 @@
       "acpx": {
         "source": "path",
         "spec": "acpx",
-        "sourcePath": "~/.nvm/versions/node/v24.14.0/lib/node_modules/openclaw/extensions/acpx",
-        "installPath": "~/.nvm/versions/node/v24.14.0/lib/node_modules/openclaw/extensions/acpx",
+        "sourcePath": "~/.nvm/versions/node/v24.14.0/lib/node_modules/acpx",
+        "installPath": "~/.nvm/versions/node/v24.14.0/lib/node_modules/acpx",
         "installedAt": "2026-03-13T09:43:44.174Z"
       },
       "wecom-openclaw-plugin": {
