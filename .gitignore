@@ -46,4 +46,5 @@ workspace/stock_system/logs/
 workspace/stock_system/reports/
 workspace/stock_system/pids/
 workspace/stock_system/*.txt
+!workspace/stock_system/requirements.txt
 workspace/stock_system/predictions.db
