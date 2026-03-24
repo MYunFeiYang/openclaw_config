@@ -8,7 +8,7 @@
       "name": "股票早盘分析",
       "enabled": true,
       "createdAtMs": 1773886616628,
-      "updatedAtMs": 1774224008963,
+      "updatedAtMs": 1774314484487,
       "schedule": {
         "kind": "cron",
         "expr": "0 8 * * 1-5",
@@ -24,19 +24,19 @@
         "timeoutSeconds": 1200
       },
       "delivery": {
-        "mode": "announce",
+        "mode": "none",
         "channel": "wecom",
         "to": "thinkway"
       },
       "state": {
-        "nextRunAtMs": 1774310400000,
-        "lastRunAtMs": 1774224000005,
-        "lastRunStatus": "ok",
-        "lastStatus": "ok",
-        "lastDurationMs": 8958,
-        "lastDelivered": true,
-        "lastDeliveryStatus": "delivered",
-        "consecutiveErrors": 0
+        "nextRunAtMs": 1774396800000,
+        "lastRunAtMs": 1774310400004,
+        "lastRunStatus": "error",
+        "lastStatus": "error",
+        "lastDurationMs": 27230,
+        "lastDeliveryStatus": "unknown",
+        "consecutiveErrors": 1,
+        "lastError": "Channel is required (no configured channels detected). Set delivery.channel explicitly or use a main session with a previous channel."
       }
     },
     {
@@ -122,7 +122,7 @@
       "name": "股票系统日志清理",
       "enabled": true,
       "createdAtMs": 1773886651960,
-      "updatedAtMs": 1774202404038,
+      "updatedAtMs": 1774314481627,
       "schedule": {
         "kind": "cron",
         "expr": "0 2 * * *",
@@ -138,18 +138,19 @@
         "model": "oneapi/kimi-k2-250905"
       },
       "delivery": {
-        "mode": "announce",
-        "channel": "webchat"
+        "mode": "none",
+        "channel": "wecom",
+        "to": "thinkway"
       },
       "state": {
-        "nextRunAtMs": 1774288800000,
-        "lastRunAtMs": 1774202400005,
-        "lastRunStatus": "ok",
-        "lastStatus": "ok",
-        "lastDurationMs": 4033,
-        "lastDelivered": true,
-        "lastDeliveryStatus": "delivered",
-        "consecutiveErrors": 0
+        "nextRunAtMs": 1774375200000,
+        "lastRunAtMs": 1774288800022,
+        "lastRunStatus": "error",
+        "lastStatus": "error",
+        "lastDurationMs": 2821,
+        "lastDeliveryStatus": "unknown",
+        "consecutiveErrors": 1,
+        "lastError": "Channel is required (no configured channels detected). Set delivery.channel explicitly or use a main session with a previous channel."
       }
     },
     {

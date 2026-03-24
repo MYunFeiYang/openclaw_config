@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "payload": {
+    "kind": "restart",
+    "status": "ok",
+    "ts": 1774314563159,
+    "sessionKey": "agent:main:wecom:direct:thinkway",
+    "deliveryContext": {
+      "channel": "webchat"
+    },
+    "message": "重启OpenClaw网关以尝试重新加载企业微信插件",
+    "doctorHint": "Run: openclaw doctor --non-interactive",
+    "stats": {
+      "mode": "gateway.restart"
+    }
+  }
+}
