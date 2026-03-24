@@ -507,6 +507,7 @@
     ],
     "load": {
       "paths": [
+        "~/.openclaw/extensions/wecom-openclaw-plugin",
         "~/.nvm/versions/node/v24.14.0/lib/node_modules/acpx"
       ]
     },
