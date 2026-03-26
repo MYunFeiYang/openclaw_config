@@ -73,6 +73,43 @@ def _parse_agent_stdout(stdout: str) -> Tuple[Optional[str], str]:
     raw = stdout.strip()
     if not raw:
         return None, raw
+    
+    # Look for the JSON object containing payloads
+    # Find all potential JSON objects and look for one with "payloads" key
+    
+    i = 0
+    while i < len(raw):
+        if raw[i] == '{':
+            # Found opening brace, find matching closing brace
+            brace_count = 1
+            j = i + 1
+            while j < len(raw) and brace_count > 0:
+                if raw[j] == '{':
+                    brace_count += 1
+                elif raw[j] == '}':
+                    brace_count -= 1
+                j += 1
+            
+            if brace_count == 0:
+                # Found a complete JSON object
+                json_str = raw[i:j]
+                try:
+                    parsed = json.loads(json_str)
+                    if isinstance(parsed, dict) and "payloads" in parsed:
+                        payloads = parsed.get("payloads")
+                        if isinstance(payloads, list) and payloads:
+                            t = payloads[0].get("text")
+                            if isinstance(t, str):
+                                return t, raw
+                except json.JSONDecodeError:
+                    pass
+                i = j
+            else:
+                i += 1
+        else:
+            i += 1
+    
+    # Fall back to original parsing
     try:
         outer = json.loads(raw)
     except json.JSONDecodeError:
@@ -140,7 +177,11 @@ class OpenclawAgentWebProvider:
         if proc.returncode != 0:
             err = (proc.stderr or proc.stdout or "").strip()[:2000]
             raise RuntimeError(f"openclaw agent 失败 (code={proc.returncode}): {err}")
+        
+        # Try stdout first, then stderr (some OpenClaw versions output to stderr)
         payload_text, _ = _parse_agent_stdout(proc.stdout or "")
+        if not payload_text:
+            payload_text, _ = _parse_agent_stdout(proc.stderr or "")
         if not payload_text:
             raise RuntimeError("openclaw agent 返回无法解析（无 payloads.text）")
         low = payload_text.lower()
@@ -151,6 +192,30 @@ class OpenclawAgentWebProvider:
                 "agents.defaults.timeoutSeconds，或换更快模型；"
                 "带网页搜索的单股查询常需较长时间。"
             )
+        
+        # The payload_text should be a JSON string containing the stock data
+        # First try to parse it as the outer JSON (from OpenClaw agent format)
+        try:
+            outer_data = json.loads(payload_text)
+            if isinstance(outer_data, dict) and "text" in outer_data:
+                # This is the OpenClaw agent format, extract the text field
+                inner_text = outer_data["text"]
+                if inner_text:
+                    inner_data = json.loads(inner_text)
+                    if isinstance(inner_data, dict) and "current_price" in inner_data:
+                        return inner_data
+        except json.JSONDecodeError:
+            pass
+        
+        # If that fails, try direct parsing
+        try:
+            data = json.loads(payload_text)
+            if isinstance(data, dict) and "current_price" in data:
+                return data
+        except json.JSONDecodeError:
+            pass
+        
+        # If direct parsing fails, try the inner JSON extraction
         data = _parse_inner_json_object(payload_text)
         if not data:
             raise RuntimeError(f"无法从 Agent 回复中解析 JSON: {payload_text[:500]}")

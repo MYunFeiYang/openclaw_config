@@ -1,7 +1,7 @@
 {
   "meta": {
-    "lastTouchedVersion": "2026.3.22",
-    "lastTouchedAt": "2026-03-23T12:24:00.821Z"
+    "lastTouchedVersion": "2026.3.23-1",
+    "lastTouchedAt": "2026-03-24T16:20:35.182Z"
   },
   "wizard": {
     "lastRunAt": "2026-03-23T12:24:00.804Z",
@@ -10,6 +10,7 @@
     "lastRunMode": "local"
   },
   "update": {
+    "channel": "stable",
     "auto": {
       "enabled": true
     }

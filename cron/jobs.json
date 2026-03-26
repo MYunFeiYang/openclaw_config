@@ -8,7 +8,7 @@
       "name": "股票早盘分析",
       "enabled": true,
       "createdAtMs": 1773886616628,
-      "updatedAtMs": 1774317628572,
+      "updatedAtMs": 1774483269042,
       "schedule": {
         "kind": "cron",
         "expr": "0 8 * * 1-5",
@@ -29,11 +29,11 @@
         "to": "thinkway"
       },
       "state": {
-        "nextRunAtMs": 1774396800000,
-        "lastRunAtMs": 1774317597268,
+        "nextRunAtMs": 1774569600000,
+        "lastRunAtMs": 1774483200003,
         "lastRunStatus": "ok",
         "lastStatus": "ok",
-        "lastDurationMs": 31304,
+        "lastDurationMs": 69039,
         "lastDeliveryStatus": "delivered",
         "consecutiveErrors": 0,
         "lastDelivered": true
@@ -46,7 +46,7 @@
       "name": "股票收盘分析",
       "enabled": true,
       "createdAtMs": 1773886636323,
-      "updatedAtMs": 1774253383302,
+      "updatedAtMs": 1774425875753,
       "schedule": {
         "kind": "cron",
         "expr": "0 16 * * 1-5",
@@ -67,11 +67,11 @@
         "to": "thinkway"
       },
       "state": {
-        "nextRunAtMs": 1774339200000,
-        "lastRunAtMs": 1774253237153,
+        "nextRunAtMs": 1774512000000,
+        "lastRunAtMs": 1774425600003,
         "lastRunStatus": "ok",
         "lastStatus": "ok",
-        "lastDurationMs": 146149,
+        "lastDurationMs": 275750,
         "lastDelivered": true,
         "lastDeliveryStatus": "delivered",
         "consecutiveErrors": 0
@@ -122,7 +122,7 @@
       "name": "股票系统日志清理",
       "enabled": true,
       "createdAtMs": 1773886651960,
-      "updatedAtMs": 1774317593839,
+      "updatedAtMs": 1774461608804,
       "schedule": {
         "kind": "cron",
         "expr": "0 2 * * *",
@@ -143,11 +143,11 @@
         "to": "thinkway"
       },
       "state": {
-        "nextRunAtMs": 1774375200000,
-        "lastRunAtMs": 1774317591141,
+        "nextRunAtMs": 1774548000000,
+        "lastRunAtMs": 1774461600004,
         "lastRunStatus": "ok",
         "lastStatus": "ok",
-        "lastDurationMs": 2698,
+        "lastDurationMs": 8800,
         "lastDeliveryStatus": "delivered",
         "consecutiveErrors": 0,
         "lastDelivered": true
@@ -160,7 +160,7 @@
       "name": "股票午盘分析",
       "enabled": true,
       "createdAtMs": 1773889787156,
-      "updatedAtMs": 1774253515967,
+      "updatedAtMs": 1774422215919,
       "schedule": {
         "kind": "cron",
         "expr": "0 15 * * 1-5",
@@ -181,14 +181,15 @@
         "channel": "wecom"
       },
       "state": {
-        "nextRunAtMs": 1774335600000,
-        "lastRunAtMs": 1774253383302,
+        "nextRunAtMs": 1774508400000,
+        "lastRunAtMs": 1774422000006,
         "lastRunStatus": "ok",
         "lastStatus": "ok",
-        "lastDurationMs": 132665,
-        "lastDelivered": true,
+        "lastDurationMs": 215913,
         "lastDeliveryStatus": "delivered",
-        "consecutiveErrors": 0
+        "consecutiveErrors": 0,
+        "lastDelivered": true,
+        "runningAtMs": 1774508400002
       }
     }
   ]

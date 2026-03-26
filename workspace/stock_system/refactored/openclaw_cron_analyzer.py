@@ -11,6 +11,7 @@ from datetime import datetime
 from pathlib import Path
 
 # 导入预测和总结引擎
+sys.path.append(os.path.dirname(__file__))
 from predict_then_summarize import StockAnalyzer, ConfigManager
 
 def main():
