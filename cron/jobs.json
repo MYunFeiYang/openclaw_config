@@ -46,7 +46,7 @@
       "name": "股票收盘分析",
       "enabled": true,
       "createdAtMs": 1773886636323,
-      "updatedAtMs": 1774425875753,
+      "updatedAtMs": 1774512211497,
       "schedule": {
         "kind": "cron",
         "expr": "0 16 * * 1-5",
@@ -67,11 +67,11 @@
         "to": "thinkway"
       },
       "state": {
-        "nextRunAtMs": 1774512000000,
-        "lastRunAtMs": 1774425600003,
+        "nextRunAtMs": 1774598400000,
+        "lastRunAtMs": 1774512000004,
         "lastRunStatus": "ok",
         "lastStatus": "ok",
-        "lastDurationMs": 275750,
+        "lastDurationMs": 211493,
         "lastDelivered": true,
         "lastDeliveryStatus": "delivered",
         "consecutiveErrors": 0
@@ -160,7 +160,7 @@
       "name": "股票午盘分析",
       "enabled": true,
       "createdAtMs": 1773889787156,
-      "updatedAtMs": 1774422215919,
+      "updatedAtMs": 1774509088779,
       "schedule": {
         "kind": "cron",
         "expr": "0 15 * * 1-5",
@@ -181,15 +181,14 @@
         "channel": "wecom"
       },
       "state": {
-        "nextRunAtMs": 1774508400000,
-        "lastRunAtMs": 1774422000006,
+        "nextRunAtMs": 1774594800000,
+        "lastRunAtMs": 1774508400005,
         "lastRunStatus": "ok",
         "lastStatus": "ok",
-        "lastDurationMs": 215913,
+        "lastDurationMs": 688774,
         "lastDeliveryStatus": "delivered",
         "consecutiveErrors": 0,
-        "lastDelivered": true,
-        "runningAtMs": 1774508400002
+        "lastDelivered": true
       }
     }
   ]
