@@ -13,6 +13,7 @@ from enum import Enum
 from pathlib import Path
 
 from data_providers import StockDataProvider, get_default_provider
+from evening_optimizer import EveningPredictionOptimizer
 
 
 def _default_stock_system_root() -> str:
@@ -113,7 +114,7 @@ class PredictionEngine:
         self.scoring_engine = ScoringEngine()
         self.signal_generator = SignalGenerator()
     
-    def predict_stock(self, stock: StockConfig) -> PredictionResult:
+    def predict_stock(self, stock: StockConfig, analysis_type: str = "evening") -> PredictionResult:
         """对单只股票进行预测"""
         
         inputs = self._provider.fetch(stock)
@@ -125,13 +126,23 @@ class PredictionEngine:
         sentiment_score = self.scoring_engine.calculate_sentiment_score(inputs.sentiment)
         sector_score = self.scoring_engine.calculate_sector_score(inputs.sector)
         
-        final_score = self.scoring_engine.calculate_final_score(
-            technical_score, fundamental_score, sentiment_score, sector_score
-        )
-        
-        signal, confidence, reasons = self.signal_generator.generate_signal(
-            final_score, stock, inputs.technical
-        )
+        # 收盘预测特殊处理
+        if analysis_type == 'evening':
+            from evening_optimizer import EveningPredictionOptimizer
+            evening_optimizer = EveningPredictionOptimizer()
+            final_score, signal, reasons = evening_optimizer.optimize_evening_prediction(
+                technical_score, fundamental_score, sentiment_score, sector_score,
+                datetime.now()
+            )
+            confidence = 65  # 收盘预测使用固定信心值
+        else:
+            # 其他时间段的正常预测
+            final_score = self.scoring_engine.calculate_final_score(
+                technical_score, fundamental_score, sentiment_score, sector_score
+            )
+            signal, confidence, reasons = self.signal_generator.generate_signal(
+                final_score, stock, inputs.technical
+            )
         
         return PredictionResult(
             stock=stock,
@@ -149,12 +160,12 @@ class PredictionEngine:
             data_provenance=inputs.provenance,
         )
     
-    def predict_portfolio(self, stocks: List[StockConfig]) -> List[PredictionResult]:
+    def predict_portfolio(self, stocks: List[StockConfig], analysis_type: str = "evening") -> List[PredictionResult]:
         """对股票组合进行预测"""
         
         results = []
         for stock in stocks:
-            result = self.predict_stock(stock)
+            result = self.predict_stock(stock, analysis_type)
             results.append(result)
         
         # 按综合评分排序

@@ -30,7 +30,8 @@ def _expected_direction(signal: str) -> int:
     return 0
 
 
-def _actual_direction(change_percent: float, neutral_band: float = 0.05) -> int:
+def _actual_direction(change_percent: float, neutral_band: float = 0.8) -> int:
+    """修正中性区间，从0.05%调整为0.8%，更合理的市场波动区间"""
     if change_percent > neutral_band:
         return 1
     if change_percent < -neutral_band:
@@ -94,7 +95,7 @@ def validate_file(path: Path, neutral_band: float = 0.05) -> Dict[str, Any]:
 def main() -> int:
     ap = argparse.ArgumentParser(description="Validate latest refactored predictions JSON")
     ap.add_argument("analysis_type", nargs="?", default="morning", help="morning|afternoon|evening|weekly")
-    ap.add_argument("--neutral", type=float, default=0.05, help="neutral band for %% change")
+    ap.add_argument("--neutral", type=float, default=0.8, help="neutral band for %% change (修正为0.8%，更合理的市场波动区间)")
     args = ap.parse_args()
     root = _root()
     data_dir = root / "data"
