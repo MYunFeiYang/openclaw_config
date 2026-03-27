@@ -38,6 +38,7 @@ python3 refactored/openclaw_cron_analyzer.py morning
 每个交易日 **`day_review` 结束后** 会根据 `data/reconcile_history.jsonl` 滚动统计，更新 **`config/calibration_overrides.json`**（信号阈值 `signal_thresholds`、综合分权重 `score_weights`）。**次日早盘** `StockAnalyzer.analyze` 开头会重新加载该文件。该文件已加入 `.gitignore`，本地自动生成；字段格式可参考同目录 **`calibration_overrides.example.json`**。
 
 - 样本过少（有效方向样本不足 24）时**只写 meta、不改数值**。
+- 滚动统计对交易日做 **指数衰减加权**（越近权重越大），并按 **强烈买入/普通买入、强烈卖出/普通卖出** 分拆调门槛，与复盘强档规则一致。
 - 单次调整幅度有上限，且阈值保持 `strong_buy > buy > hold > sell`。
 - 预测落盘 JSON 中带 `calibration` 字段，便于核对当时使用的档位。
 

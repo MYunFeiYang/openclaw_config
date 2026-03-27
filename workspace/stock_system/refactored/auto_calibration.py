@@ -70,7 +70,11 @@ STEP_TH = 0.05
 STEP_W = 0.02
 MIN_TOTAL_SAMPLES = 24
 MIN_BUCKET_SAMPLES = 6
-LAST_SESSIONS = 15
+LAST_SESSIONS = 20
+# 越近的交易日权重越大（仅用于误判率，原始计数仍写入 stats 便于阅读）
+DECAY_PER_SESSION = 0.92
+# 加权后等效样本够即可调该桶（略低于纯条数门槛，避免浪费近期数据）
+MIN_BUCKET_WEIGHT = 5.5
 
 
 def _enforce_order(th: Dict[str, float]) -> Dict[str, float]:
@@ -85,6 +89,12 @@ def _enforce_order(th: Dict[str, float]) -> Dict[str, float]:
         "buy": round(b, 3),
         "strong_buy": round(sb, 3),
     }
+
+
+def _weighted_miss_rate(miss_w: float, w_sum: float) -> float:
+    if w_sum <= 0:
+        return 0.0
+    return miss_w / w_sum
 
 
 def _clamp_to_defaults(th: Dict[str, float], w: Dict[str, float]) -> Tuple[Dict[str, float], Dict[str, float]]:
@@ -104,19 +114,48 @@ def _clamp_to_defaults(th: Dict[str, float], w: Dict[str, float]) -> Tuple[Dict[
     return _enforce_order(th2), w2
 
 
-def _aggregate_stats(records: List[Dict[str, Any]]) -> Dict[str, int]:
+def _bucket_ready(n_raw: int, w_sum: float) -> bool:
+    return n_raw >= MIN_BUCKET_SAMPLES or w_sum >= MIN_BUCKET_WEIGHT
+
+
+def _aggregate_stats(records: List[Dict[str, Any]]) -> Dict[str, Any]:
     by_date = _by_trade_date(records)
     dates = sorted(by_date.keys())[-LAST_SESSIONS:]
-    stats = {
+    n_sess = len(dates)
+    stats: Dict[str, Any] = {
         "n_buy": 0,
         "miss_buy": 0,
         "n_sell": 0,
         "miss_sell": 0,
         "n_hold": 0,
         "miss_hold": 0,
-        "sessions_used": len(dates),
+        "n_strong_buy": 0,
+        "miss_strong_buy": 0,
+        "n_norm_buy": 0,
+        "miss_norm_buy": 0,
+        "n_strong_sell": 0,
+        "miss_strong_sell": 0,
+        "n_norm_sell": 0,
+        "miss_norm_sell": 0,
+        "w_buy": 0.0,
+        "miss_buy_w": 0.0,
+        "w_sell": 0.0,
+        "miss_sell_w": 0.0,
+        "w_hold": 0.0,
+        "miss_hold_w": 0.0,
+        "w_strong_buy": 0.0,
+        "miss_strong_buy_w": 0.0,
+        "w_norm_buy": 0.0,
+        "miss_norm_buy_w": 0.0,
+        "w_strong_sell": 0.0,
+        "miss_strong_sell_w": 0.0,
+        "w_norm_sell": 0.0,
+        "miss_norm_sell_w": 0.0,
+        "sessions_used": n_sess,
+        "decay_per_session": DECAY_PER_SESSION,
     }
-    for d in dates:
+    for i, d in enumerate(dates):
+        w_sess = float(DECAY_PER_SESSION) ** (n_sess - 1 - i) if n_sess else 1.0
         rec = by_date[d]
         for sym, info in (rec.get("symbols") or {}).items():
             if not isinstance(info, dict) or not info.get("ok", True):
@@ -128,16 +167,46 @@ def _aggregate_stats(records: List[Dict[str, Any]]) -> Dict[str, int]:
             ok = bool(info["match"])
             if exp == 1:
                 stats["n_buy"] += 1
+                stats["w_buy"] += w_sess
                 if not ok:
                     stats["miss_buy"] += 1
+                    stats["miss_buy_w"] += w_sess
+                if "强烈买入" in sig:
+                    stats["n_strong_buy"] += 1
+                    stats["w_strong_buy"] += w_sess
+                    if not ok:
+                        stats["miss_strong_buy"] += 1
+                        stats["miss_strong_buy_w"] += w_sess
+                elif sig == "买入":
+                    stats["n_norm_buy"] += 1
+                    stats["w_norm_buy"] += w_sess
+                    if not ok:
+                        stats["miss_norm_buy"] += 1
+                        stats["miss_norm_buy_w"] += w_sess
             elif exp == -1:
                 stats["n_sell"] += 1
+                stats["w_sell"] += w_sess
                 if not ok:
                     stats["miss_sell"] += 1
+                    stats["miss_sell_w"] += w_sess
+                if "强烈卖出" in sig:
+                    stats["n_strong_sell"] += 1
+                    stats["w_strong_sell"] += w_sess
+                    if not ok:
+                        stats["miss_strong_sell"] += 1
+                        stats["miss_strong_sell_w"] += w_sess
+                elif sig == "卖出":
+                    stats["n_norm_sell"] += 1
+                    stats["w_norm_sell"] += w_sess
+                    if not ok:
+                        stats["miss_norm_sell"] += 1
+                        stats["miss_norm_sell_w"] += w_sess
             else:
                 stats["n_hold"] += 1
+                stats["w_hold"] += w_sess
                 if not ok:
                     stats["miss_hold"] += 1
+                    stats["miss_hold_w"] += w_sess
     return stats
 
 
@@ -164,48 +233,106 @@ def run_auto_calibration(stock_system_root: Optional[Path] = None) -> Dict[str, 
     if total < MIN_TOTAL_SAMPLES:
         notes.append(f"样本不足（有效方向样本 {total} < {MIN_TOTAL_SAMPLES}），未调整阈值/权重。")
     else:
-        if stats["n_buy"] >= MIN_BUCKET_SAMPLES:
-            mr = stats["miss_buy"] / stats["n_buy"]
+        touched_buy = False
+        if _bucket_ready(int(stats["n_strong_buy"]), float(stats["w_strong_buy"])):
+            mr = _weighted_miss_rate(
+                float(stats["miss_strong_buy_w"]), float(stats["w_strong_buy"])
+            )
+            if mr > 0.45:
+                th["strong_buy"] += STEP_TH
+                notes.append(f"强烈买入加权误判率偏高({mr:.0%})，略提高 strong_buy 门槛。")
+                touched_buy = True
+            elif mr < 0.2:
+                th["strong_buy"] -= STEP_TH
+                notes.append(f"强烈买入加权较准({mr:.0%})，略放宽 strong_buy。")
+                touched_buy = True
+
+        if _bucket_ready(int(stats["n_norm_buy"]), float(stats["w_norm_buy"])):
+            mr = _weighted_miss_rate(
+                float(stats["miss_norm_buy_w"]), float(stats["w_norm_buy"])
+            )
+            if mr > 0.45:
+                th["buy"] += STEP_TH
+                notes.append(f"普通买入加权误判率偏高({mr:.0%})，略提高 buy 门槛。")
+                touched_buy = True
+            elif mr < 0.2:
+                th["buy"] -= STEP_TH
+                notes.append(f"普通买入加权较准({mr:.0%})，略放宽 buy。")
+                touched_buy = True
+
+        if not touched_buy and _bucket_ready(int(stats["n_buy"]), float(stats["w_buy"])):
+            mr = _weighted_miss_rate(float(stats["miss_buy_w"]), float(stats["w_buy"]))
             if mr > 0.45:
                 th["buy"] += STEP_TH
                 th["strong_buy"] += STEP_TH
-                notes.append(f"买入向误判率偏高({mr:.0%})，略提高买入门槛。")
+                notes.append(f"买入向加权误判率偏高({mr:.0%})，略提高买入门槛。")
             elif mr < 0.2:
                 th["buy"] -= STEP_TH
                 th["strong_buy"] -= STEP_TH
-                notes.append(f"买入向较准({mr:.0%})，略放宽买入门槛。")
+                notes.append(f"买入向加权较准({mr:.0%})，略放宽买入门槛。")
 
-        if stats["n_sell"] >= MIN_BUCKET_SAMPLES:
-            mr = stats["miss_sell"] / stats["n_sell"]
+        touched_sell = False
+        if _bucket_ready(int(stats["n_strong_sell"]), float(stats["w_strong_sell"])):
+            mr = _weighted_miss_rate(
+                float(stats["miss_strong_sell_w"]), float(stats["w_strong_sell"])
+            )
+            if mr > 0.45:
+                th["sell"] += STEP_TH
+                notes.append(f"强烈卖出加权误判率偏高({mr:.0%})，略抬高 sell 线、收缩极端看空区。")
+                touched_sell = True
+            elif mr < 0.2:
+                th["sell"] -= STEP_TH
+                notes.append(f"强烈卖出加权较准({mr:.0%})，略放宽极端看空区。")
+                touched_sell = True
+
+        if _bucket_ready(int(stats["n_norm_sell"]), float(stats["w_norm_sell"])):
+            mr = _weighted_miss_rate(
+                float(stats["miss_norm_sell_w"]), float(stats["w_norm_sell"])
+            )
             if mr > 0.45:
                 th["hold"] -= STEP_TH
                 th["sell"] -= STEP_TH
-                notes.append(f"卖出向误判率偏高({mr:.0%})，略扩大持有带、减少边缘卖出。")
+                notes.append(f"普通卖出加权误判率偏高({mr:.0%})，略扩大持有带、减少边缘卖出。")
+                touched_sell = True
             elif mr < 0.2:
                 th["hold"] += STEP_TH
                 th["sell"] += STEP_TH
-                notes.append(f"卖出向较准({mr:.0%})，略收紧持有带。")
+                notes.append(f"普通卖出加权较准({mr:.0%})，略收紧持有带。")
+                touched_sell = True
 
-        if stats["miss_buy"] + stats["miss_sell"] > 0:
-            if stats["miss_buy"] > stats["miss_sell"] * 1.4:
+        if not touched_sell and _bucket_ready(int(stats["n_sell"]), float(stats["w_sell"])):
+            mr = _weighted_miss_rate(float(stats["miss_sell_w"]), float(stats["w_sell"]))
+            if mr > 0.45:
+                th["hold"] -= STEP_TH
+                th["sell"] -= STEP_TH
+                notes.append(f"卖出向加权误判率偏高({mr:.0%})，略扩大持有带、减少边缘卖出。")
+            elif mr < 0.2:
+                th["hold"] += STEP_TH
+                th["sell"] += STEP_TH
+                notes.append(f"卖出向加权较准({mr:.0%})，略收紧持有带。")
+
+        mbw = float(stats["miss_buy_w"])
+        msw = float(stats["miss_sell_w"])
+        if mbw + msw > 0:
+            if mbw > msw * 1.4:
                 w["technical"] -= STEP_W
                 w["fundamental"] += STEP_W
-                notes.append("买入误判更多，略降技术面、增基本面权重。")
-            elif stats["miss_sell"] > stats["miss_buy"] * 1.4:
+                notes.append("买入误判（加权）更多，略降技术面、增基本面权重。")
+            elif msw > mbw * 1.4:
                 w["technical"] -= STEP_W
                 w["sector"] += STEP_W
-                notes.append("卖出误判更多，略降技术面、增行业权重。")
+                notes.append("卖出误判（加权）更多，略降技术面、增行业权重。")
 
-        if stats["n_hold"] >= MIN_BUCKET_SAMPLES:
-            mr = stats["miss_hold"] / stats["n_hold"]
+        if _bucket_ready(int(stats["n_hold"]), float(stats["w_hold"])):
+            mr = _weighted_miss_rate(float(stats["miss_hold_w"]), float(stats["w_hold"]))
             if mr > 0.45:
                 th["hold"] += STEP_TH
                 th["buy"] -= STEP_TH
-                notes.append(f"持有向误判率偏高({mr:.0%})，收窄评分意义上的持有带。")
+                notes.append(f"持有向加权误判率偏高({mr:.0%})，收窄评分意义上的持有带。")
             elif mr < 0.2:
                 th["hold"] -= STEP_TH
                 th["buy"] += STEP_TH
-                notes.append(f"持有向较准({mr:.0%})，略放宽持有带。")
+                notes.append(f"持有向加权较准({mr:.0%})，略放宽持有带。")
 
         th, w = _clamp_to_defaults(th, w)
         th = _enforce_order(th)
