@@ -31,6 +31,8 @@ python3 refactored/openclaw_cron_analyzer.py morning
 
 环境变量：`STOCK_SYSTEM_ROOT`、`OPENCLAW_BIN`、`OPENCLAW_AGENT_TIMEOUT`、`STOCK_OPENCLAW_CACHE_SEC`（见仓库根目录 `SETUP.md`）。
 
+**免费强化 OpenClaw 搜索（仍为 DuckDuckGo）**：在 `openclaw.json` 为 `duckduckgo` 配 `region: cn-zh`，并视需要调 `tools.web.search` 的 `maxResults` / `cacheTtlMinutes`。片段见根目录 `SETUP.md`（含敏感项的配置请勿提交到公开仓库）。
+
 落盘目录：`data/`、`reports/`、`logs/`。
 
 ## 规则自校准（不调模型）

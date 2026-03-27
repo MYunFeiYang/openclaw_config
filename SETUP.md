@@ -64,6 +64,36 @@ python3 refactored/openclaw_cron_analyzer.py morning
 
 股票分析**仅通过 OpenClaw**：Python 脚本内调用 `openclaw agent`，由 Agent 使用网页搜索/浏览取价（较慢、耗模型 Token，见 `workspace/stock_system/README.md`）。需本机可执行 `openclaw` 且模型/工具已配置。历史 `original/` 已移除。监控可读 `data/predictions_*.json`、`reconcile_history.jsonl`、`iteration_briefing.txt` 等。可选环境变量：`STOCK_SYSTEM_ROOT`、`OPENCLAW_AGENT_TIMEOUT`、`STOCK_OPENCLAW_MAX_ATTEMPTS`（单股拉价重试次数，默认 2）等，详见 `workspace/stock_system/refactored/openclaw_search_provider.py` 顶部说明。
 
+**免费搜索优化（仍用 DuckDuckGo、无 Brave 等 API Key）**：在 `openclaw.json` 中合并如下思路（字段与 OpenClaw 文档 `tools/duckduckgo-search.md`、`zh-CN/tools/web.md` 一致）。`region: cn-zh` 偏向中国大陆中文结果；`maxResults` 略增便于模型挑到财经站；`cacheTtlMinutes` 降低可减轻行情类查询缓存偏旧。**修改后重启 Gateway**（或你实际跑 agent 的进程）使配置生效。
+
+```json
+"tools": {
+  "web": {
+    "search": {
+      "enabled": true,
+      "provider": "duckduckgo",
+      "maxResults": 8,
+      "cacheTtlMinutes": 5
+    }
+  }
+},
+"plugins": {
+  "entries": {
+    "duckduckgo": {
+      "enabled": true,
+      "config": {
+        "webSearch": {
+          "region": "cn-zh",
+          "safeSearch": "moderate"
+        }
+      }
+    }
+  }
+}
+```
+
+（以上为片段，需与现有 `tools` / `plugins` 对象**合并**，勿整段覆盖。`openclaw.json` 常含密钥，勿提交到公开 Git。）
+
 ## 5. 自动化与 Cron
 
 - 定时任务定义在 `cron/jobs.json`；其中 shell 片段使用 `"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace/stock_system"`。
