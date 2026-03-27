@@ -160,7 +160,7 @@
       "name": "股票午盘分析",
       "enabled": true,
       "createdAtMs": 1773889787156,
-      "updatedAtMs": 1774509088779,
+      "updatedAtMs": 1774595172761,
       "schedule": {
         "kind": "cron",
         "expr": "0 15 * * 1-5",
@@ -181,14 +181,90 @@
         "channel": "wecom"
       },
       "state": {
-        "nextRunAtMs": 1774594800000,
-        "lastRunAtMs": 1774508400005,
+        "nextRunAtMs": 1774854000000,
+        "lastRunAtMs": 1774594800004,
         "lastRunStatus": "ok",
         "lastStatus": "ok",
-        "lastDurationMs": 688774,
+        "lastDurationMs": 372757,
         "lastDeliveryStatus": "delivered",
         "consecutiveErrors": 0,
         "lastDelivered": true
+      }
+    },
+    {
+      "id": "1d736a97-6ff1-4f1f-865a-e5882d61438c",
+      "agentId": "main",
+      "sessionKey": "agent:main:wecom:direct:thinkway",
+      "name": "股票收盘复盘（对照早盘预测）",
+      "enabled": true,
+      "createdAtMs": 1774600000000,
+      "updatedAtMs": 1774596287006,
+      "schedule": {
+        "kind": "cron",
+        "expr": "20 15 * * 1-5",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "执行A股收盘复盘（早盘预测对照现价）：cd \"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace/stock_system\" && python3 refactored/openclaw_cron_analyzer.py reconcile",
+        "thinking": "off",
+        "timeoutSeconds": 1200,
+        "model": "oneapi/kimi-k2-250905"
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "wecom",
+        "to": "thinkway"
+      },
+      "state": {
+        "nextRunAtMs": 1774855200000,
+        "lastRunAtMs": 1774596000003,
+        "lastRunStatus": "ok",
+        "lastStatus": "ok",
+        "lastDurationMs": 287003,
+        "lastDeliveryStatus": "delivered",
+        "consecutiveErrors": 0,
+        "lastDelivered": true
+      }
+    },
+    {
+      "id": "3430a13a-7a77-4daf-855e-43b5f1b93082",
+      "agentId": "main",
+      "sessionKey": "agent:main:wecom:direct:thinkway",
+      "name": "股票全日预测汇总",
+      "enabled": true,
+      "createdAtMs": 1774600000001,
+      "updatedAtMs": 1774593603165,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 21 * * 1-5",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "执行A股全日预测汇总：cd \"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace/stock_system\" && python3 refactored/openclaw_cron_analyzer.py day_review",
+        "thinking": "off",
+        "timeoutSeconds": 600,
+        "model": "oneapi/kimi-k2-250905"
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "wecom",
+        "to": "thinkway"
+      },
+      "state": {
+        "nextRunAtMs": 1774616400000,
+        "lastRunAtMs": 1774593591565,
+        "lastRunStatus": "ok",
+        "lastStatus": "ok",
+        "lastDurationMs": 11600,
+        "lastDeliveryStatus": "not-delivered",
+        "consecutiveErrors": 0,
+        "lastDelivered": false
       }
     }
   ]

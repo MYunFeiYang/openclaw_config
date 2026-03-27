@@ -603,6 +603,23 @@ class ReportGenerator:
         self.data_dir.mkdir(exist_ok=True)
         self.reports_dir.mkdir(exist_ok=True)
         self.logs_dir.mkdir(exist_ok=True)
+
+    def _morning_iteration_briefing_lines(self, analysis_type: str) -> List[str]:
+        if analysis_type != "morning":
+            return []
+        brief_path = self.data_dir / "iteration_briefing.txt"
+        if not brief_path.exists():
+            return []
+        brief_txt = brief_path.read_text(encoding="utf-8").strip()
+        if not brief_txt:
+            return []
+        return [
+            "",
+            "【持续迭代简报】",
+            "-" * 60,
+            *brief_txt.splitlines(),
+            "-" * 60,
+        ]
     
     def generate_prediction_report(self, predictions: List[PredictionResult], analysis_type: str) -> str:
         """生成预测报告"""
@@ -613,6 +630,7 @@ class ReportGenerator:
         report_lines.append(f"预测时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         report_lines.append(f"分析类型: {self._get_analysis_type_name(analysis_type)}")
         report_lines.append("=" * 60)
+        report_lines.extend(self._morning_iteration_briefing_lines(analysis_type))
         
         # 分类预测结果
         buy_predictions = [p for p in predictions if p.final_score >= 7.0]
@@ -651,6 +669,7 @@ class ReportGenerator:
         report_lines.append(f"总结时间: {summary.report_time.strftime('%Y-%m-%d %H:%M:%S')}")
         report_lines.append(f"分析类型: {self._get_analysis_type_name(summary.analysis_type)}")
         report_lines.append("=" * 60)
+        report_lines.extend(self._morning_iteration_briefing_lines(summary.analysis_type))
         
         # 推荐总结
         self._add_recommendation_summary(summary, report_lines)

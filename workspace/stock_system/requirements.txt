@@ -1,6 +1,2 @@
-# Full automation stack (start_system.sh / prediction_automation)
-pandas>=2.0.0
-schedule>=1.2.0
-psutil>=5.9.0
-
-# 股票行情经 OpenClaw Agent（openclaw CLI），无需 akshare
+# 主链路 refactored/ 仅依赖 Python 标准库；行情经本机 openclaw CLI。
+# 若自行扩展脚本再在此添加第三方包。

@@ -1,3 +1,0 @@
-15 09 * * 1-5 cd /Users/thinkway/.openclaw/workspace && python3 a_stock_top5_simple.py 2>/dev/null
-05 15 * * 1-5 cd /Users/thinkway/.openclaw/workspace && python3 a_stock_top5_simple.py evening 2>/dev/null
-00 20 * * 0 cd /Users/thinkway/.openclaw/workspace && python3 a_stock_top5_simple.py weekly 2>/dev/null

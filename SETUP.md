@@ -62,7 +62,7 @@ pip install -r requirements.txt
 python3 refactored/openclaw_cron_analyzer.py morning
 ```
 
-股票分析**仅通过 OpenClaw**：Python 脚本内调用 `openclaw agent`，由 Agent 使用网页搜索/浏览取价（较慢、耗模型 Token，见 `workspace/stock_system/README.md`）。需本机可执行 `openclaw` 且模型/工具已配置。历史 `original/` 已移除。监控可读 `data/predictions_*.json`、`validation_metrics_*.json` 或 `predictions.db`。可选：`export STOCK_SYSTEM_ROOT=...`。
+股票分析**仅通过 OpenClaw**：Python 脚本内调用 `openclaw agent`，由 Agent 使用网页搜索/浏览取价（较慢、耗模型 Token，见 `workspace/stock_system/README.md`）。需本机可执行 `openclaw` 且模型/工具已配置。历史 `original/` 已移除。监控可读 `data/predictions_*.json`、`reconcile_history.jsonl`、`iteration_briefing.txt` 等。可选：`export STOCK_SYSTEM_ROOT=...`。
 
 ## 5. 自动化与 Cron
 
