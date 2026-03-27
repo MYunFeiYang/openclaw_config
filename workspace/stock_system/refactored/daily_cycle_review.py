@@ -476,11 +476,16 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
 
 def run_day_review(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> int:
     """汇总当日各档 predictions 文件（若存在），并引用最新 reconcile。"""
+    from predict_then_summarize import ConfigManager
+    from auto_calibration import run_auto_calibration
+
     root = _root(base_dir)
     data_dir = root / "data"
     reports_dir = root / "reports"
     reports_dir.mkdir(parents=True, exist_ok=True)
     day = ymd or _ymd()
+
+    ConfigManager.reload_calibration()
 
     types_order = ("morning", "afternoon", "evening", "weekly")
     sections: List[str] = []
@@ -499,10 +504,13 @@ def run_day_review(base_dir: Optional[str] = None, ymd: Optional[str] = None) ->
             "count": len(preds),
             "timestamp": b.get("timestamp"),
         }
-        buy = sum(1 for p in preds if float(p.get("final_score", 0)) >= 7.0)
-        sell = sum(1 for p in preds if float(p.get("final_score", 0)) < 5.0)
+        th = ConfigManager.get_signal_thresholds()
+        b_line, h_line = th["buy"], th["hold"]
+        buy = sum(1 for p in preds if float(p.get("final_score", 0)) >= b_line)
+        sell = sum(1 for p in preds if float(p.get("final_score", 0)) < h_line)
         sections.append(
-            f"### {t}\n- 文件: {path.name}\n- 股票数: {len(preds)} | 买入档≥7分: {buy} | 卖出档<5分: {sell}"
+            f"### {t}\n- 文件: {path.name}\n- 股票数: {len(preds)} | "
+            f"买入档≥{b_line}: {buy} | 卖出档<{h_line}: {sell}"
         )
 
     # 最新 reconcile
@@ -525,6 +533,7 @@ def run_day_review(base_dir: Optional[str] = None, ymd: Optional[str] = None) ->
         )
 
     iteration_state = refresh_iteration_artifacts(data_dir, day)
+    cal_payload = run_auto_calibration(root)
 
     ts = datetime.now().strftime("%H%M%S")
     out_json = {
@@ -541,6 +550,14 @@ def run_day_review(base_dir: Optional[str] = None, ymd: Optional[str] = None) ->
             "symbol_attention_count": len(iteration_state.get("symbol_attention") or []),
             "briefing_file": ITERATION_BRIEFING_FILENAME,
             "state_file": ITERATION_STATE_FILENAME,
+        },
+        "auto_calibration": {
+            "updated_at": cal_payload.get("updated_at"),
+            "stats": cal_payload.get("stats"),
+            "notes": cal_payload.get("notes"),
+            "signal_thresholds": cal_payload.get("signal_thresholds"),
+            "score_weights": cal_payload.get("score_weights"),
+            "config_file": "config/calibration_overrides.json",
         },
     }
     jpath = data_dir / f"day_review_{day}_{ts}.json"
@@ -561,6 +578,19 @@ def run_day_review(base_dir: Optional[str] = None, ymd: Optional[str] = None) ->
                 f"- {t.get('name')} ({t.get('symbol')}): 近{t.get('recent_sessions')}次中不一致{t.get('recent_mismatch')}次"
             )
 
+    cal_notes = cal_payload.get("notes") or []
+    iter_lines.append("")
+    iter_lines.append("### 规则自校准（已写入 config/calibration_overrides.json，下一交易日早盘预测生效）")
+    if cal_notes:
+        iter_lines.extend(cal_notes)
+    else:
+        iter_lines.append("（无新说明）")
+    iter_lines.append(
+        f"当前阈值: buy={cal_payload.get('signal_thresholds', {}).get('buy')} "
+        f"hold={cal_payload.get('signal_thresholds', {}).get('hold')} "
+        f"sell={cal_payload.get('signal_thresholds', {}).get('sell')}"
+    )
+
     lines = [
         f"【A股全日预测汇总】{day}",
         f"生成时间: {out_json['generated_at']}",
@@ -571,7 +601,7 @@ def run_day_review(base_dir: Optional[str] = None, ymd: Optional[str] = None) ->
         "",
         "\n".join(iter_lines),
         "",
-        "说明: 汇总不调用大模型；迭代块依据 reconcile_history.jsonl 滚动统计，用于校准流程与次日简报。",
+        "说明: 汇总不调用大模型；迭代与规则自校准依据 reconcile_history.jsonl；阈值/权重见 config/calibration_overrides.json。",
     ]
     text = "\n".join(lines)
     tpath = reports_dir / f"day_review_report_{day}_{ts}.txt"

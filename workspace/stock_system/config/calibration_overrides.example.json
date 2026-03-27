@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "updated_at": "2026-03-27T12:00:00",
+  "source": "reconcile_history.jsonl",
+  "stats": {},
+  "notes": ["示例结构；运行 day_review 或 auto_calibration.py 后会在本机生成 calibration_overrides.json，无需手抄。"],
+  "signal_thresholds": {
+    "strong_buy": 8.5,
+    "buy": 7.0,
+    "hold": 5.0,
+    "sell": 3.5
+  },
+  "score_weights": {
+    "technical": 0.4,
+    "fundamental": 0.35,
+    "sentiment": 0.15,
+    "sector": 0.1
+  }
+}

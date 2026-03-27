@@ -244,7 +244,7 @@ class ScoringEngine:
     def calculate_final_score(self, technical: float, fundamental: float, sentiment: float, sector: float) -> float:
         """计算综合评分"""
         
-        weights = ConfigManager.SCORE_WEIGHTS
+        weights = ConfigManager.get_score_weights()
         final_score = (
             technical * weights['technical'] +
             fundamental * weights['fundamental'] +
@@ -258,7 +258,7 @@ class ScoringEngine:
 
 def _confidence_from_score_and_technical(final_score: float, technical: Dict) -> int:
     """由综合分与 RSI 偏离度推导信心（可复现，非随机）。"""
-    th = ConfigManager.SIGNAL_THRESHOLDS
+    th = ConfigManager.get_signal_thresholds()
     dist_to_edges = [
         abs(final_score - th["strong_buy"]),
         abs(final_score - th["buy"]),
@@ -282,7 +282,7 @@ class SignalGenerator:
         """生成交易信号"""
         
         technical_data = technical_data or {}
-        thresholds = ConfigManager.SIGNAL_THRESHOLDS
+        thresholds = ConfigManager.get_signal_thresholds()
         
         if final_score >= thresholds['strong_buy']:
             signal = SignalType.STRONG_BUY
@@ -342,11 +342,12 @@ class SummaryEngine:
     
     def generate_summary(self, predictions: List[PredictionResult], analysis_type: str) -> SummaryReport:
         """生成总结报告"""
-        
-        # 分类推荐
-        buy_recommendations = [p for p in predictions if p.final_score >= 7.0][:3]
-        sell_recommendations = [p for p in predictions if p.final_score < 5.0][:2]
-        hold_recommendations = [p for p in predictions if 5.0 <= p.final_score < 7.0][:2]
+        th = ConfigManager.get_signal_thresholds()
+        b_line, h_line = th["buy"], th["hold"]
+        # 分类推荐（与 SignalGenerator 档位一致）
+        buy_recommendations = [p for p in predictions if p.final_score >= b_line][:3]
+        sell_recommendations = [p for p in predictions if p.final_score < h_line][:2]
+        hold_recommendations = [p for p in predictions if h_line <= p.final_score < b_line][:2]
         
         # 市场概况
         market_overview = self._generate_market_overview(predictions, buy_recommendations, sell_recommendations, hold_recommendations)
@@ -571,13 +572,63 @@ class ConfigManager:
         'sector': 0.10
     }
     
-    # 信号阈值配置
+    # 信号阈值配置（默认值；运行时可由 config/calibration_overrides.json 覆盖）
     SIGNAL_THRESHOLDS = {
         'strong_buy': 8.5,
         'buy': 7.0,
         'hold': 5.0,
         'sell': 3.5
     }
+
+    _merged_signal_thresholds: Optional[Dict[str, float]] = None
+    _merged_score_weights: Optional[Dict[str, float]] = None
+
+    @classmethod
+    def reload_calibration(cls) -> None:
+        """清除合并缓存，下次读取磁盘上的 calibration_overrides.json。"""
+        cls._merged_signal_thresholds = None
+        cls._merged_score_weights = None
+
+    @classmethod
+    def get_signal_thresholds(cls) -> Dict[str, float]:
+        if cls._merged_signal_thresholds is not None:
+            return cls._merged_signal_thresholds
+        base = dict(cls.SIGNAL_THRESHOLDS)
+        path = Path(_default_stock_system_root()) / "config" / "calibration_overrides.json"
+        if path.is_file():
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                ov = data.get("signal_thresholds") or {}
+                for k in base:
+                    if k in ov:
+                        base[k] = float(ov[k])
+            except (OSError, ValueError, TypeError, KeyError):
+                pass
+        cls._merged_signal_thresholds = base
+        return base
+
+    @classmethod
+    def get_score_weights(cls) -> Dict[str, float]:
+        if cls._merged_score_weights is not None:
+            return cls._merged_score_weights
+        base = dict(cls.SCORE_WEIGHTS)
+        path = Path(_default_stock_system_root()) / "config" / "calibration_overrides.json"
+        if path.is_file():
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                ov = data.get("score_weights") or {}
+                for k in base:
+                    if k in ov:
+                        base[k] = float(ov[k])
+                s = sum(base.values())
+                if s > 0:
+                    base = {k: round(base[k] / s, 4) for k in base}
+            except (OSError, ValueError, TypeError, KeyError):
+                pass
+        cls._merged_score_weights = base
+        return base
     
     @classmethod
     def get_sector_benchmark(cls, sector: str) -> Dict[str, float]:
@@ -632,10 +683,12 @@ class ReportGenerator:
         report_lines.append("=" * 60)
         report_lines.extend(self._morning_iteration_briefing_lines(analysis_type))
         
+        th = ConfigManager.get_signal_thresholds()
+        b_line, h_line = th["buy"], th["hold"]
         # 分类预测结果
-        buy_predictions = [p for p in predictions if p.final_score >= 7.0]
-        sell_predictions = [p for p in predictions if p.final_score < 5.0]
-        hold_predictions = [p for p in predictions if 5.0 <= p.final_score < 7.0]
+        buy_predictions = [p for p in predictions if p.final_score >= b_line]
+        sell_predictions = [p for p in predictions if p.final_score < h_line]
+        hold_predictions = [p for p in predictions if h_line <= p.final_score < b_line]
         
         # 买入预测
         if buy_predictions:
@@ -706,7 +759,11 @@ class ReportGenerator:
             'analysis_type': analysis_type,
             'data_provider': 'openclaw',
             'predictions': [pred.to_dict() for pred in predictions],
-            'prediction_count': len(predictions)
+            'prediction_count': len(predictions),
+            'calibration': {
+                'signal_thresholds': ConfigManager.get_signal_thresholds(),
+                'score_weights': ConfigManager.get_score_weights(),
+            },
         }
         
         prediction_file = self.data_dir / f"predictions_{analysis_type}_{timestamp}.json"
@@ -768,7 +825,8 @@ class ReportGenerator:
                                  hold: List[PredictionResult], report_lines: List[str]):
         """添加预测统计"""
         
-        report_lines.append(f"\n【预测统计】")
+        th = ConfigManager.get_signal_thresholds()
+        report_lines.append(f"\n【预测统计】（档位: 买入≥{th['buy']} 持有≥{th['hold']} 卖出<{th['hold']}）")
         report_lines.append(f"总预测股票数: {len(predictions)}")
         report_lines.append(f"买入预测: {len(buy)}只")
         report_lines.append(f"卖出预测: {len(sell)}只") 
@@ -846,6 +904,7 @@ class StockAnalyzer:
     ):
         root = base_dir or _default_stock_system_root()
         ConfigManager.reload_stock_pool()
+        ConfigManager.reload_calibration()
         self.prediction_engine = PredictionEngine(data_provider=data_provider)
         self.summary_engine = SummaryEngine()
         self.report_generator = ReportGenerator(root)
@@ -853,13 +912,13 @@ class StockAnalyzer:
     
     def analyze(self, analysis_type: str = "evening") -> Dict[str, any]:
         """执行完整分析流程 - 先预测再总结"""
-        
+        ConfigManager.reload_calibration()
         print(f"🚀 开始{self._get_analysis_type_name(analysis_type)}分析...")
         print("📊 第一步: 生成个股预测...")
         
         # 第一步: 预测阶段 - 对每只股票进行独立预测（股票池见 config/stock_pool.json）
         universe = ConfigManager.get_analysis_stock_slice(analysis_type)
-        predictions = self.prediction_engine.predict_portfolio(universe)
+        predictions = self.prediction_engine.predict_portfolio(universe, analysis_type)
         
         print(f"✅ 预测完成，共{len(predictions)}只股票")
         print("📋 第二步: 生成总结报告...")
