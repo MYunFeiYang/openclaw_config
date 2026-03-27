@@ -2,9 +2,9 @@
 
 **唯一推荐入口**：`refactored/openclaw_cron_analyzer.py`
 
-参数：`morning` | `afternoon` | `evening` | `weekly` | `reconcile` | `day_review`。
+参数：`morning` | `afternoon` | `evening` | `weekly` | `reconcile` | `day_review` | **`post_close`**（定时推荐：先 `reconcile` 再 `day_review`，汇总与自校准立刻用到刚写入的复盘）。
 
-**OpenClaw Cron（工作日）**：仅 **08:00 `morning`** → **18:10 `reconcile`**（晚于 18:00，网页收盘数据更稳）→ **21:00 `day_review`**；另每日 **02:00** 运行 `scripts/cleanup_stock_system.sh`（与预测无关）。
+**OpenClaw Cron（工作日）**：**08:00 `morning`** → **18:10 `post_close`**（一次完成收盘复盘 + 全日汇总 + 规则自校准；晚于 18:00 拉价更稳）；另每日 **02:00** 运行 `scripts/cleanup_stock_system.sh`（与预测无关）。
 
 **定期清理规则**（可调环境变量覆盖天数）：
 

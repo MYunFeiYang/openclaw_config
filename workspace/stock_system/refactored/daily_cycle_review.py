@@ -630,10 +630,18 @@ if __name__ == "__main__":
     import argparse
 
     p = argparse.ArgumentParser(description="日周期复盘 / 全日汇总")
-    p.add_argument("command", choices=["reconcile", "day_review"])
+    p.add_argument(
+        "command",
+        choices=["reconcile", "day_review", "post_close"],
+        help="post_close: 先 reconcile 再 day_review（与 openclaw_cron_analyzer post_close 一致）",
+    )
     p.add_argument("--date", default=None, help="交易日 YYYYMMDD，默认今天")
     p.add_argument("--root", default=None, help="stock_system 根目录，默认本模块上级目录")
     a = p.parse_args()
     if a.command == "reconcile":
         raise SystemExit(run_reconcile(a.root, a.date))
+    if a.command == "post_close":
+        r1 = run_reconcile(a.root, a.date)
+        r2 = run_day_review(a.root, a.date)
+        raise SystemExit(r1 if r1 != 0 else r2)
     raise SystemExit(run_day_review(a.root, a.date))

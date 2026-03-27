@@ -2,7 +2,7 @@
 """
 OpenClaw定时任务专用的股票分析系统
 支持不同分析类型：morning, afternoon, evening, weekly
-以及复盘类：reconcile（早盘预测 vs 收盘后再拉价）、day_review（当日各档落盘汇总）。
+以及复盘类：reconcile、day_review；**post_close** 为二者连续执行（先复盘再汇总与自校准，供定时任务一次跑完）。
 """
 
 import os
@@ -22,7 +22,15 @@ def main():
     analysis_type = sys.argv[1] if len(sys.argv) > 1 else "evening"
     
     # 验证分析类型
-    valid_types = ['morning', 'afternoon', 'evening', 'weekly', 'reconcile', 'day_review']
+    valid_types = [
+        'morning',
+        'afternoon',
+        'evening',
+        'weekly',
+        'reconcile',
+        'day_review',
+        'post_close',
+    ]
     if analysis_type not in valid_types:
         print(f"❌ 无效的分析类型: {analysis_type}")
         print(f"✅ 有效的类型: {', '.join(valid_types)}")
@@ -43,6 +51,23 @@ def main():
         print(f"系统时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         print("=" * 70)
         return run_reconcile(str(base_dir))
+
+    if analysis_type == "post_close":
+        from daily_cycle_review import run_reconcile, run_day_review
+
+        print(f"🚀 启动A股{get_analysis_type_name(analysis_type)}")
+        print("=" * 70)
+        print(f"系统时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print("=" * 70)
+        print("\n── 1/2 收盘复盘（reconcile）──\n")
+        rc_r = run_reconcile(str(base_dir))
+        print("\n── 2/2 全日汇总与规则自校准（day_review）──\n")
+        rc_d = run_day_review(str(base_dir))
+        if rc_r != 0:
+            print(f"\n⚠️ 复盘阶段退出码 {rc_r}（可能无早盘文件或拉价失败），仍已执行汇总。")
+        if rc_d != 0:
+            print(f"\n❌ 汇总阶段退出码 {rc_d}")
+        return rc_r if rc_r != 0 else rc_d
 
     if analysis_type == "day_review":
         from daily_cycle_review import run_day_review
@@ -102,6 +127,7 @@ def get_analysis_type_name(analysis_type: str) -> str:
         'weekly': '周度',
         'reconcile': '收盘复盘（对照早盘预测）',
         'day_review': '全日预测汇总',
+        'post_close': '收盘复盘 + 全日汇总（含自校准）',
     }
     return names.get(analysis_type, analysis_type)
 
