@@ -9,7 +9,7 @@
   刷新 iteration_state.json 与 iteration_briefing.txt，供次日早盘报告引用（持续迭代）。
 
 准确性建议（调度层面）：
-- 早盘任务尽量放在开盘前；reconcile 放在收盘后足够晚（Cron 现为 16:10，依网页行情更新节奏可调），减少「价未更新 / 不代表全日收盘」的歧义。
+- 早盘任务尽量放在开盘前；reconcile 放在收盘后足够晚（Cron 现为 18:10，晚于 18:00，依网页行情更新节奏可调），减少「价未更新 / 不代表全日收盘」的歧义。
 - 仍依赖 OpenClaw Agent 拉价；若要与交易所官方收盘核对，可后续换数据源仅用于复盘价位。
 - 复盘逻辑见 `reconcile_accuracy.py`（自适应中性带、强档更严、可选大盘超额）；调度侧可设 `RECONCILE_BENCHMARK_RETURN_PCT`。
 """
