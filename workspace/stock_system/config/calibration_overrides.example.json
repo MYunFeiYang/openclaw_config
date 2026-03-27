@@ -3,7 +3,7 @@
   "updated_at": "2026-03-27T12:00:00",
   "source": "reconcile_history.jsonl",
   "stats": {},
-  "notes": ["示例结构；运行 day_review 或 auto_calibration.py 后会在本机生成 calibration_overrides.json，无需手抄。"],
+  "notes": ["示例结构；运行 day_review 或 auto_calibration.py 后会在本机生成 calibration_overrides.json。可改 accuracy_tuning（预测/复盘）与 auto_calibration（自校准）。"],
   "signal_thresholds": {
     "strong_buy": 8.5,
     "buy": 7.0,
@@ -24,5 +24,20 @@
     "reconcile_band_max": 2.0,
     "strong_band_factor": 1.35,
     "strong_band_min_extra": 0.35
+  },
+  "auto_calibration": {
+    "decay_per_session": 0.92,
+    "last_sessions": 20,
+    "min_total_samples": 24,
+    "min_bucket_samples": 6,
+    "min_bucket_weight": 5.5,
+    "max_thresh_drift": 0.35,
+    "max_weight_drift": 0.06,
+    "step_th": 0.05,
+    "step_w": 0.02,
+    "miss_rate_high": 0.45,
+    "miss_rate_low": 0.2,
+    "miss_imbalance_ratio": 1.4,
+    "max_history_lines": 400
   }
 }

@@ -39,6 +39,7 @@ python3 refactored/openclaw_cron_analyzer.py morning
 
 - 样本过少（有效方向样本不足 24）时**只写 meta、不改数值**。
 - 滚动统计对交易日做 **指数衰减加权**（越近权重越大），并按 **强烈买入/普通买入、强烈卖出/普通卖出** 分拆调门槛，与复盘强档规则一致。
+- 自校准超参集中在 **`auto_calibration`**（与代码默认值合并，写入 overrides 时会落盘；见 `calibration_overrides.example.json`）：衰减系数、回溯交易日数、样本门槛、单步 `step_th`/`step_w`、误判率高低阈值、买卖误判对比倍数、历史 jsonl 最大行数等。
 - 单次调整幅度有上限，且阈值保持 `strong_buy > buy > hold > sell`。
 - 预测落盘 JSON 中带 `calibration` 字段，便于核对当时使用的档位。
 
