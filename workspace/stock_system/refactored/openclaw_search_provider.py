@@ -5,11 +5,12 @@
 依赖本机已配置好的 `openclaw` CLI 与模型（`openclaw agent --local` 或走 Gateway）。
 
 环境变量：
-  OPENCLAW_BIN              openclaw 可执行文件（默认 PATH 中 openclaw）
-  OPENCLAW_STOCK_AGENT_ID   默认 main
-  OPENCLAW_AGENT_LOCAL      1=--local 嵌入式代理（默认）；0=走已运行的 Gateway
-  OPENCLAW_AGENT_TIMEOUT    秒，默认 600（网页搜索较慢，可按需再加大）
-  STOCK_OPENCLAW_CACHE_SEC  单股缓存秒数，默认 90
+  OPENCLAW_BIN                 openclaw 可执行文件（默认 PATH 中 openclaw）
+  OPENCLAW_STOCK_AGENT_ID      默认 main
+  OPENCLAW_AGENT_LOCAL         1=--local 嵌入式代理（默认）；0=走已运行的 Gateway
+  OPENCLAW_AGENT_TIMEOUT       秒，默认 600（网页搜索较慢，可按需再加大）
+  STOCK_OPENCLAW_CACHE_SEC     单股缓存秒数，默认 90
+  STOCK_OPENCLAW_MAX_ATTEMPTS  单股最多调用 Agent 次数，默认 2（失败自动再试）
 """
 from __future__ import annotations
 
@@ -17,6 +18,7 @@ import json
 import os
 import re
 import shutil
+import random
 import subprocess
 import time
 from typing import Any, Dict, List, Optional, Tuple
@@ -139,18 +141,30 @@ class OpenclawAgentWebProvider:
         )
         self._cache: Dict[str, Tuple[float, Tuple[float, float]]] = {}
         self._ttl = float(os.environ.get("STOCK_OPENCLAW_CACHE_SEC") or "90")
+        self._max_attempts = max(
+            1, min(5, int(os.environ.get("STOCK_OPENCLAW_MAX_ATTEMPTS") or "2"))
+        )
 
-    def _invoke_agent(self, stock: Any) -> Dict[str, Any]:
-        code = str(getattr(stock, "symbol", "")).strip()
+    def _invoke_agent(self, stock: Any, *, is_retry: bool = False) -> Dict[str, Any]:
+        code = str(getattr(stock, "symbol", "")).strip().zfill(6)
         name = str(getattr(stock, "name", "")).strip()
-        prompt = (
-            f"请使用你可用的网页搜索、网页抓取或浏览器类工具，查询 A 股 {name}（股票代码 {code}）"
-            f"当前可参考的实时或最新行情：最新价（人民币元）、涨跌幅（百分比数字，例如 -1.25 表示跌 1.25%）。\n"
-            f"务必基于搜索结果中的公开页面作答，不要编造。\n"
+        base = (
+            f"任务：查询 A 股 {name}（股票代码 {code}）在公开网页上展示的「最新价/现价」"
+            f"与「涨跌幅%」（相对前收的当日涨跌幅，例如 -1.25 表示跌 1.25%）。\n"
+            f"请优先使用网页搜索找到 **东方财富、新浪财经、雪球、同花顺** 等主流行情页，"
+            f"必要时用浏览器工具打开个股行情页，从行情 **表格或报价条** 读取数字，不要心算改写。\n"
+            f"交易时段可参考「最新」；若已收盘可参考「收盘」价，仍以页面上展示为准。\n"
+            f"务必基于实际打开的页面内容作答，查不到则填 null，不要编造。\n"
             f"最后只输出一行合法 JSON，不要 Markdown 代码块，格式严格为：\n"
             f'{{"current_price": <number|null>, "change_percent": <number|null>}}\n'
-            f"若确实查不到，对应字段用 null。"
         )
+        retry = ""
+        if is_retry:
+            retry = (
+                "\n【重试】上次未返回有效 JSON 或 current_price 为 null。"
+                "请直接打开 eastmoney 或 sina 财经上该股的行情页，从页面表格读取现价与涨跌幅后再输出上述一行 JSON。"
+            )
+        prompt = base + retry
         cmd: List[str] = [self._bin, "agent"]
         if self._use_local:
             cmd.append("--local")
@@ -230,17 +244,33 @@ class OpenclawAgentWebProvider:
                 price, pct = pair
                 return self._build_inputs(stock, price, pct)
 
-        data = self._invoke_agent(stock)
+        last_err: Optional[Exception] = None
+        data: Optional[Dict[str, Any]] = None
+        for att in range(self._max_attempts):
+            try:
+                data = self._invoke_agent(stock, is_retry=(att > 0))
+                price_v = data.get("current_price")
+                if price_v is None:
+                    raise RuntimeError(f"OpenClaw 未返回有效现价: {data!r}")
+                price = float(price_v)
+                if price <= 0:
+                    raise RuntimeError(f"现价无效: {price}")
+                break
+            except (RuntimeError, TypeError, ValueError) as e:
+                last_err = e
+                if att >= self._max_attempts - 1:
+                    raise RuntimeError(
+                        f"单股拉价失败（已试 {self._max_attempts} 次）: {e}"
+                    ) from last_err
+                time.sleep(1.5 + att * 1.5 + random.uniform(0, 0.6))
+
+        assert data is not None
         price_v = data.get("current_price")
         chg_v = data.get("change_percent")
-        if price_v is None:
-            raise RuntimeError(f"OpenClaw 搜索未返回有效现价: {data!r}")
         try:
             price = float(price_v)
         except (TypeError, ValueError) as e:
             raise RuntimeError(f"现价格式无效: {price_v!r}") from e
-        if price <= 0:
-            raise RuntimeError(f"现价无效: {price}")
         try:
             pct = float(chg_v) if chg_v is not None else 0.0
         except (TypeError, ValueError):

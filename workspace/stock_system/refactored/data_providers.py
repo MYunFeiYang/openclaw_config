@@ -8,6 +8,7 @@
   OPENCLAW_AGENT_LOCAL         1=--local（默认）；0=走 Gateway
   OPENCLAW_AGENT_TIMEOUT       秒，默认 600
   STOCK_OPENCLAW_CACHE_SEC     单股缓存秒数，默认 90
+  STOCK_OPENCLAW_MAX_ATTEMPTS  单股拉价最多调用 Agent 次数，默认 2
 """
 from __future__ import annotations
 
