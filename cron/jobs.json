@@ -40,158 +40,6 @@
       }
     },
     {
-      "id": "edacb5be-4121-4104-833e-c99826860225",
-      "agentId": "main",
-      "sessionKey": "agent:main:wecom:direct:thinkway",
-      "name": "股票收盘分析",
-      "enabled": true,
-      "createdAtMs": 1773886636323,
-      "updatedAtMs": 1774512211497,
-      "schedule": {
-        "kind": "cron",
-        "expr": "0 16 * * 1-5",
-        "tz": "Asia/Shanghai"
-      },
-      "sessionTarget": "isolated",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "agentTurn",
-        "message": "执行A股收盘分析：cd \"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace/stock_system\" && python3 refactored/openclaw_cron_analyzer.py evening",
-        "thinking": "off",
-        "timeoutSeconds": 1200,
-        "model": "oneapi/kimi-k2-250905"
-      },
-      "delivery": {
-        "mode": "announce",
-        "channel": "wecom",
-        "to": "thinkway"
-      },
-      "state": {
-        "nextRunAtMs": 1774598400000,
-        "lastRunAtMs": 1774512000004,
-        "lastRunStatus": "ok",
-        "lastStatus": "ok",
-        "lastDurationMs": 211493,
-        "lastDelivered": true,
-        "lastDeliveryStatus": "delivered",
-        "consecutiveErrors": 0
-      }
-    },
-    {
-      "id": "314640cc-f4f3-4308-b5fa-656071097473",
-      "agentId": "main",
-      "sessionKey": "agent:main:wecom:direct:thinkway",
-      "name": "股票周度分析",
-      "enabled": true,
-      "createdAtMs": 1773886643404,
-      "updatedAtMs": 1774180811966,
-      "schedule": {
-        "kind": "cron",
-        "expr": "0 20 * * 0",
-        "tz": "Asia/Shanghai"
-      },
-      "sessionTarget": "isolated",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "agentTurn",
-        "message": "执行A股周度分析（先预测再总结）：cd \"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace/stock_system\" && python3 refactored/openclaw_cron_analyzer.py weekly",
-        "thinking": "off",
-        "timeoutSeconds": 1200,
-        "model": "oneapi/kimi-k2-250905"
-      },
-      "delivery": {
-        "mode": "announce",
-        "channel": "wecom",
-        "to": "thinkway"
-      },
-      "state": {
-        "nextRunAtMs": 1774785600000,
-        "lastRunAtMs": 1774180800005,
-        "lastRunStatus": "ok",
-        "lastStatus": "ok",
-        "lastDurationMs": 11961,
-        "lastDelivered": true,
-        "lastDeliveryStatus": "delivered",
-        "consecutiveErrors": 0
-      }
-    },
-    {
-      "id": "cf7fa95f-64c0-4dec-b430-493bab61a45f",
-      "agentId": "main",
-      "sessionKey": "agent:main:wecom:direct:thinkway",
-      "name": "股票系统日志清理",
-      "enabled": true,
-      "createdAtMs": 1773886651960,
-      "updatedAtMs": 1774548003214,
-      "schedule": {
-        "kind": "cron",
-        "expr": "0 2 * * *",
-        "tz": "Asia/Shanghai"
-      },
-      "sessionTarget": "isolated",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "agentTurn",
-        "message": "清理股票系统旧日志：cd \"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace/stock_system\" && find logs/ -name \"*.log\" -mtime +7 -delete && find data/ -name \"*.txt\" -mtime +30 -delete && echo \"日志清理完成\"",
-        "thinking": "off",
-        "timeoutSeconds": 180,
-        "model": "oneapi/kimi-k2-250905"
-      },
-      "delivery": {
-        "mode": "announce",
-        "channel": "wecom",
-        "to": "thinkway"
-      },
-      "state": {
-        "nextRunAtMs": 1774634400000,
-        "lastRunAtMs": 1774548000005,
-        "lastRunStatus": "ok",
-        "lastStatus": "ok",
-        "lastDurationMs": 3209,
-        "lastDeliveryStatus": "delivered",
-        "consecutiveErrors": 0,
-        "lastDelivered": true
-      }
-    },
-    {
-      "id": "8cd7f57e-ab81-47d3-a04d-b2134f177e14",
-      "agentId": "main",
-      "sessionKey": "agent:main:wecom:direct:thinkway",
-      "name": "股票午盘分析",
-      "enabled": true,
-      "createdAtMs": 1773889787156,
-      "updatedAtMs": 1774595172761,
-      "schedule": {
-        "kind": "cron",
-        "expr": "0 15 * * 1-5",
-        "tz": "Asia/Shanghai"
-      },
-      "sessionTarget": "isolated",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "agentTurn",
-        "message": "执行A股午盘分析：cd \"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace/stock_system\" && python3 refactored/openclaw_cron_analyzer.py afternoon",
-        "thinking": "off",
-        "timeoutSeconds": 1200,
-        "model": "oneapi/kimi-k2-250905"
-      },
-      "delivery": {
-        "mode": "announce",
-        "to": "thinkway",
-        "channel": "wecom"
-      },
-      "state": {
-        "nextRunAtMs": 1774854000000,
-        "lastRunAtMs": 1774594800004,
-        "lastRunStatus": "ok",
-        "lastStatus": "ok",
-        "lastDurationMs": 372757,
-        "lastDeliveryStatus": "delivered",
-        "consecutiveErrors": 0,
-        "lastDelivered": true
-      }
-    },
-    {
       "id": "1d736a97-6ff1-4f1f-865a-e5882d61438c",
       "agentId": "main",
       "sessionKey": "agent:main:wecom:direct:thinkway",
@@ -265,6 +113,44 @@
         "lastDeliveryStatus": "not-delivered",
         "consecutiveErrors": 0,
         "lastDelivered": false
+      }
+    },
+    {
+      "id": "cf7fa95f-64c0-4dec-b430-493bab61a45f",
+      "agentId": "main",
+      "sessionKey": "agent:main:wecom:direct:thinkway",
+      "name": "股票系统定期清理",
+      "enabled": true,
+      "createdAtMs": 1773886651960,
+      "updatedAtMs": 1774548003214,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 2 * * *",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "执行股票系统定期清理：cd \"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace/stock_system\" && bash scripts/cleanup_stock_system.sh",
+        "thinking": "off",
+        "timeoutSeconds": 180,
+        "model": "oneapi/kimi-k2-250905"
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "wecom",
+        "to": "thinkway"
+      },
+      "state": {
+        "nextRunAtMs": 1774634400000,
+        "lastRunAtMs": 1774548000005,
+        "lastRunStatus": "ok",
+        "lastStatus": "ok",
+        "lastDurationMs": 3209,
+        "lastDeliveryStatus": "delivered",
+        "consecutiveErrors": 0,
+        "lastDelivered": true
       }
     }
   ]

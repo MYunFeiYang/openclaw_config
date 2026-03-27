@@ -84,6 +84,7 @@ python3 refactored/openclaw_cron_analyzer.py morning
 3. **兜底**：若环境变量与 shell 展开不可靠，可直接把 `cron/jobs.json` 里对应 `message` 中的路径改成**本机绝对路径**（团队各自维护或使用内网模板生成）。
 
 4. **直跑脚本（推荐作 crontab 备选）**：`workspace/stock_system/scripts/run_stock_cron.sh` 会 `cd` 到 `STOCK_SYSTEM_ROOT`（或 `OPENCLAW_HOME/workspace/stock_system`）并执行 `refactored/openclaw_cron_analyzer.py`，不经过 OpenClaw `agentTurn`。系统 crontab 可调用该脚本，分析结果仍写入 `stock_system/data/` 与 `reports/`。
+5. **定期清理**：`scripts/cleanup_stock_system.sh` 定义日志/报告/历史 JSON 的保留天数；OpenClaw Cron 每日 02:00 调用该脚本。细则见 `workspace/stock_system/README.md` 中的表格。
 
 ## 6. 本地环境文件（不提交）
 
