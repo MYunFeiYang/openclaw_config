@@ -9,27 +9,9 @@ import statistics
 
 
 class EveningPredictionOptimizer:
-    """收盘预测优化器"""
+    """收盘预测优化器（权重/阈值与早盘共用 calibration_overrides，另保留时间衰减）。"""
     
     def __init__(self):
-        # 收盘预测专用权重配置
-        self.evening_weights = {
-            'technical': 0.25,      # 降低技术面权重（盘中波动大）
-            'fundamental': 0.35,    # 提高基本面权重（长期价值）
-            'sentiment': 0.20,      # 降低情绪面权重（尾盘情绪波动）
-            'sector': 0.30          # 提高行业面权重（行业趋势稳定）
-        }
-        
-        # 收盘专用阈值配置
-        self.evening_thresholds = {
-            'strong_buy': 7.5,      # 提高阈值，避免过度交易
-            'buy': 6.5,
-            'hold': 4.5,
-            'sell': 3.5,
-            'strong_sell': 2.5
-        }
-        
-        # 时间衰减因子（距离收盘时间越长，权重越低）
         self.time_decay_factor = 0.95
     
     def optimize_evening_prediction(self, 
@@ -40,7 +22,8 @@ class EveningPredictionOptimizer:
                                   prediction_time: datetime,
                                   market_close_time: datetime = None) -> Tuple[float, str, List[str]]:
         """优化收盘预测"""
-        
+        from predict_then_summarize import ConfigManager, apply_signal_margin
+
         if market_close_time is None:
             # 默认A股收盘时间 15:00
             market_close_time = datetime.now().replace(hour=15, minute=0, second=0, microsecond=0)
@@ -52,16 +35,28 @@ class EveningPredictionOptimizer:
         adjusted_technical = technical_score * time_decay
         adjusted_sentiment = sentiment_score * time_decay
         
-        # 计算优化后的综合评分
+        weights = ConfigManager.get_score_weights()
         final_score = (
-            adjusted_technical * self.evening_weights['technical'] +
-            fundamental_score * self.evening_weights['fundamental'] +
-            adjusted_sentiment * self.evening_weights['sentiment'] +
-            sector_score * self.evening_weights['sector']
+            adjusted_technical * weights['technical'] +
+            fundamental_score * weights['fundamental'] +
+            adjusted_sentiment * weights['sentiment'] +
+            sector_score * weights['sector']
         )
-        
-        # 生成信号
-        signal = self._generate_evening_signal(final_score)
+        final_score = round(final_score, 1)
+
+        th = ConfigManager.get_signal_thresholds()
+        if final_score >= th['strong_buy']:
+            signal = "强烈买入"
+        elif final_score >= th['buy']:
+            signal = "买入"
+        elif final_score >= th['hold']:
+            signal = "持有"
+        elif final_score >= th['sell']:
+            signal = "卖出"
+        else:
+            signal = "强烈卖出"
+        margin = float(ConfigManager.get_accuracy_tuning().get('signal_margin') or 0)
+        signal = apply_signal_margin(signal, final_score, th, margin)
         
         # 生成收盘专用理由
         reasons = self._generate_evening_reasons(
@@ -69,7 +64,7 @@ class EveningPredictionOptimizer:
             adjusted_sentiment, sector_score, time_decay
         )
         
-        return round(final_score, 1), signal, reasons
+        return final_score, signal, reasons
     
     def _calculate_time_decay(self, prediction_time: datetime, market_close_time: datetime) -> float:
         """计算时间衰减因子"""
@@ -91,22 +86,6 @@ class EveningPredictionOptimizer:
             return 0.90
         else:                       # 2小时以上
             return 0.85
-    
-    def _generate_evening_signal(self, final_score: float) -> str:
-        """生成收盘专用信号"""
-        
-        thresholds = self.evening_thresholds
-        
-        if final_score >= thresholds['strong_buy']:
-            return "强烈买入"
-        elif final_score >= thresholds['buy']:
-            return "买入"
-        elif final_score >= thresholds['hold']:
-            return "持有"
-        elif final_score >= thresholds['sell']:
-            return "卖出"
-        else:
-            return "强烈卖出"
     
     def _generate_evening_reasons(self, final_score: float, 
                                   technical_score: float, fundamental_score: float,

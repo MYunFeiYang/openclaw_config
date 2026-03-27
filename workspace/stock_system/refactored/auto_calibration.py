@@ -196,10 +196,21 @@ def run_auto_calibration(stock_system_root: Optional[Path] = None) -> Dict[str, 
                 w["sector"] += STEP_W
                 notes.append("卖出误判更多，略降技术面、增行业权重。")
 
+        if stats["n_hold"] >= MIN_BUCKET_SAMPLES:
+            mr = stats["miss_hold"] / stats["n_hold"]
+            if mr > 0.45:
+                th["hold"] += STEP_TH
+                th["buy"] -= STEP_TH
+                notes.append(f"持有向误判率偏高({mr:.0%})，收窄评分意义上的持有带。")
+            elif mr < 0.2:
+                th["hold"] -= STEP_TH
+                th["buy"] += STEP_TH
+                notes.append(f"持有向较准({mr:.0%})，略放宽持有带。")
+
         th, w = _clamp_to_defaults(th, w)
         th = _enforce_order(th)
 
-    payload = {
+    payload: Dict[str, Any] = {
         "version": 1,
         "updated_at": datetime.now().isoformat(),
         "source": "reconcile_history.jsonl",
@@ -208,6 +219,15 @@ def run_auto_calibration(stock_system_root: Optional[Path] = None) -> Dict[str, 
         "signal_thresholds": th,
         "score_weights": w,
     }
+    if out_path.is_file():
+        try:
+            with open(out_path, "r", encoding="utf-8") as f:
+                old = json.load(f)
+            at = old.get("accuracy_tuning")
+            if isinstance(at, dict) and at:
+                payload["accuracy_tuning"] = at
+        except (OSError, ValueError, TypeError):
+            pass
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
 

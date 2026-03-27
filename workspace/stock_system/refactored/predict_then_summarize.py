@@ -8,12 +8,13 @@ import json
 import os
 from datetime import datetime, timedelta
 from dataclasses import dataclass, asdict
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional, Tuple, Any
 from enum import Enum
 from pathlib import Path
 
 from data_providers import StockDataProvider, get_default_provider
 from evening_optimizer import EveningPredictionOptimizer
+from reconcile_accuracy import default_accuracy_tuning, merge_accuracy_tuning
 
 
 def _default_stock_system_root() -> str:
@@ -31,6 +32,28 @@ class SignalType(Enum):
     HOLD = "持有"
     SELL = "卖出"
     STRONG_SELL = "强烈卖出"
+
+
+def apply_signal_margin(signal: str, final_score: float, th: Dict[str, float], margin: float) -> str:
+    """
+    阈值边界保守化：贴边的买入/卖出/强档略向持有或弱一档收拢，减少勉强信号。
+    margin<=0 时不调整。
+    """
+    if margin <= 0:
+        return signal
+    sb = float(th["strong_buy"])
+    b = float(th["buy"])
+    h = float(th["hold"])
+    s = float(th["sell"])
+    if signal == SignalType.BUY.value and b <= final_score < b + margin:
+        return SignalType.HOLD.value
+    if signal == SignalType.STRONG_BUY.value and sb <= final_score < sb + margin:
+        return SignalType.BUY.value
+    if signal == SignalType.SELL.value and h - margin < final_score < h:
+        return SignalType.HOLD.value
+    if signal == SignalType.STRONG_SELL.value and s <= final_score < s + margin:
+        return SignalType.SELL.value
+    return signal
 
 
 @dataclass
@@ -176,63 +199,92 @@ class PredictionEngine:
 # ==================== 评分引擎 ====================
 
 class ScoringEngine:
-    """评分引擎 - 计算各项评分"""
+    """评分引擎 - 计算各项评分（分段线性，减少阶梯跳变）"""
+
+    @staticmethod
+    def _lin(x: float, knots: List[Tuple[float, float]]) -> float:
+        k = sorted(knots, key=lambda t: t[0])
+        if x <= k[0][0]:
+            return float(k[0][1])
+        for i in range(1, len(k)):
+            x0, y0 = k[i - 1]
+            x1, y1 = k[i]
+            if x <= x1:
+                den = x1 - x0
+                t = 0.0 if den == 0 else (x - x0) / den
+                return float(y0 + t * (y1 - y0))
+        return float(k[-1][1])
     
     def calculate_technical_score(self, data: Dict) -> float:
         """计算技术面评分"""
-        
-        # RSI评分 (0-10分)
-        rsi = data['rsi']
-        rsi_score = 9 if rsi < 25 else 7 if rsi < 35 else 5 if rsi < 45 else 4 if rsi < 55 else 3 if rsi < 65 else 2 if rsi < 75 else 1
-        
-        # MACD评分
-        macd_scores = {'金叉': 9, '死叉': 2, '中性': 5}
-        macd_score = macd_scores.get(data['macd_signal'], 5)
-        
-        # 布林带评分
-        bollinger = data['bollinger_position']
-        bollinger_score = 9 if bollinger < -1.5 else 7 if bollinger < -0.5 else 5 if bollinger < 0.5 else 3 if bollinger < 1.5 else 1
-        
-        # 成交量评分
-        volume = data['volume_ratio']
-        volume_score = 8 if volume > 1.4 else 6 if volume > 1.1 else 4 if volume > 0.8 else 2
-        
-        # 动量评分
-        momentum = data['momentum_5d']
-        momentum_score = 8 if momentum > 0.02 else 6 if momentum > 0 else 4 if momentum > -0.02 else 2
-        
+        rsi = float(data.get("rsi", 50))
+        rsi_score = self._lin(
+            rsi,
+            [(0, 1), (25, 9), (35, 7), (45, 5), (55, 4), (65, 3), (75, 2), (100, 1)],
+        )
+
+        sig = str(data.get("macd_signal", "中性"))
+        mp = -1.0 if sig == "死叉" else (1.0 if sig == "金叉" else 0.0)
+        macd_score = self._lin(mp, [(-1, 2.2), (0, 5.0), (1, 8.2)])
+
+        bollinger = float(data.get("bollinger_position", 0))
+        bollinger_score = self._lin(
+            bollinger,
+            [(-2.5, 9), (-1.5, 7), (-0.5, 5.5), (0.5, 5), (1.5, 3), (2.5, 1)],
+        )
+
+        volume = float(data.get("volume_ratio", 1))
+        volume_score = self._lin(
+            volume, [(0.3, 2), (0.8, 4), (1.1, 6), (1.4, 8), (2.5, 8.5)]
+        )
+
+        momentum = float(data.get("momentum_5d", 0))
+        momentum_score = self._lin(
+            momentum, [(-0.05, 2), (-0.02, 4), (0, 6), (0.02, 6.5), (0.05, 8)]
+        )
+
         return round((rsi_score + macd_score + bollinger_score + volume_score + momentum_score) / 5, 1)
     
     def calculate_fundamental_score(self, data: Dict, sector: str) -> float:
         """计算基本面评分"""
         
         benchmark = ConfigManager.get_sector_benchmark(sector)
-        
-        # 估值评分
-        pe_score = 8 if data['pe_ratio'] < benchmark['pe_avg'] * 0.8 else 6 if data['pe_ratio'] < benchmark['pe_avg'] else 4 if data['pe_ratio'] < benchmark['pe_avg'] * 1.2 else 2
-        pb_score = 8 if data['pb_ratio'] < benchmark['pb_avg'] * 0.8 else 6 if data['pb_ratio'] < benchmark['pb_avg'] else 4 if data['pb_ratio'] < benchmark['pb_avg'] * 1.2 else 2
-        
-        # 盈利能力评分
-        roe_score = 9 if data['roe'] > benchmark['roe_avg'] * 1.2 else 7 if data['roe'] > benchmark['roe_avg'] else 5 if data['roe'] > benchmark['roe_avg'] * 0.8 else 3
-        growth_score = 9 if data['growth_rate'] > benchmark['growth_avg'] * 1.2 else 7 if data['growth_rate'] > benchmark['growth_avg'] else 5 if data['growth_rate'] > benchmark['growth_avg'] * 0.8 else 3
-        
-        # 财务健康评分
-        debt_score = 8 if data['debt_ratio'] < 0.3 else 6 if data['debt_ratio'] < 0.5 else 4 if data['debt_ratio'] < 0.7 else 2
-        dividend_score = 8 if data['dividend_yield'] > 3 else 6 if data['dividend_yield'] > 2 else 4 if data['dividend_yield'] > 1 else 2
+        pe_avg = float(benchmark["pe_avg"]) or 1.0
+        pb_avg = float(benchmark["pb_avg"]) or 1.0
+        roe_avg = float(benchmark["roe_avg"]) or 1.0
+        growth_avg = float(benchmark["growth_avg"]) or 1.0
+
+        r_pe = float(data.get("pe_ratio", pe_avg)) / pe_avg
+        pe_score = self._lin(r_pe, [(0.4, 9), (0.75, 7), (1.0, 5.5), (1.25, 4), (1.6, 2)])
+
+        r_pb = float(data.get("pb_ratio", pb_avg)) / pb_avg
+        pb_score = self._lin(r_pb, [(0.4, 9), (0.75, 7), (1.0, 5.5), (1.25, 4), (1.6, 2)])
+
+        r_roe = float(data.get("roe", roe_avg)) / roe_avg
+        roe_score = self._lin(r_roe, [(0.5, 3), (0.85, 5), (1.0, 6.5), (1.2, 8), (1.5, 9)])
+
+        r_gr = float(data.get("growth_rate", growth_avg)) / growth_avg
+        growth_score = self._lin(r_gr, [(0.5, 3), (0.85, 5), (1.0, 6.5), (1.2, 8), (1.5, 9)])
+
+        debt = float(data.get("debt_ratio", 0.5))
+        debt_score = self._lin(debt, [(0.15, 9), (0.35, 7), (0.5, 5.5), (0.65, 4), (0.85, 2)])
+
+        divy = float(data.get("dividend_yield", 0))
+        dividend_score = self._lin(divy, [(0, 2), (1, 4), (2, 6), (3, 8), (5, 9)])
         
         return round((pe_score + pb_score + roe_score + growth_score + debt_score + dividend_score) / 6, 1)
     
     def calculate_sentiment_score(self, data: Dict) -> float:
         """计算情绪面评分"""
         
-        heat_score = data['market_heat']
-        attention_score = data['institution_attention']
-        
-        sentiment_map = {'恐慌': 2, '谨慎': 4, '中性': 6, '乐观': 8, '狂热': 4}
-        retail_score = sentiment_map.get(data['retail_sentiment'], 6)
-        
-        news_scores = {'负面': 3, '中性': 6, '正面': 8}
-        news_score = news_scores.get(data['news_sentiment'], 6)
+        heat_score = float(data.get("market_heat", 5))
+        attention_score = float(data.get("institution_attention", 5))
+
+        retail_map = {"恐慌": 2.0, "谨慎": 4.0, "中性": 6.0, "乐观": 8.0, "狂热": 4.5}
+        retail_score = retail_map.get(str(data.get("retail_sentiment", "中性")), 6.0)
+
+        news_map = {"负面": 3.0, "中性": 6.0, "正面": 8.0}
+        news_score = news_map.get(str(data.get("news_sentiment", "中性")), 6.0)
         
         return round((heat_score + attention_score + retail_score + news_score) / 4, 1)
     
@@ -295,10 +347,14 @@ class SignalGenerator:
         else:
             signal = SignalType.STRONG_SELL
         
+        sig_str = signal.value
+        margin = float(ConfigManager.get_accuracy_tuning().get("signal_margin") or 0)
+        sig_str = apply_signal_margin(sig_str, final_score, thresholds, margin)
+
         confidence = _confidence_from_score_and_technical(final_score, technical_data)
         reasons = self._generate_reasons(final_score, stock)
         
-        return signal.value, confidence, reasons
+        return sig_str, confidence, reasons
     
     def _generate_reasons(self, final_score: float, stock: StockConfig) -> List[str]:
         """生成推荐理由"""
@@ -582,12 +638,31 @@ class ConfigManager:
 
     _merged_signal_thresholds: Optional[Dict[str, float]] = None
     _merged_score_weights: Optional[Dict[str, float]] = None
+    _merged_accuracy_tuning: Optional[Dict[str, Any]] = None
 
     @classmethod
     def reload_calibration(cls) -> None:
         """清除合并缓存，下次读取磁盘上的 calibration_overrides.json。"""
         cls._merged_signal_thresholds = None
         cls._merged_score_weights = None
+        cls._merged_accuracy_tuning = None
+
+    @classmethod
+    def get_accuracy_tuning(cls) -> Dict[str, Any]:
+        if cls._merged_accuracy_tuning is not None:
+            return cls._merged_accuracy_tuning
+        base = default_accuracy_tuning()
+        path = Path(_default_stock_system_root()) / "config" / "calibration_overrides.json"
+        if path.is_file():
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                ov = data.get("accuracy_tuning") or {}
+                base = merge_accuracy_tuning(ov)
+            except (OSError, ValueError, TypeError, KeyError):
+                pass
+        cls._merged_accuracy_tuning = base
+        return base
 
     @classmethod
     def get_signal_thresholds(cls) -> Dict[str, float]:
@@ -763,6 +838,7 @@ class ReportGenerator:
             'calibration': {
                 'signal_thresholds': ConfigManager.get_signal_thresholds(),
                 'score_weights': ConfigManager.get_score_weights(),
+                'accuracy_tuning': ConfigManager.get_accuracy_tuning(),
             },
         }
         

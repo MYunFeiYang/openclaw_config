@@ -42,3 +42,11 @@ python3 refactored/openclaw_cron_analyzer.py morning
 - 预测落盘 JSON 中带 `calibration` 字段，便于核对当时使用的档位。
 
 手动试跑：`python3 refactored/auto_calibration.py`（可选参数：stock_system 根目录）。
+
+### 准确率相关（已落地）
+
+- **reconcile**：中性带按早盘 `|change_percent|` **自适应**；**强烈买入/强烈卖出** 要求当日区间涨跌超过「强档带」才算方向一致。可选 **`RECONCILE_BENCHMARK_RETURN_PCT`**（例如当日沪深300涨跌幅），用 **个股涨跌减大盘** 做方向判定。
+- **打分**：技术面/基本面等子项改为 **分段线性**，减轻阶梯边界抖动。
+- **信号**：`calibration_overrides.json` 里 **`accuracy_tuning.signal_margin`**（示例见 `calibration_overrides.example.json`）在阈值贴边时把买/卖/强档向 **持有或弱一档** 收敛。
+- **收盘预测**：`evening_optimizer` 与早盘共用同一套 **阈值、权重、signal_margin**（仍保留时间衰减）。
+- **自校准**：除买/卖外，**持有误判** 也会驱动收窄/放宽持有带（`hold`/`buy` 边界）。

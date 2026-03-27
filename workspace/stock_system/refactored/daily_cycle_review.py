@@ -11,6 +11,7 @@
 准确性建议（调度层面）：
 - 早盘任务尽量放在开盘前；reconcile 放在收盘后（如 15:05/16:05），减少「价差不代表全日」的歧义。
 - 仍依赖 OpenClaw Agent 拉价；若要与交易所官方收盘核对，可后续换数据源仅用于复盘价位。
+- 复盘逻辑见 `reconcile_accuracy.py`（自适应中性带、强档更严、可选大盘超额）；调度侧可设 `RECONCILE_BENCHMARK_RETURN_PCT`。
 """
 from __future__ import annotations
 
@@ -22,8 +23,13 @@ from pathlib import Path
 from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 
-# 方向约定：买入/卖出/持有 与 当日区间涨跌 对照时使用
-_NEUTRAL_BAND_PCT = 0.8
+from reconcile_accuracy import (
+    adaptive_neutral_band_pct,
+    benchmark_return_pct_for_reconcile,
+    direction_match_with_tuning,
+    expected_direction_from_signal,
+    session_return_for_direction,
+)
 
 RECONCILE_HISTORY_FILENAME = "reconcile_history.jsonl"
 ITERATION_STATE_FILENAME = "iteration_state.json"
@@ -56,28 +62,6 @@ def _prediction_files_for_day(data_dir: Path, analysis_type: str, ymd: str) -> L
 def _latest_prediction_for_day(data_dir: Path, analysis_type: str, ymd: str) -> Optional[Path]:
     files = _prediction_files_for_day(data_dir, analysis_type, ymd)
     return files[-1] if files else None
-
-
-def _expected_direction(signal: str) -> int:
-    if "强烈买入" in signal or signal == "买入":
-        return 1
-    if "强烈卖出" in signal or signal == "卖出":
-        return -1
-    return 0
-
-
-def _actual_direction_from_return(session_return_pct: float, band: float = _NEUTRAL_BAND_PCT) -> int:
-    if session_return_pct > band:
-        return 1
-    if session_return_pct < -band:
-        return -1
-    return 0
-
-
-def _match(expected: int, actual: int) -> bool:
-    if expected == 0:
-        return actual == 0
-    return expected == actual
 
 
 def _compact_symbols_from_rows(rows: List[Dict[str, Any]]) -> Dict[str, Any]:
@@ -356,6 +340,10 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
 
     # 延迟导入，避免无 OpenClaw 时影响其它子命令
     from openclaw_search_provider import OpenclawAgentWebProvider
+    from predict_then_summarize import ConfigManager
+
+    tuning = ConfigManager.get_accuracy_tuning()
+    benchmark_ret = benchmark_return_pct_for_reconcile()
 
     provider = OpenclawAgentWebProvider()
     rows: List[Dict[str, Any]] = []
@@ -370,7 +358,9 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
         )
         morning_px = float(p.get("current_price") or 0)
         signal = str(p.get("signal") or "")
-        exp = _expected_direction(signal)
+        exp = expected_direction_from_signal(signal)
+        morning_vol = abs(float(p.get("change_percent") or 0))
+        band = adaptive_neutral_band_pct(morning_vol, tuning)
 
         try:
             inputs = provider.fetch(stock)
@@ -395,8 +385,10 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
             session_ret = 0.0
         else:
             session_ret = (evening_px - morning_px) / morning_px * 100.0
-        act = _actual_direction_from_return(session_ret)
-        matched = _match(exp, act)
+        ret_for_match = session_return_for_direction(session_ret, benchmark_ret)
+        matched, act, strong_band = direction_match_with_tuning(
+            signal, ret_for_match, band, tuning
+        )
         if matched:
             ok += 1
         rows.append(
@@ -406,6 +398,10 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
                 "morning_price": round(morning_px, 4),
                 "evening_price": round(evening_px, 4),
                 "session_return_pct": round(session_ret, 4),
+                "benchmark_return_pct": benchmark_ret,
+                "session_return_for_match_pct": round(ret_for_match, 4),
+                "neutral_band_pct": band,
+                "strong_band_pct": strong_band,
                 "morning_signal": signal,
                 "expected_direction": exp,
                 "inferred_direction_from_session_return": act,
@@ -425,7 +421,12 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
         "trade_date": day,
         "morning_source": str(morning_path),
         "generated_at": datetime.now().isoformat(),
-        "neutral_band_pct": _NEUTRAL_BAND_PCT,
+        "reconcile_logic": {
+            "adaptive_neutral_band": True,
+            "strong_signal_stricter": True,
+            "benchmark_return_pct": benchmark_ret,
+            "accuracy_tuning": tuning,
+        },
         "stats": {
             "rows": total,
             "with_prices": with_result,
@@ -442,11 +443,18 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
 
     _append_reconcile_history(data_dir, out_json, jpath.name)
 
+    bench_note = (
+        f"；大盘涨跌基准={benchmark_ret}%（用于超额收益判定，环境变量 RECONCILE_BENCHMARK_RETURN_PCT）"
+        if benchmark_ret is not None
+        else ""
+    )
     lines = [
         f"【A股收盘复盘】交易日 {day}",
         f"早盘预测来源: {morning_path.name}",
         f"生成时间: {out_json['generated_at']}",
-        f"说明: 用早盘记录价 → 收盘后再拉现价，计算区间涨跌幅，与早盘信号方向对照（中性带 ±{_NEUTRAL_BAND_PCT}%）。",
+        "说明: 早盘价→收盘再拉价算区间涨跌；中性带按早盘|涨跌幅|自适应；"
+        "强烈买入/卖出要求超过「强档带」幅度；普通买/卖与持有为三向对照。"
+        + bench_note,
         "",
         f"统计: 共 {total} 条，有效比价 {with_result}，方向一致 {hit}，不一致 {miss}，拉价失败 {err_n}",
         f"方向一致率: {out_json['stats']['hit_rate']!s}",
@@ -457,10 +465,14 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
         if r.get("error"):
             lines.append(f"- {r['name']}({r['symbol']}): 拉价失败 — {r['error'][:120]}")
         else:
+            extra = ""
+            if r.get("benchmark_return_pct") is not None:
+                extra = f" | 判定用涨跌={r['session_return_for_match_pct']}%"
             lines.append(
                 f"- {r['name']}({r['symbol']}): 早盘信号={r['morning_signal']} | "
                 f"早盘价={r['morning_price']} → 现价={r['evening_price']} | "
-                f"区间涨跌={r['session_return_pct']}% | 方向一致={'是' if r['direction_match'] else '否'}"
+                f"区间涨跌={r['session_return_pct']}%{extra} | "
+                f"中性±{r['neutral_band_pct']}% | 方向一致={'是' if r['direction_match'] else '否'}"
             )
 
     text = "\n".join(lines)
