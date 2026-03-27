@@ -4,7 +4,7 @@
 
 参数：`morning` | `afternoon` | `evening` | `weekly` | `reconcile` | `day_review`。
 
-**OpenClaw Cron（工作日）**：仅 **08:00 `morning`** → **15:20 `reconcile`** → **21:00 `day_review`**；另每日 **02:00** 运行 `scripts/cleanup_stock_system.sh`（与预测无关）。
+**OpenClaw Cron（工作日）**：仅 **08:00 `morning`** → **16:10 `reconcile`**（收盘 15:00 后留足间隔，降低网页行情未更新导致拉价失败）→ **21:00 `day_review`**；另每日 **02:00** 运行 `scripts/cleanup_stock_system.sh`（与预测无关）。
 
 **定期清理规则**（可调环境变量覆盖天数）：
 

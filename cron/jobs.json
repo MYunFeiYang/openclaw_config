@@ -49,7 +49,7 @@
       "updatedAtMs": 1774596287006,
       "schedule": {
         "kind": "cron",
-        "expr": "20 15 * * 1-5",
+        "expr": "10 16 * * 1-5",
         "tz": "Asia/Shanghai"
       },
       "sessionTarget": "isolated",
