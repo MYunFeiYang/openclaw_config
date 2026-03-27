@@ -329,7 +329,9 @@
     "web": {
       "search": {
         "enabled": true,
-        "provider": "duckduckgo"
+        "provider": "duckduckgo",
+        "maxResults": 8,
+        "cacheTtlMinutes": 5
       }
     },
     "sessions": {
@@ -516,8 +518,7 @@
     ],
     "load": {
       "paths": [
-        "~/.openclaw/extensions/wecom-openclaw-plugin",
-        "~/.nvm/versions/node/v24.14.0/lib/node_modules/acpx"
+        "~/.openclaw/extensions/wecom-openclaw-plugin"
       ]
     },
     "entries": {
@@ -528,17 +529,16 @@
         "enabled": true
       },
       "duckduckgo": {
-        "enabled": true
+        "enabled": true,
+        "config": {
+          "webSearch": {
+            "region": "cn-zh",
+            "safeSearch": "moderate"
+          }
+        }
       }
     },
     "installs": {
-      "acpx": {
-        "source": "path",
-        "spec": "acpx",
-        "sourcePath": "~/.nvm/versions/node/v24.14.0/lib/node_modules/acpx",
-        "installPath": "~/.nvm/versions/node/v24.14.0/lib/node_modules/acpx",
-        "installedAt": "2026-03-13T09:43:44.174Z"
-      },
       "wecom-openclaw-plugin": {
         "source": "npm",
         "spec": "@wecom/wecom-openclaw-plugin",

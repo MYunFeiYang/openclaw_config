@@ -26,21 +26,15 @@ export OPENCLAW_HOME="/path/to/clone"
 2. 若报错指向含 `~` 的路径：用本机绝对路径替换，例如 macOS/Linux 上把 `~` 换成 `/Users/你的用户名` 或运行 `echo $HOME` 得到的前缀。
 3. `agents.defaults.workspace`、`plugins.installs.*.installPath` 等字段都是常见需要核对的位置。
 
-### 1.2 `acpx` 插件路径与 Node 版本
+### 1.2 `acpx` 与「duplicate plugin id」告警
 
-当前配置里 `plugins.load.paths` 与 `installs.acpx` 通常指向：
+OpenClaw **2026.3.x 起已在安装包内捆绑 `acpx`**（`openclaw/dist/extensions/acpx`）。若同时在 `plugins.load.paths` 里再加载 **`node_modules/acpx`**（或另一份同名包），会出现：
 
-`~/.nvm/versions/node/<版本号>/lib/node_modules/openclaw/extensions/acpx`
+`duplicate plugin id detected; bundled plugin will be overridden by config plugin`
 
-该路径**随 nvm 下 Node 版本变化而变化**。升级 Node、换机器或未用 nvm 时，插件会加载失败。
+**处理方式：** 删除 `plugins.load.paths` 中指向独立 `acpx` 包的那一项，并去掉 `plugins.installs` 里仅用于该路径的 `acpx` 记录；保留 `plugins.allow` 与 `plugins.entries.acpx` 即可使用**内置**插件。
 
-**处理方式（任选）：**
-
-- 在本机安装全局 OpenClaw CLI 后，查找实际目录，例如：
-  - `ls "$(npm root -g)/openclaw/extensions/acpx"` 或
-  - `find ~/.nvm -path '*/openclaw/extensions/acpx' -type d 2>/dev/null | head -1`
-- 将上述**真实绝对路径**写入 `openclaw.json` 的 `plugins.load.paths[0]` 以及 `plugins.installs.acpx` 的 `sourcePath` / `installPath`（需与当前 OpenClaw 文档字段一致）。
-- 长期方案：把 `acpx` 安装或链接到 `~/.openclaw/extensions/acpx`，并把 JSON 中的路径改为该固定位置（与 `wecom-openclaw-plugin` 类似）。
+仅当你**刻意**要用比内置更新/不同的 `acpx` 时，才保留外置路径并承受该告警（或按官方文档关闭内置，二选一）。
 
 ## 2. 网络与密钥
 
