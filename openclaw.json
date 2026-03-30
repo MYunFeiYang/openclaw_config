@@ -308,6 +308,7 @@
         "zhuge-oneapi/kimi-k2-250905": {}
       },
       "workspace": "~/.openclaw/workspace",
+      "userTimezone": "Asia/Shanghai",
       "compaction": {
         "mode": "safeguard"
       },
