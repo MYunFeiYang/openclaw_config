@@ -322,6 +322,66 @@
       {
         "id": "main",
         "model": "oneapi/kimi-k2-250905"
+      },
+      {
+        "id": "frontend",
+        "model": "oneapi/doubao-seed-1-6-flash-250828",
+        "skills": [
+          "critical-code-reviewer",
+          "find-skills",
+          "research-analyzer",
+          "skill-vetter",
+          "summarize",
+          "task_boundary_checker_precise",
+          "ui-development",
+          "web-search-preferences"
+        ]
+      },
+      {
+        "id": "backend",
+        "model": "oneapi/kimi-k2-250905",
+        "skills": [
+          "critical-code-reviewer",
+          "find-skills",
+          "research-analyzer",
+          "skill-creator",
+          "skill-vetter",
+          "spring-boot-engineer",
+          "summarize",
+          "task_boundary_checker_precise",
+          "web-search-preferences"
+        ]
+      },
+      {
+        "id": "ui",
+        "model": "oneapi/doubao-seed-1-6-vision-250815",
+        "skills": [
+          "critical-code-reviewer",
+          "find-skills",
+          "skill-vetter",
+          "summarize",
+          "task_boundary_checker_precise",
+          "ui-development",
+          "ui-ux-pro-max",
+          "web-search-preferences"
+        ]
+      },
+      {
+        "id": "stock",
+        "model": "oneapi/kimi-k2-250905",
+        "skills": [
+          "auto-updater",
+          "critical-code-reviewer",
+          "find-skills",
+          "openclaw-agent-optimize",
+          "openclaw-wecom-channel",
+          "research-analyzer",
+          "skill-vetter",
+          "stock-analyzer",
+          "summarize",
+          "task_boundary_checker_precise",
+          "web-search-preferences"
+        ]
       }
     ]
   },

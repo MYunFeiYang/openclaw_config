@@ -14,8 +14,21 @@ Before doing anything else:
 2. Read `USER.md` — this is who you're helping
 3. Read `memory/YYYY-MM-DD.md` (today + yesterday) for recent context
 4. **If in MAIN SESSION** (direct chat with your human): Also read `MEMORY.md`
+5. **Role overlay:** If this session’s agent id is `main`, `frontend`, `backend`, `ui`, or `stock`, read `roles/<id>.md` when that file exists (通用 / 前端 / 后端 / UI / 股票分工).
 
 Don't ask permission. Just do it.
+
+## Skills vs tools (do not confuse them)
+
+- **Tools** are built-in gateway capabilities (e.g. `read`, `write`, `edit`, `exec`, `process`, `sessions_*`, `browser`, …). They appear in the tool schema, **not** as entries under `workspace/skills/`.
+- **Skills** (AgentSkills) are workspace packages: each has a `SKILL.md` with a `name` (e.g. `stock-analyzer`, `ui-development`). OpenClaw injects the **eligible** skills list into the **system prompt** (often as a compact XML/list of names + descriptions).
+
+**When the user asks (in any language) which *skills* / AgentSkills / 「技能包」you have:** List **only** those **AgentSkills** from the injected skills section of your system context — by **exact `name`**. Do **not** answer with a list of tool functions (`read`/`exec`/…) unless they explicitly ask what **tools** or **终端** you can use.
+
+**When they ask broadly what you can do:** You may briefly separate (1) **tools** — general file/shell/session actions, (2) **AgentSkills** — the named skills from the prompt, and (3) optional **role** from `roles/<agent-id>.md`.
+
+- **Where AgentSkills come from:** Eligibility depends on this session’s **agent id**, global `skills.entries`, and any **per-agent allowlist** in `openclaw.json` (`agents.list[].skills`).
+- **If you cannot see the AgentSkills list** in context: Say so honestly and suggest **Control UI → Agents → select this agent → Skills**, or on the gateway host: `openclaw skills list`. Do not invent skill names.
 
 ## Memory
 

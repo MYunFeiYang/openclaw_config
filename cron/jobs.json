@@ -3,12 +3,12 @@
   "jobs": [
     {
       "id": "ca38d074-c454-4f80-adbe-f10b8c2fc3ed",
-      "agentId": "main",
-      "sessionKey": "agent:main:wecom:direct:thinkway",
+      "agentId": "stock",
+      "sessionKey": "agent:stock:wecom:direct:thinkway",
       "name": "股票早盘分析",
       "enabled": true,
       "createdAtMs": 1773886616628,
-      "updatedAtMs": 1774569689379,
+      "updatedAtMs": 1774870740391,
       "schedule": {
         "kind": "cron",
         "expr": "0 8 * * 1-5",
@@ -29,24 +29,24 @@
         "to": "thinkway"
       },
       "state": {
-        "nextRunAtMs": 1774828800000,
-        "lastRunAtMs": 1774569600005,
+        "nextRunAtMs": 1774915200000,
+        "lastRunAtMs": 1774870228555,
         "lastRunStatus": "ok",
         "lastStatus": "ok",
-        "lastDurationMs": 89374,
-        "lastDeliveryStatus": "delivered",
+        "lastDurationMs": 511836,
+        "lastDeliveryStatus": "not-delivered",
         "consecutiveErrors": 0,
-        "lastDelivered": true
+        "lastDelivered": false
       }
     },
     {
       "id": "1d736a97-6ff1-4f1f-865a-e5882d61438c",
-      "agentId": "main",
-      "sessionKey": "agent:main:wecom:direct:thinkway",
+      "agentId": "stock",
+      "sessionKey": "agent:stock:wecom:direct:thinkway",
       "name": "股票收盘复盘与全日汇总（含自校准）",
       "enabled": true,
       "createdAtMs": 1774600000000,
-      "updatedAtMs": 1774596287006,
+      "updatedAtMs": 1774870849319,
       "schedule": {
         "kind": "cron",
         "expr": "10 18 * * 1-5",
@@ -67,24 +67,24 @@
         "to": "thinkway"
       },
       "state": {
-        "nextRunAtMs": 1774855200000,
-        "lastRunAtMs": 1774596000003,
+        "nextRunAtMs": 1774951800000,
+        "lastRunAtMs": 1774870740391,
         "lastRunStatus": "ok",
         "lastStatus": "ok",
-        "lastDurationMs": 287003,
-        "lastDeliveryStatus": "delivered",
+        "lastDurationMs": 108928,
+        "lastDeliveryStatus": "not-delivered",
         "consecutiveErrors": 0,
-        "lastDelivered": true
+        "lastDelivered": false
       }
     },
     {
       "id": "cf7fa95f-64c0-4dec-b430-493bab61a45f",
-      "agentId": "main",
-      "sessionKey": "agent:main:wecom:direct:thinkway",
+      "agentId": "stock",
+      "sessionKey": "agent:stock:wecom:direct:thinkway",
       "name": "股票系统定期清理",
       "enabled": true,
       "createdAtMs": 1773886651960,
-      "updatedAtMs": 1774548003214,
+      "updatedAtMs": 1774873697463,
       "schedule": {
         "kind": "cron",
         "expr": "0 2 * * *",
@@ -105,11 +105,11 @@
         "to": "thinkway"
       },
       "state": {
-        "nextRunAtMs": 1774634400000,
-        "lastRunAtMs": 1774548000005,
+        "nextRunAtMs": 1774893600000,
+        "lastRunAtMs": 1774873688085,
         "lastRunStatus": "ok",
         "lastStatus": "ok",
-        "lastDurationMs": 3209,
+        "lastDurationMs": 9378,
         "lastDeliveryStatus": "delivered",
         "consecutiveErrors": 0,
         "lastDelivered": true
