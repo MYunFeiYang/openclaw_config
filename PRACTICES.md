@@ -63,7 +63,7 @@ openclaw doctor
 ## 4. 技能与模型
 
 - **技能**：各 `workspace-*/skills/` 优先于 `~/.openclaw/skills`（见 [SETUP.md](SETUP.md) §1.3）。**少而精**，减少误触发与 token。
-- **模型**：在 `agents.list[].model` 或 Control UI 为不同 agent 选型（例如 **`ui` 用带 vision 的模型**）。避免所有任务同一重模型。
+- **模型**：**全局目录**在 [`openclaw.json`](openclaw.json) 的 **`models.providers`**（`models.mode: merge`）；各 agent 的 [`agents/<id>/agent/models.json`](agents/main/agent/models.json) **只写本 agent 独有差异**，其余回退合并全局（见官方 [Configuration Reference — Custom providers](https://docs.openclaw.ai/gateway/configuration-reference)）。本仓库当前：`main` / `backend` / `ui` / `stock` 为 `providers: {}`；**`frontend`** 额外保留本地 **`ollama`**。在 `agents.list[].model` 或 Control UI 为不同 agent 选型（例如 **`ui` 用带 vision 的模型**）；默认主模型 **`oneapi/kimi-k2-250905`**。避免所有任务同一重模型。
 
 - [ ] 每季度扫一眼：是否仍有从不使用的 skill 可关（`skills.entries.*.enabled`）。
 

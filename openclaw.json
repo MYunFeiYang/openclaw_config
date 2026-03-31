@@ -294,7 +294,7 @@
   "agents": {
     "defaults": {
       "model": {
-        "primary": "zhuge-oneapi/kimi-k2-250905"
+        "primary": "oneapi/kimi-k2-250905"
       },
       "imageGenerationModel": {
         "primary": "google/gemini-3-pro-image-preview"
@@ -313,8 +313,7 @@
         "oneapi/deepseek3": {},
         "oneapi/sf-gpt5": {},
         "oneapi/QwQ-32B": {},
-        "oneapi/doubao-seed-1-6-250615": {},
-        "zhuge-oneapi/kimi-k2-250905": {}
+        "oneapi/doubao-seed-1-6-250615": {}
       },
       "workspace": "~/.openclaw/workspace",
       "userTimezone": "Asia/Shanghai",
