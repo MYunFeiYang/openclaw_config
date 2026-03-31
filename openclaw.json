@@ -313,7 +313,8 @@
         "oneapi/deepseek3": {},
         "oneapi/sf-gpt5": {},
         "oneapi/QwQ-32B": {},
-        "oneapi/doubao-seed-1-6-250615": {}
+        "oneapi/doubao-seed-1-6-250615": {},
+        "ollama/qwen2.5:7b": {}
       },
       "workspace": "~/.openclaw/workspace",
       "userTimezone": "Asia/Shanghai",
