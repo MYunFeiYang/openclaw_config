@@ -248,7 +248,7 @@
     },
     "oneapi": {
       "baseUrl": "https://zhuge-oneapi.sangfor.com/v1",
-      "apiKey": "sk-XygyzbgawEUi7wpQ0CFm1Ce8lU1lMoPhOYLDR5UiLfNao3A4",
+      "apiKey": "ONEAPI_API_KEY",
       "api": "openai-completions",
       "models": [
         {
