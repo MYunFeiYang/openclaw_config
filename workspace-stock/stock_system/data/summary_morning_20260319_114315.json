@@ -1,0 +1,169 @@
+{
+  "timestamp": "2026-03-19T11:43:15.806307",
+  "analysis_type": "morning",
+  "summary": {
+    "report_time": "2026-03-19T11:43:15.805047",
+    "analysis_type": "morning",
+    "buy_recommendations": [],
+    "sell_recommendations": [
+      {
+        "stock": {
+          "name": "比亚迪",
+          "symbol": "002594",
+          "sector": "新能源",
+          "weight": 0.4
+        },
+        "current_price": 116.57,
+        "change_percent": -2.86,
+        "technical_score": 4.6,
+        "fundamental_score": 5.7,
+        "sentiment_score": 3.2,
+        "sector_score": 6.2,
+        "final_score": 4.9,
+        "signal": "卖出",
+        "confidence": 71,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-19T11:43:15.804598"
+      },
+      {
+        "stock": {
+          "name": "海康威视",
+          "symbol": "002415",
+          "sector": "科技",
+          "weight": 0.3
+        },
+        "current_price": 111.75,
+        "change_percent": -2.83,
+        "technical_score": 2.6,
+        "fundamental_score": 7.0,
+        "sentiment_score": 4.8,
+        "sector_score": 6.5,
+        "final_score": 4.9,
+        "signal": "卖出",
+        "confidence": 60,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-19T11:43:15.804692"
+      }
+    ],
+    "hold_recommendations": [
+      {
+        "stock": {
+          "name": "恒瑞医药",
+          "symbol": "600276",
+          "sector": "医药",
+          "weight": 0.5
+        },
+        "current_price": 126.94,
+        "change_percent": 1.55,
+        "technical_score": 6.4,
+        "fundamental_score": 6.7,
+        "sentiment_score": 5.2,
+        "sector_score": 6.8,
+        "final_score": 6.4,
+        "signal": "持有",
+        "confidence": 58,
+        "reasons": [
+          "技术面有所改善",
+          "估值相对合理"
+        ],
+        "prediction_time": "2026-03-19T11:43:15.804561"
+      },
+      {
+        "stock": {
+          "name": "京东方A",
+          "symbol": "000725",
+          "sector": "面板",
+          "weight": 0.0
+        },
+        "current_price": 101.6,
+        "change_percent": 1.6,
+        "technical_score": 7.4,
+        "fundamental_score": 4.7,
+        "sentiment_score": 4.0,
+        "sector_score": 7.5,
+        "final_score": 6.0,
+        "signal": "持有",
+        "confidence": 69,
+        "reasons": [
+          "技术面有所改善",
+          "估值相对合理"
+        ],
+        "prediction_time": "2026-03-19T11:43:15.804966"
+      }
+    ],
+    "market_overview": {
+      "total_stocks": 10,
+      "buy_count": 0,
+      "sell_count": 2,
+      "hold_count": 2,
+      "avg_buy_score": 0,
+      "avg_sell_score": 4.9,
+      "avg_hold_score": 6.2,
+      "buy_sectors": [],
+      "sell_sectors": [
+        "科技",
+        "新能源"
+      ],
+      "hold_sectors": [
+        "面板",
+        "医药"
+      ],
+      "market_sentiment": "谨慎"
+    },
+    "sector_analysis": {
+      "医药": {
+        "avg_score": 6.4,
+        "stock_count": 1,
+        "trend": "强势"
+      },
+      "面板": {
+        "avg_score": 6.0,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "银行": {
+        "avg_score": 5.5,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "消费": {
+        "avg_score": 5.5,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "白酒": {
+        "avg_score": 5.3,
+        "stock_count": 2,
+        "trend": "震荡"
+      },
+      "新能源": {
+        "avg_score": 5.1,
+        "stock_count": 2,
+        "trend": "震荡"
+      },
+      "地产": {
+        "avg_score": 5.0,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "科技": {
+        "avg_score": 4.9,
+        "stock_count": 1,
+        "trend": "震荡"
+      }
+    },
+    "risk_alerts": [],
+    "next_actions": [
+      "关注开盘后的量价配合情况",
+      "观察昨夜美股对A股的影响",
+      "留意早盘资金流入方向"
+    ]
+  },
+  "report_text": "【A股早盘总结报告】\n============================================================\n总结时间: 2026-03-19 11:43:15\n分析类型: 早盘\n============================================================\n\n【推荐总结】\n卖出推荐 (2只):\n  1. 比亚迪 (002594) - 评分:4.9\n  2. 海康威视 (002415) - 评分:4.9\n持有推荐 (2只):\n  1. 恒瑞医药 (600276) - 评分:6.4\n  2. 京东方A (000725) - 评分:6.0\n\n【市场概况】\n总股票数: 10\n买入推荐: 0只 | 平均评分: 0\n卖出推荐: 2只 | 平均评分: 4.9\n持有推荐: 2只 | 平均评分: 6.2\n市场情绪: 谨慎\n\n【行业分析】\n医药: 平均评分6.4 (强势, 1只股票)\n面板: 平均评分6.0 (震荡, 1只股票)\n银行: 平均评分5.5 (震荡, 1只股票)\n消费: 平均评分5.5 (震荡, 1只股票)\n白酒: 平均评分5.3 (震荡, 2只股票)\n新能源: 平均评分5.1 (震荡, 2只股票)\n地产: 平均评分5.0 (震荡, 1只股票)\n科技: 平均评分4.9 (震荡, 1只股票)\n\n【下一步行动】\n1. 关注开盘后的量价配合情况\n2. 观察昨夜美股对A股的影响\n3. 留意早盘资金流入方向"
+}

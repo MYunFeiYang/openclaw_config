@@ -1,0 +1,125 @@
+{
+  "timestamp": "2026-03-26T08:09:02.893733",
+  "analysis_type": "afternoon",
+  "summary": {
+    "report_time": "2026-03-26T08:09:02.892437",
+    "analysis_type": "afternoon",
+    "buy_recommendations": [],
+    "sell_recommendations": [
+      {
+        "stock": {
+          "name": "贵州茅台",
+          "symbol": "600519",
+          "sector": "白酒",
+          "weight": 0.9
+        },
+        "current_price": 1602.0,
+        "change_percent": -1.88,
+        "technical_score": 4.4,
+        "fundamental_score": 4.7,
+        "sentiment_score": 4.8,
+        "sector_score": 5.0,
+        "final_score": 4.6,
+        "signal": "卖出",
+        "confidence": 62,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-26T08:07:30.399056",
+        "data_provenance": "openclaw_agent_web"
+      },
+      {
+        "stock": {
+          "name": "招商银行",
+          "symbol": "600036",
+          "sector": "银行",
+          "weight": 0.7
+        },
+        "current_price": 42.05,
+        "change_percent": -1.31,
+        "technical_score": 4.4,
+        "fundamental_score": 4.7,
+        "sentiment_score": 4.5,
+        "sector_score": 5.2,
+        "final_score": 4.6,
+        "signal": "卖出",
+        "confidence": 62,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-26T08:07:52.692502",
+        "data_provenance": "openclaw_agent_web"
+      }
+    ],
+    "hold_recommendations": [],
+    "market_overview": {
+      "total_stocks": 10,
+      "buy_count": 0,
+      "sell_count": 2,
+      "hold_count": 0,
+      "avg_buy_score": 0,
+      "avg_sell_score": 4.6,
+      "avg_hold_score": 0,
+      "buy_sectors": [],
+      "sell_sectors": [
+        "白酒",
+        "银行"
+      ],
+      "hold_sectors": [],
+      "market_sentiment": "谨慎"
+    },
+    "sector_analysis": {
+      "白酒": {
+        "avg_score": 4.6,
+        "stock_count": 2,
+        "trend": "震荡"
+      },
+      "银行": {
+        "avg_score": 4.6,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "医药": {
+        "avg_score": 4.6,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "新能源": {
+        "avg_score": 4.4,
+        "stock_count": 2,
+        "trend": "震荡"
+      },
+      "科技": {
+        "avg_score": 4.6,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "消费": {
+        "avg_score": 4.6,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "地产": {
+        "avg_score": 4.6,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "面板": {
+        "avg_score": 4.6,
+        "stock_count": 1,
+        "trend": "震荡"
+      }
+    },
+    "risk_alerts": [
+      "市场卖出信号较多，注意风险控制"
+    ],
+    "next_actions": [
+      "关注午后资金动向",
+      "观察上午强势股的持续性",
+      "留意尾盘异动情况"
+    ]
+  },
+  "report_text": "【A股午盘总结报告】\n============================================================\n总结时间: 2026-03-26 08:09:02\n分析类型: 午盘\n============================================================\n\n【推荐总结】\n卖出推荐 (2只):\n  1. 贵州茅台 (600519) - 评分:4.6\n  2. 招商银行 (600036) - 评分:4.6\n\n【市场概况】\n总股票数: 10\n买入推荐: 0只 | 平均评分: 0\n卖出推荐: 2只 | 平均评分: 4.6\n持有推荐: 0只 | 平均评分: 0\n市场情绪: 谨慎\n\n【行业分析】\n白酒: 平均评分4.6 (震荡, 2只股票)\n银行: 平均评分4.6 (震荡, 1只股票)\n医药: 平均评分4.6 (震荡, 1只股票)\n新能源: 平均评分4.4 (震荡, 2只股票)\n科技: 平均评分4.6 (震荡, 1只股票)\n消费: 平均评分4.6 (震荡, 1只股票)\n地产: 平均评分4.6 (震荡, 1只股票)\n面板: 平均评分4.6 (震荡, 1只股票)\n\n【风险提示】\n1. 市场卖出信号较多，注意风险控制\n\n【下一步行动】\n1. 关注午后资金动向\n2. 观察上午强势股的持续性\n3. 留意尾盘异动情况"
+}

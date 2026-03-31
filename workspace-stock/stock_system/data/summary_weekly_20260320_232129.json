@@ -1,0 +1,156 @@
+{
+  "timestamp": "2026-03-20T23:21:29.995346",
+  "analysis_type": "weekly",
+  "summary": {
+    "report_time": "2026-03-20T23:21:29.995277",
+    "analysis_type": "weekly",
+    "total_stocks": 20,
+    "buy_recommendations": [
+      {
+        "name": "贵州茅台",
+        "symbol": "600519",
+        "sector": "白酒",
+        "final_score": 8.0,
+        "signal": "买入",
+        "confidence": 76,
+        "analysis_type": "morning",
+        "prediction_time": "2026-03-20T23:21:29.801575"
+      },
+      {
+        "name": "宁德时代",
+        "symbol": "300750",
+        "sector": "新能源",
+        "final_score": 7.5,
+        "signal": "买入",
+        "confidence": 80,
+        "analysis_type": "morning",
+        "prediction_time": "2026-03-20T23:21:29.801586"
+      },
+      {
+        "name": "五粮液",
+        "symbol": "000858",
+        "sector": "白酒",
+        "final_score": 7.1,
+        "signal": "买入",
+        "confidence": 78,
+        "analysis_type": "morning",
+        "prediction_time": "2026-03-20T23:21:29.801600"
+      }
+    ],
+    "sell_recommendations": [
+      {
+        "name": "京东方A",
+        "symbol": "000725",
+        "sector": "面板",
+        "final_score": 4.9,
+        "signal": "卖出",
+        "confidence": 61,
+        "analysis_type": "morning",
+        "prediction_time": "2026-03-20T23:21:29.801637"
+      }
+    ],
+    "hold_recommendations": [
+      {
+        "name": "恒瑞医药",
+        "symbol": "600276",
+        "sector": "医药",
+        "final_score": 6.6,
+        "signal": "持有",
+        "confidence": 57,
+        "analysis_type": "morning",
+        "prediction_time": "2026-03-20T23:21:29.801605"
+      },
+      {
+        "name": "比亚迪",
+        "symbol": "002594",
+        "sector": "新能源",
+        "final_score": 6.5,
+        "signal": "持有",
+        "confidence": 50,
+        "analysis_type": "morning",
+        "prediction_time": "2026-03-20T23:21:29.801611"
+      }
+    ],
+    "market_overview": {
+      "total_stocks_analyzed": 20,
+      "buy_count": 3,
+      "sell_count": 1,
+      "hold_count": 2,
+      "avg_buy_score": 7.5,
+      "avg_sell_score": 4.9,
+      "avg_hold_score": 6.5,
+      "market_sentiment": "乐观"
+    },
+    "sector_analysis": {
+      "白酒": {
+        "avg_score": 7.2,
+        "stock_count": 4,
+        "buy_count": 3,
+        "sell_count": 0,
+        "trend": "强势"
+      },
+      "新能源": {
+        "avg_score": 6.8,
+        "stock_count": 4,
+        "buy_count": 1,
+        "sell_count": 0,
+        "trend": "强势"
+      },
+      "银行": {
+        "avg_score": 7.3,
+        "stock_count": 2,
+        "buy_count": 2,
+        "sell_count": 0,
+        "trend": "强势"
+      },
+      "医药": {
+        "avg_score": 6.3,
+        "stock_count": 2,
+        "buy_count": 0,
+        "sell_count": 0,
+        "trend": "强势"
+      },
+      "科技": {
+        "avg_score": 5.8,
+        "stock_count": 2,
+        "buy_count": 0,
+        "sell_count": 0,
+        "trend": "震荡"
+      },
+      "消费": {
+        "avg_score": 5.5,
+        "stock_count": 2,
+        "buy_count": 0,
+        "sell_count": 0,
+        "trend": "震荡"
+      },
+      "地产": {
+        "avg_score": 5.7,
+        "stock_count": 2,
+        "buy_count": 0,
+        "sell_count": 0,
+        "trend": "震荡"
+      },
+      "面板": {
+        "avg_score": 5.2,
+        "stock_count": 2,
+        "buy_count": 0,
+        "sell_count": 1,
+        "trend": "震荡"
+      }
+    },
+    "comparison_analysis": {
+      "morning_avg_score": 6.4,
+      "afternoon_avg_score": 6.3,
+      "morning_buy_count": 4,
+      "afternoon_buy_count": 2,
+      "morning_sell_count": 1,
+      "afternoon_sell_count": 0
+    },
+    "based_on_predictions": 20,
+    "prediction_sources": [
+      "morning",
+      "afternoon"
+    ]
+  }
+}

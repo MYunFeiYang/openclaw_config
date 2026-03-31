@@ -1,0 +1,54 @@
+{
+  "timestamp": "2026-03-26T19:55:13.965272",
+  "analysis_type": "evening",
+  "predictions": [
+    {
+      "stock": {
+        "name": "五粮液",
+        "symbol": "000858",
+        "sector": "白酒",
+        "weight": 0.5
+      },
+      "current_price": 100.9,
+      "change_percent": 0.67,
+      "technical_score": 52,
+      "fundamental_score": 25,
+      "sentiment_score": 5.0,
+      "sector_score": 5.0,
+      "final_score": 5.59,
+      "signal": "持有",
+      "confidence": 73,
+      "reasons": [
+        "市场情绪有所改善",
+        "技术面支撑较强"
+      ],
+      "prediction_time": "2026-03-26T19:55:13.963785",
+      "data_provenance": "optimized_predictor"
+    },
+    {
+      "stock": {
+        "name": "贵州茅台",
+        "symbol": "600519",
+        "sector": "白酒",
+        "weight": 0.5
+      },
+      "current_price": 1445.0,
+      "change_percent": -0.54,
+      "technical_score": 45,
+      "fundamental_score": 30,
+      "sentiment_score": 5.0,
+      "sector_score": 5.0,
+      "final_score": 5.24,
+      "signal": "持有",
+      "confidence": 74,
+      "reasons": [
+        "技术面支撑较强",
+        "技术面支撑较强"
+      ],
+      "prediction_time": "2026-03-26T19:55:13.964338",
+      "data_provenance": "optimized_predictor"
+    }
+  ],
+  "prediction_count": 2,
+  "model_version": "optimized_v1.0"
+}

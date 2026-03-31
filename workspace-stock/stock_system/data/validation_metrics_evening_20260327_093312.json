@@ -1,0 +1,62 @@
+{
+  "source_file": "/Users/thinkway/.openclaw/workspace/stock_system/data/predictions_evening_20260326_195815.json",
+  "analysis_type": "evening",
+  "bundle_timestamp": "2026-03-26T19:58:15.727652",
+  "evaluated_at": "2026-03-27T09:33:12.608109",
+  "neutral_band_percent": 0.05,
+  "total": 5,
+  "direction_matches": 0,
+  "direction_accuracy": 0.0,
+  "details": [
+    {
+      "symbol": "000858",
+      "name": "五粮液",
+      "signal": "持有",
+      "change_percent": 0.67,
+      "expected_direction": 0,
+      "inferred_direction_from_change": 1,
+      "direction_match": false,
+      "data_provenance": "optimized_predictor"
+    },
+    {
+      "symbol": "600519",
+      "name": "贵州茅台",
+      "signal": "持有",
+      "change_percent": -0.54,
+      "expected_direction": 0,
+      "inferred_direction_from_change": -1,
+      "direction_match": false,
+      "data_provenance": "optimized_predictor"
+    },
+    {
+      "symbol": "300750",
+      "name": "宁德时代",
+      "signal": "持有",
+      "change_percent": 0.75,
+      "expected_direction": 0,
+      "inferred_direction_from_change": 1,
+      "direction_match": false,
+      "data_provenance": "optimized_predictor"
+    },
+    {
+      "symbol": "600036",
+      "name": "招商银行",
+      "signal": "持有",
+      "change_percent": -0.38,
+      "expected_direction": 0,
+      "inferred_direction_from_change": -1,
+      "direction_match": false,
+      "data_provenance": "optimized_predictor"
+    },
+    {
+      "symbol": "600276",
+      "name": "恒瑞医药",
+      "signal": "持有",
+      "change_percent": -1.57,
+      "expected_direction": 0,
+      "inferred_direction_from_change": -1,
+      "direction_match": false,
+      "data_provenance": "optimized_predictor"
+    }
+  ]
+}

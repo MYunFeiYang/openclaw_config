@@ -49,14 +49,14 @@ OpenClaw **2026.3.x 起已在安装包内捆绑 `acpx`**（`openclaw/dist/extens
 ## 4. 股票分析（Python）
 
 ```bash
-cd "$OPENCLAW_HOME/workspace/stock_system"
+cd "$OPENCLAW_HOME/workspace-stock/stock_system"
 python3 -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 python3 refactored/openclaw_cron_analyzer.py morning
 ```
 
-股票分析**仅通过 OpenClaw**：Python 脚本内调用 `openclaw agent`，由 Agent 使用网页搜索/浏览取价（较慢、耗模型 Token，见 `workspace/stock_system/README.md`）。需本机可执行 `openclaw` 且模型/工具已配置。历史 `original/` 已移除。监控可读 `data/predictions_*.json`、`reconcile_history.jsonl`、`iteration_briefing.txt` 等。可选环境变量：`STOCK_SYSTEM_ROOT`、`OPENCLAW_AGENT_TIMEOUT`、`STOCK_OPENCLAW_MAX_ATTEMPTS`（单股拉价重试次数，默认 2）等，详见 `workspace/stock_system/refactored/openclaw_search_provider.py` 顶部说明。
+股票分析**仅通过 OpenClaw**：Python 脚本内调用 `openclaw agent`，由 Agent 使用网页搜索/浏览取价（较慢、耗模型 Token，见 `workspace-stock/stock_system/README.md`）。**权威目录**为 `workspace-stock/stock_system`（与 `stock` agent workspace 一致）；`workspace/stock_system` 若仍存在多为历史副本，勿与 Cron 混用。需本机可执行 `openclaw` 且模型/工具已配置。历史 `original/` 已移除。监控可读 `data/predictions_*.json`、`reconcile_history.jsonl`、`iteration_briefing.txt` 等。可选环境变量：`STOCK_SYSTEM_ROOT`、`OPENCLAW_AGENT_TIMEOUT`、`STOCK_OPENCLAW_MAX_ATTEMPTS`（单股拉价重试次数，默认 2）等，详见 `workspace-stock/stock_system/refactored/openclaw_search_provider.py` 顶部说明。
 
 **免费搜索优化（仍用 DuckDuckGo、无 Brave 等 API Key）**：在 `openclaw.json` 中合并如下思路（字段与 OpenClaw 文档 `tools/duckduckgo-search.md`、`zh-CN/tools/web.md` 一致）。`region: cn-zh` 偏向中国大陆中文结果；`maxResults` 略增便于模型挑到财经站；`cacheTtlMinutes` 降低可减轻行情类查询缓存偏旧。**修改后重启 Gateway**（或你实际跑 agent 的进程）使配置生效。
 
@@ -90,12 +90,12 @@ python3 refactored/openclaw_cron_analyzer.py morning
 
 ## 5. 自动化与 Cron
 
-- 定时任务定义在 `cron/jobs.json`；其中 shell 片段使用 `"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace/stock_system"`。
+- 定时任务定义在 `cron/jobs.json`；其中 shell 片段使用 `"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace-stock/stock_system"`。
 - 在 OpenClaw 中加载/同步 Cron 后，确保运行代理的环境里有正确的 `HOME` 或 `OPENCLAW_HOME`。
 
 ### 5.1 Cron 消息、`OPENCLAW_HOME` 与 shell 展开
 
-任务 `payload.message` 里包含 **bash 风格** 的路径：`cd "${OPENCLAW_HOME:-$HOME/.openclaw}/workspace/stock_system" && ...`。
+任务 `payload.message` 里包含 **bash 风格** 的路径：`cd "${OPENCLAW_HOME:-$HOME/.openclaw}/workspace-stock/stock_system" && ...`。
 
 **请注意：**
 
@@ -107,8 +107,8 @@ python3 refactored/openclaw_cron_analyzer.py morning
    或在 systemd/launchd 等服务配置里写入同一变量。
 3. **兜底**：若环境变量与 shell 展开不可靠，可直接把 `cron/jobs.json` 里对应 `message` 中的路径改成**本机绝对路径**（团队各自维护或使用内网模板生成）。
 
-4. **直跑脚本（推荐作 crontab 备选）**：`workspace/stock_system/scripts/run_stock_cron.sh` 会 `cd` 到 `STOCK_SYSTEM_ROOT`（或 `OPENCLAW_HOME/workspace/stock_system`）并执行 `refactored/openclaw_cron_analyzer.py`，不经过 OpenClaw `agentTurn`。系统 crontab 可调用该脚本，分析结果仍写入 `stock_system/data/` 与 `reports/`。
-5. **定期清理**：`scripts/cleanup_stock_system.sh` 定义日志/报告/历史 JSON 的保留天数；OpenClaw Cron 每日 02:00 调用该脚本。细则见 `workspace/stock_system/README.md` 中的表格。
+4. **直跑脚本（推荐作 crontab 备选）**：`workspace-stock/stock_system/scripts/run_stock_cron.sh` 会 `cd` 到 `STOCK_SYSTEM_ROOT`（或 `OPENCLAW_HOME/workspace-stock/stock_system`）并执行 `refactored/openclaw_cron_analyzer.py`，不经过 OpenClaw `agentTurn`。系统 crontab 可调用该脚本，分析结果仍写入该 `stock_system/data/` 与 `reports/`。
+5. **定期清理**：`scripts/cleanup_stock_system.sh` 定义日志/报告/历史 JSON 的保留天数；OpenClaw Cron 每日 02:00 调用该脚本。细则见 `workspace-stock/stock_system/README.md` 中的表格。
 
 ## 6. 本地环境文件（不提交）
 

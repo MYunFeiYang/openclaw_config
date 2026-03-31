@@ -1,0 +1,169 @@
+{
+  "timestamp": "2026-03-19T11:45:15.895018",
+  "analysis_type": "evening",
+  "summary": {
+    "report_time": "2026-03-19T11:45:15.888350",
+    "analysis_type": "evening",
+    "buy_recommendations": [],
+    "sell_recommendations": [
+      {
+        "stock": {
+          "name": "京东方A",
+          "symbol": "000725",
+          "sector": "面板",
+          "weight": 0.0
+        },
+        "current_price": 97.6,
+        "change_percent": -2.4,
+        "technical_score": 3.6,
+        "fundamental_score": 6.0,
+        "sentiment_score": 3.2,
+        "sector_score": 6.8,
+        "final_score": 4.7,
+        "signal": "卖出",
+        "confidence": 71,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-19T11:45:15.887963"
+      },
+      {
+        "stock": {
+          "name": "宁德时代",
+          "symbol": "300750",
+          "sector": "新能源",
+          "weight": 0.8
+        },
+        "current_price": 141.48,
+        "change_percent": 1.05,
+        "technical_score": 4.6,
+        "fundamental_score": 4.0,
+        "sentiment_score": 4.8,
+        "sector_score": 5.8,
+        "final_score": 4.5,
+        "signal": "卖出",
+        "confidence": 71,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-19T11:45:15.886958"
+      }
+    ],
+    "hold_recommendations": [
+      {
+        "stock": {
+          "name": "比亚迪",
+          "symbol": "002594",
+          "sector": "新能源",
+          "weight": 0.4
+        },
+        "current_price": 122.91,
+        "change_percent": 2.42,
+        "technical_score": 6.6,
+        "fundamental_score": 5.7,
+        "sentiment_score": 4.8,
+        "sector_score": 7.2,
+        "final_score": 6.1,
+        "signal": "持有",
+        "confidence": 70,
+        "reasons": [
+          "技术面有所改善",
+          "估值相对合理"
+        ],
+        "prediction_time": "2026-03-19T11:45:15.887282"
+      },
+      {
+        "stock": {
+          "name": "万科A",
+          "symbol": "000002",
+          "sector": "地产",
+          "weight": 0.1
+        },
+        "current_price": 106.91,
+        "change_percent": 1.82,
+        "technical_score": 4.8,
+        "fundamental_score": 5.7,
+        "sentiment_score": 5.8,
+        "sector_score": 6.8,
+        "final_score": 5.5,
+        "signal": "持有",
+        "confidence": 63,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-19T11:45:15.887836"
+      }
+    ],
+    "market_overview": {
+      "total_stocks": 10,
+      "buy_count": 0,
+      "sell_count": 2,
+      "hold_count": 2,
+      "avg_buy_score": 0,
+      "avg_sell_score": 4.6,
+      "avg_hold_score": 5.8,
+      "buy_sectors": [],
+      "sell_sectors": [
+        "面板",
+        "新能源"
+      ],
+      "hold_sectors": [
+        "地产",
+        "新能源"
+      ],
+      "market_sentiment": "谨慎"
+    },
+    "sector_analysis": {
+      "新能源": {
+        "avg_score": 5.3,
+        "stock_count": 2,
+        "trend": "震荡"
+      },
+      "地产": {
+        "avg_score": 5.5,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "消费": {
+        "avg_score": 5.3,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "医药": {
+        "avg_score": 5.2,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "科技": {
+        "avg_score": 5.2,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "白酒": {
+        "avg_score": 5.0,
+        "stock_count": 2,
+        "trend": "震荡"
+      },
+      "面板": {
+        "avg_score": 4.7,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "银行": {
+        "avg_score": 4.4,
+        "stock_count": 1,
+        "trend": "震荡"
+      }
+    },
+    "risk_alerts": [],
+    "next_actions": [
+      "总结全天市场表现",
+      "为次日交易做准备",
+      "关注晚间重要消息"
+    ]
+  },
+  "report_text": "【A股收盘总结报告】\n============================================================\n总结时间: 2026-03-19 11:45:15\n分析类型: 收盘\n============================================================\n\n【推荐总结】\n卖出推荐 (2只):\n  1. 京东方A (000725) - 评分:4.7\n  2. 宁德时代 (300750) - 评分:4.5\n持有推荐 (2只):\n  1. 比亚迪 (002594) - 评分:6.1\n  2. 万科A (000002) - 评分:5.5\n\n【市场概况】\n总股票数: 10\n买入推荐: 0只 | 平均评分: 0\n卖出推荐: 2只 | 平均评分: 4.6\n持有推荐: 2只 | 平均评分: 5.8\n市场情绪: 谨慎\n\n【行业分析】\n新能源: 平均评分5.3 (震荡, 2只股票)\n地产: 平均评分5.5 (震荡, 1只股票)\n消费: 平均评分5.3 (震荡, 1只股票)\n医药: 平均评分5.2 (震荡, 1只股票)\n科技: 平均评分5.2 (震荡, 1只股票)\n白酒: 平均评分5.0 (震荡, 2只股票)\n面板: 平均评分4.7 (震荡, 1只股票)\n银行: 平均评分4.4 (震荡, 1只股票)\n\n【下一步行动】\n1. 总结全天市场表现\n2. 为次日交易做准备\n3. 关注晚间重要消息"
+}

@@ -1,0 +1,62 @@
+{
+  "source_file": "/Users/thinkway/.openclaw/workspace/stock_system/data/predictions_morning_20260326_080720.json",
+  "analysis_type": "morning",
+  "bundle_timestamp": "2026-03-26T08:07:20.704502",
+  "evaluated_at": "2026-03-26T08:28:25.039018",
+  "neutral_band_percent": 0.05,
+  "total": 5,
+  "direction_matches": 5,
+  "direction_accuracy": 1.0,
+  "details": [
+    {
+      "symbol": "600519",
+      "name": "贵州茅台",
+      "signal": "卖出",
+      "change_percent": -1.88,
+      "expected_direction": -1,
+      "inferred_direction_from_change": -1,
+      "direction_match": true,
+      "data_provenance": "openclaw_agent_web"
+    },
+    {
+      "symbol": "600036",
+      "name": "招商银行",
+      "signal": "卖出",
+      "change_percent": -1.31,
+      "expected_direction": -1,
+      "inferred_direction_from_change": -1,
+      "direction_match": true,
+      "data_provenance": "openclaw_agent_web"
+    },
+    {
+      "symbol": "000858",
+      "name": "五粮液",
+      "signal": "卖出",
+      "change_percent": -1.95,
+      "expected_direction": -1,
+      "inferred_direction_from_change": -1,
+      "direction_match": true,
+      "data_provenance": "openclaw_agent_web"
+    },
+    {
+      "symbol": "600276",
+      "name": "恒瑞医药",
+      "signal": "卖出",
+      "change_percent": -1.58,
+      "expected_direction": -1,
+      "inferred_direction_from_change": -1,
+      "direction_match": true,
+      "data_provenance": "openclaw_agent_web"
+    },
+    {
+      "symbol": "300750",
+      "name": "宁德时代",
+      "signal": "卖出",
+      "change_percent": -2.06,
+      "expected_direction": -1,
+      "inferred_direction_from_change": -1,
+      "direction_match": true,
+      "data_provenance": "openclaw_agent_web"
+    }
+  ]
+}

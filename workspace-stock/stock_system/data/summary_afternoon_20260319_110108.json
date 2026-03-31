@@ -1,0 +1,172 @@
+{
+  "timestamp": "2026-03-19T11:01:08.676029",
+  "analysis_type": "afternoon",
+  "summary": {
+    "report_time": "2026-03-19T11:01:08.674216",
+    "analysis_type": "afternoon",
+    "buy_recommendations": [],
+    "sell_recommendations": [
+      {
+        "stock": {
+          "name": "伊利股份",
+          "symbol": "600887",
+          "sector": "消费",
+          "weight": 0.2
+        },
+        "current_price": 112.77,
+        "change_percent": 2.52,
+        "technical_score": 5.2,
+        "fundamental_score": 4.7,
+        "sentiment_score": 3.8,
+        "sector_score": 5.8,
+        "final_score": 4.9,
+        "signal": "卖出",
+        "confidence": 69,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-19T11:01:08.674022"
+      },
+      {
+        "stock": {
+          "name": "京东方A",
+          "symbol": "000725",
+          "sector": "面板",
+          "weight": 0.0
+        },
+        "current_price": 100.64,
+        "change_percent": 0.64,
+        "technical_score": 3.4,
+        "fundamental_score": 6.0,
+        "sentiment_score": 5.0,
+        "sector_score": 5.5,
+        "final_score": 4.8,
+        "signal": "卖出",
+        "confidence": 71,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-19T11:01:08.674115"
+      }
+    ],
+    "hold_recommendations": [
+      {
+        "stock": {
+          "name": "宁德时代",
+          "symbol": "300750",
+          "sector": "新能源",
+          "weight": 0.8
+        },
+        "current_price": 143.87,
+        "change_percent": 2.76,
+        "technical_score": 5.2,
+        "fundamental_score": 5.7,
+        "sentiment_score": 5.8,
+        "sector_score": 5.8,
+        "final_score": 5.5,
+        "signal": "持有",
+        "confidence": 63,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-19T11:01:08.673726"
+      },
+      {
+        "stock": {
+          "name": "恒瑞医药",
+          "symbol": "600276",
+          "sector": "医药",
+          "weight": 0.5
+        },
+        "current_price": 127.03,
+        "change_percent": 1.62,
+        "technical_score": 5.2,
+        "fundamental_score": 5.7,
+        "sentiment_score": 5.8,
+        "sector_score": 4.5,
+        "final_score": 5.4,
+        "signal": "持有",
+        "confidence": 52,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-19T11:01:08.673874"
+      }
+    ],
+    "market_overview": {
+      "total_stocks": 10,
+      "buy_count": 0,
+      "sell_count": 2,
+      "hold_count": 2,
+      "avg_buy_score": 0,
+      "avg_sell_score": 4.8,
+      "avg_hold_score": 5.5,
+      "buy_sectors": [],
+      "sell_sectors": [
+        "面板",
+        "消费"
+      ],
+      "hold_sectors": [
+        "新能源",
+        "医药"
+      ],
+      "market_sentiment": "谨慎"
+    },
+    "sector_analysis": {
+      "新能源": {
+        "avg_score": 5.1,
+        "stock_count": 2,
+        "trend": "震荡"
+      },
+      "医药": {
+        "avg_score": 5.4,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "银行": {
+        "avg_score": 5.2,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "白酒": {
+        "avg_score": 4.8,
+        "stock_count": 2,
+        "trend": "震荡"
+      },
+      "消费": {
+        "avg_score": 4.9,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "面板": {
+        "avg_score": 4.8,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "地产": {
+        "avg_score": 4.0,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "科技": {
+        "avg_score": 3.9,
+        "stock_count": 1,
+        "trend": "弱势"
+      }
+    },
+    "risk_alerts": [
+      "市场卖出信号较多，注意风险控制",
+      "弱势行业: 科技"
+    ],
+    "next_actions": [
+      "关注午后资金动向",
+      "观察上午强势股的持续性",
+      "留意尾盘异动情况"
+    ]
+  },
+  "report_text": "【A股午盘总结报告】\n============================================================\n总结时间: 2026-03-19 11:01:08\n分析类型: 午盘\n============================================================\n\n【推荐总结】\n卖出推荐 (2只):\n  1. 伊利股份 (600887) - 评分:4.9\n  2. 京东方A (000725) - 评分:4.8\n持有推荐 (2只):\n  1. 宁德时代 (300750) - 评分:5.5\n  2. 恒瑞医药 (600276) - 评分:5.4\n\n【市场概况】\n总股票数: 10\n买入推荐: 0只 | 平均评分: 0\n卖出推荐: 2只 | 平均评分: 4.8\n持有推荐: 2只 | 平均评分: 5.5\n市场情绪: 谨慎\n\n【行业分析】\n新能源: 平均评分5.1 (震荡, 2只股票)\n医药: 平均评分5.4 (震荡, 1只股票)\n银行: 平均评分5.2 (震荡, 1只股票)\n白酒: 平均评分4.8 (震荡, 2只股票)\n消费: 平均评分4.9 (震荡, 1只股票)\n面板: 平均评分4.8 (震荡, 1只股票)\n地产: 平均评分4.0 (震荡, 1只股票)\n科技: 平均评分3.9 (弱势, 1只股票)\n\n【风险提示】\n1. 市场卖出信号较多，注意风险控制\n2. 弱势行业: 科技\n\n【下一步行动】\n1. 关注午后资金动向\n2. 观察上午强势股的持续性\n3. 留意尾盘异动情况"
+}

@@ -1,0 +1,169 @@
+{
+  "timestamp": "2026-03-19T11:01:09.553506",
+  "analysis_type": "afternoon",
+  "summary": {
+    "report_time": "2026-03-19T11:01:09.551482",
+    "analysis_type": "afternoon",
+    "buy_recommendations": [],
+    "sell_recommendations": [
+      {
+        "stock": {
+          "name": "恒瑞医药",
+          "symbol": "600276",
+          "sector": "医药",
+          "weight": 0.5
+        },
+        "current_price": 122.12,
+        "change_percent": -2.3,
+        "technical_score": 3.4,
+        "fundamental_score": 5.3,
+        "sentiment_score": 6.5,
+        "sector_score": 5.8,
+        "final_score": 4.8,
+        "signal": "卖出",
+        "confidence": 66,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-19T11:01:09.551212"
+      },
+      {
+        "stock": {
+          "name": "京东方A",
+          "symbol": "000725",
+          "sector": "面板",
+          "weight": 0.0
+        },
+        "current_price": 97.57,
+        "change_percent": -2.43,
+        "technical_score": 3.6,
+        "fundamental_score": 4.3,
+        "sentiment_score": 6.2,
+        "sector_score": 4.8,
+        "final_score": 4.4,
+        "signal": "卖出",
+        "confidence": 75,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-19T11:01:09.551403"
+      }
+    ],
+    "hold_recommendations": [
+      {
+        "stock": {
+          "name": "伊利股份",
+          "symbol": "600887",
+          "sector": "消费",
+          "weight": 0.2
+        },
+        "current_price": 107.24,
+        "change_percent": -2.51,
+        "technical_score": 7.0,
+        "fundamental_score": 6.0,
+        "sentiment_score": 4.5,
+        "sector_score": 4.2,
+        "final_score": 6.0,
+        "signal": "持有",
+        "confidence": 68,
+        "reasons": [
+          "技术面有所改善",
+          "估值相对合理"
+        ],
+        "prediction_time": "2026-03-19T11:01:09.551329"
+      },
+      {
+        "stock": {
+          "name": "海康威视",
+          "symbol": "002415",
+          "sector": "科技",
+          "weight": 0.3
+        },
+        "current_price": 112.58,
+        "change_percent": -2.1,
+        "technical_score": 6.6,
+        "fundamental_score": 4.7,
+        "sentiment_score": 5.2,
+        "sector_score": 7.0,
+        "final_score": 5.8,
+        "signal": "持有",
+        "confidence": 55,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-19T11:01:09.551292"
+      }
+    ],
+    "market_overview": {
+      "total_stocks": 10,
+      "buy_count": 0,
+      "sell_count": 2,
+      "hold_count": 2,
+      "avg_buy_score": 0,
+      "avg_sell_score": 4.6,
+      "avg_hold_score": 5.9,
+      "buy_sectors": [],
+      "sell_sectors": [
+        "面板",
+        "医药"
+      ],
+      "hold_sectors": [
+        "消费",
+        "科技"
+      ],
+      "market_sentiment": "谨慎"
+    },
+    "sector_analysis": {
+      "消费": {
+        "avg_score": 6.0,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "科技": {
+        "avg_score": 5.8,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "新能源": {
+        "avg_score": 5.3,
+        "stock_count": 2,
+        "trend": "震荡"
+      },
+      "地产": {
+        "avg_score": 5.3,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "银行": {
+        "avg_score": 5.2,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "医药": {
+        "avg_score": 4.8,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "面板": {
+        "avg_score": 4.4,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "白酒": {
+        "avg_score": 4.3,
+        "stock_count": 2,
+        "trend": "震荡"
+      }
+    },
+    "risk_alerts": [],
+    "next_actions": [
+      "关注午后资金动向",
+      "观察上午强势股的持续性",
+      "留意尾盘异动情况"
+    ]
+  },
+  "report_text": "【A股午盘总结报告】\n============================================================\n总结时间: 2026-03-19 11:01:09\n分析类型: 午盘\n============================================================\n\n【推荐总结】\n卖出推荐 (2只):\n  1. 恒瑞医药 (600276) - 评分:4.8\n  2. 京东方A (000725) - 评分:4.4\n持有推荐 (2只):\n  1. 伊利股份 (600887) - 评分:6.0\n  2. 海康威视 (002415) - 评分:5.8\n\n【市场概况】\n总股票数: 10\n买入推荐: 0只 | 平均评分: 0\n卖出推荐: 2只 | 平均评分: 4.6\n持有推荐: 2只 | 平均评分: 5.9\n市场情绪: 谨慎\n\n【行业分析】\n消费: 平均评分6.0 (震荡, 1只股票)\n科技: 平均评分5.8 (震荡, 1只股票)\n新能源: 平均评分5.3 (震荡, 2只股票)\n地产: 平均评分5.3 (震荡, 1只股票)\n银行: 平均评分5.2 (震荡, 1只股票)\n医药: 平均评分4.8 (震荡, 1只股票)\n面板: 平均评分4.4 (震荡, 1只股票)\n白酒: 平均评分4.3 (震荡, 2只股票)\n\n【下一步行动】\n1. 关注午后资金动向\n2. 观察上午强势股的持续性\n3. 留意尾盘异动情况"
+}

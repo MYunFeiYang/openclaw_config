@@ -1,0 +1,169 @@
+{
+  "timestamp": "2026-03-19T11:01:08.546105",
+  "analysis_type": "morning",
+  "summary": {
+    "report_time": "2026-03-19T11:01:08.544928",
+    "analysis_type": "morning",
+    "buy_recommendations": [],
+    "sell_recommendations": [
+      {
+        "stock": {
+          "name": "伊利股份",
+          "symbol": "600887",
+          "sector": "消费",
+          "weight": 0.2
+        },
+        "current_price": 109.2,
+        "change_percent": -0.72,
+        "technical_score": 4.4,
+        "fundamental_score": 4.7,
+        "sentiment_score": 3.8,
+        "sector_score": 6.0,
+        "final_score": 4.6,
+        "signal": "卖出",
+        "confidence": 75,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-19T11:01:08.544774"
+      },
+      {
+        "stock": {
+          "name": "海康威视",
+          "symbol": "002415",
+          "sector": "科技",
+          "weight": 0.3
+        },
+        "current_price": 118.25,
+        "change_percent": 2.83,
+        "technical_score": 2.6,
+        "fundamental_score": 5.3,
+        "sentiment_score": 4.0,
+        "sector_score": 6.2,
+        "final_score": 4.1,
+        "signal": "卖出",
+        "confidence": 66,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-19T11:01:08.544735"
+      }
+    ],
+    "hold_recommendations": [
+      {
+        "stock": {
+          "name": "万科A",
+          "symbol": "000002",
+          "sector": "地产",
+          "weight": 0.1
+        },
+        "current_price": 103.26,
+        "change_percent": -1.66,
+        "technical_score": 7.0,
+        "fundamental_score": 6.3,
+        "sentiment_score": 6.8,
+        "sector_score": 5.8,
+        "final_score": 6.6,
+        "signal": "持有",
+        "confidence": 67,
+        "reasons": [
+          "技术面有所改善",
+          "估值相对合理"
+        ],
+        "prediction_time": "2026-03-19T11:01:08.544812"
+      },
+      {
+        "stock": {
+          "name": "比亚迪",
+          "symbol": "002594",
+          "sector": "新能源",
+          "weight": 0.4
+        },
+        "current_price": 119.49,
+        "change_percent": -0.43,
+        "technical_score": 6.6,
+        "fundamental_score": 5.3,
+        "sentiment_score": 5.5,
+        "sector_score": 5.8,
+        "final_score": 5.9,
+        "signal": "持有",
+        "confidence": 62,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-19T11:01:08.544694"
+      }
+    ],
+    "market_overview": {
+      "total_stocks": 10,
+      "buy_count": 0,
+      "sell_count": 2,
+      "hold_count": 2,
+      "avg_buy_score": 0,
+      "avg_sell_score": 4.3,
+      "avg_hold_score": 6.2,
+      "buy_sectors": [],
+      "sell_sectors": [
+        "科技",
+        "消费"
+      ],
+      "hold_sectors": [
+        "地产",
+        "新能源"
+      ],
+      "market_sentiment": "谨慎"
+    },
+    "sector_analysis": {
+      "地产": {
+        "avg_score": 6.6,
+        "stock_count": 1,
+        "trend": "强势"
+      },
+      "新能源": {
+        "avg_score": 5.7,
+        "stock_count": 2,
+        "trend": "震荡"
+      },
+      "银行": {
+        "avg_score": 5.7,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "白酒": {
+        "avg_score": 5.3,
+        "stock_count": 2,
+        "trend": "震荡"
+      },
+      "面板": {
+        "avg_score": 5.3,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "医药": {
+        "avg_score": 5.2,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "消费": {
+        "avg_score": 4.6,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "科技": {
+        "avg_score": 4.1,
+        "stock_count": 1,
+        "trend": "震荡"
+      }
+    },
+    "risk_alerts": [],
+    "next_actions": [
+      "关注开盘后的量价配合情况",
+      "观察昨夜美股对A股的影响",
+      "留意早盘资金流入方向"
+    ]
+  },
+  "report_text": "【A股早盘总结报告】\n============================================================\n总结时间: 2026-03-19 11:01:08\n分析类型: 早盘\n============================================================\n\n【推荐总结】\n卖出推荐 (2只):\n  1. 伊利股份 (600887) - 评分:4.6\n  2. 海康威视 (002415) - 评分:4.1\n持有推荐 (2只):\n  1. 万科A (000002) - 评分:6.6\n  2. 比亚迪 (002594) - 评分:5.9\n\n【市场概况】\n总股票数: 10\n买入推荐: 0只 | 平均评分: 0\n卖出推荐: 2只 | 平均评分: 4.3\n持有推荐: 2只 | 平均评分: 6.2\n市场情绪: 谨慎\n\n【行业分析】\n地产: 平均评分6.6 (强势, 1只股票)\n新能源: 平均评分5.7 (震荡, 2只股票)\n银行: 平均评分5.7 (震荡, 1只股票)\n白酒: 平均评分5.3 (震荡, 2只股票)\n面板: 平均评分5.3 (震荡, 1只股票)\n医药: 平均评分5.2 (震荡, 1只股票)\n消费: 平均评分4.6 (震荡, 1只股票)\n科技: 平均评分4.1 (震荡, 1只股票)\n\n【下一步行动】\n1. 关注开盘后的量价配合情况\n2. 观察昨夜美股对A股的影响\n3. 留意早盘资金流入方向"
+}

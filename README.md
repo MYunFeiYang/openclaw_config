@@ -12,7 +12,7 @@
 
 | 路径 | 说明 |
 |------|------|
-| `workspace/stock_system/` | 股票预测与分析脚本；Cron 入口推荐 `refactored/openclaw_cron_analyzer.py` |
+| `workspace-stock/stock_system/` | 股票预测与分析脚本（与 `stock` agent 同源）；Cron 入口推荐 `refactored/openclaw_cron_analyzer.py` |
 | `workspace/` | 其他工作区文件、`AGENTS.md` 等 |
 | `extensions/` | 本地安装的 OpenClaw 插件（`node_modules` 不纳入 Git） |
 | `skills/` | 技能配置与内容 |

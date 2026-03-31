@@ -1,0 +1,123 @@
+{
+  "timestamp": "2026-03-27T08:01:18.554507",
+  "analysis_type": "morning",
+  "data_provider": "openclaw",
+  "predictions": [
+    {
+      "stock": {
+        "name": "贵州茅台",
+        "symbol": "600519",
+        "sector": "白酒",
+        "weight": 0.9
+      },
+      "current_price": 1666.0,
+      "change_percent": -0.89,
+      "technical_score": 4.4,
+      "fundamental_score": 4.7,
+      "sentiment_score": 5.2,
+      "sector_score": 5.5,
+      "final_score": 4.7,
+      "signal": "卖出",
+      "confidence": 63,
+      "reasons": [
+        "处于震荡整理阶段",
+        "等待明确方向"
+      ],
+      "prediction_time": "2026-03-27T08:00:21.582911",
+      "data_provenance": "openclaw_agent_web"
+    },
+    {
+      "stock": {
+        "name": "招商银行",
+        "symbol": "600036",
+        "sector": "银行",
+        "weight": 0.7
+      },
+      "current_price": 41.6,
+      "change_percent": -0.48,
+      "technical_score": 4.4,
+      "fundamental_score": 4.7,
+      "sentiment_score": 5.2,
+      "sector_score": 5.5,
+      "final_score": 4.7,
+      "signal": "卖出",
+      "confidence": 63,
+      "reasons": [
+        "处于震荡整理阶段",
+        "等待明确方向"
+      ],
+      "prediction_time": "2026-03-27T08:00:50.713336",
+      "data_provenance": "openclaw_agent_web"
+    },
+    {
+      "stock": {
+        "name": "五粮液",
+        "symbol": "000858",
+        "sector": "白酒",
+        "weight": 0.6
+      },
+      "current_price": 132.11,
+      "change_percent": -0.89,
+      "technical_score": 4.4,
+      "fundamental_score": 4.7,
+      "sentiment_score": 5.2,
+      "sector_score": 5.5,
+      "final_score": 4.7,
+      "signal": "卖出",
+      "confidence": 63,
+      "reasons": [
+        "处于震荡整理阶段",
+        "等待明确方向"
+      ],
+      "prediction_time": "2026-03-27T08:01:03.808277",
+      "data_provenance": "openclaw_agent_web"
+    },
+    {
+      "stock": {
+        "name": "恒瑞医药",
+        "symbol": "600276",
+        "sector": "医药",
+        "weight": 0.5
+      },
+      "current_price": 44.25,
+      "change_percent": -0.54,
+      "technical_score": 4.4,
+      "fundamental_score": 4.7,
+      "sentiment_score": 5.2,
+      "sector_score": 5.5,
+      "final_score": 4.7,
+      "signal": "卖出",
+      "confidence": 63,
+      "reasons": [
+        "处于震荡整理阶段",
+        "等待明确方向"
+      ],
+      "prediction_time": "2026-03-27T08:01:18.554226",
+      "data_provenance": "openclaw_agent_web"
+    },
+    {
+      "stock": {
+        "name": "宁德时代",
+        "symbol": "300750",
+        "sector": "新能源",
+        "weight": 0.8
+      },
+      "current_price": 205.01,
+      "change_percent": -1.24,
+      "technical_score": 4.4,
+      "fundamental_score": 4.7,
+      "sentiment_score": 4.5,
+      "sector_score": 5.2,
+      "final_score": 4.6,
+      "signal": "卖出",
+      "confidence": 62,
+      "reasons": [
+        "处于震荡整理阶段",
+        "等待明确方向"
+      ],
+      "prediction_time": "2026-03-27T08:00:36.442165",
+      "data_provenance": "openclaw_agent_web"
+    }
+  ],
+  "prediction_count": 5
+}

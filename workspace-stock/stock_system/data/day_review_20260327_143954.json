@@ -1,0 +1,28 @@
+{
+  "kind": "day_review",
+  "trade_date": "20260327",
+  "generated_at": "2026-03-27T14:39:54.556050",
+  "meta": {
+    "trade_date": "20260327",
+    "slots": {
+      "morning": {
+        "file": "predictions_morning_20260327_105430.json",
+        "count": 5,
+        "timestamp": "2026-03-27T10:54:30.300511"
+      },
+      "afternoon": null,
+      "evening": {
+        "file": "predictions_evening_20260327_105435.json",
+        "count": 10,
+        "timestamp": "2026-03-27T10:54:35.695246"
+      },
+      "weekly": null
+    }
+  },
+  "reconcile_summary": {
+    "file": "reconcile_20260327_143853.json",
+    "hit_rate": 0.8,
+    "hits": 4,
+    "misses": 1
+  }
+}

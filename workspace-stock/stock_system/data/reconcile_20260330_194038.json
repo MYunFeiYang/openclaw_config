@@ -1,0 +1,105 @@
+{
+  "kind": "reconcile",
+  "trade_date": "20260330",
+  "morning_source": "/Users/thinkway/.openclaw/workspace/stock_system/data/predictions_morning_20260330_193833.json",
+  "generated_at": "2026-03-30T19:40:38.110649",
+  "reconcile_logic": {
+    "adaptive_neutral_band": true,
+    "strong_signal_stricter": true,
+    "benchmark_return_pct": null,
+    "accuracy_tuning": {
+      "signal_margin": 0.12,
+      "reconcile_band_base": 0.55,
+      "reconcile_band_vol_coef": 0.07,
+      "reconcile_band_min": 0.35,
+      "reconcile_band_max": 2.0,
+      "strong_band_factor": 1.35,
+      "strong_band_min_extra": 0.35
+    }
+  },
+  "stats": {
+    "rows": 5,
+    "with_prices": 5,
+    "direction_hits": 5,
+    "direction_misses": 0,
+    "fetch_errors": 0,
+    "hit_rate": 1.0
+  },
+  "rows": [
+    {
+      "symbol": "600036",
+      "name": "招商银行",
+      "morning_price": 42.85,
+      "evening_price": 42.85,
+      "session_return_pct": 0.0,
+      "benchmark_return_pct": null,
+      "session_return_for_match_pct": 0.0,
+      "neutral_band_pct": 0.6326,
+      "strong_band_pct": 0.9826,
+      "morning_signal": "持有",
+      "expected_direction": 0,
+      "inferred_direction_from_session_return": 0,
+      "direction_match": true
+    },
+    {
+      "symbol": "000858",
+      "name": "五粮液",
+      "morning_price": 142.3,
+      "evening_price": 142.3,
+      "session_return_pct": 0.0,
+      "benchmark_return_pct": null,
+      "session_return_for_match_pct": 0.0,
+      "neutral_band_pct": 0.6312,
+      "strong_band_pct": 0.9812,
+      "morning_signal": "持有",
+      "expected_direction": 0,
+      "inferred_direction_from_session_return": 0,
+      "direction_match": true
+    },
+    {
+      "symbol": "600519",
+      "name": "贵州茅台",
+      "morning_price": 1420.0,
+      "evening_price": 1420.0,
+      "session_return_pct": 0.0,
+      "benchmark_return_pct": null,
+      "session_return_for_match_pct": 0.0,
+      "neutral_band_pct": 0.5696,
+      "strong_band_pct": 0.9196,
+      "morning_signal": "持有",
+      "expected_direction": 0,
+      "inferred_direction_from_session_return": 0,
+      "direction_match": true
+    },
+    {
+      "symbol": "300750",
+      "name": "宁德时代",
+      "morning_price": 413.0,
+      "evening_price": 413.0,
+      "session_return_pct": 0.0,
+      "benchmark_return_pct": null,
+      "session_return_for_match_pct": 0.0,
+      "neutral_band_pct": 0.6032,
+      "strong_band_pct": 0.9532,
+      "morning_signal": "持有",
+      "expected_direction": 0,
+      "inferred_direction_from_session_return": 0,
+      "direction_match": true
+    },
+    {
+      "symbol": "600276",
+      "name": "恒瑞医药",
+      "morning_price": 44.68,
+      "evening_price": 44.68,
+      "session_return_pct": 0.0,
+      "benchmark_return_pct": null,
+      "session_return_for_match_pct": 0.0,
+      "neutral_band_pct": 0.5815,
+      "strong_band_pct": 0.9315,
+      "morning_signal": "持有",
+      "expected_direction": 0,
+      "inferred_direction_from_session_return": 0,
+      "direction_match": true
+    }
+  ]
+}

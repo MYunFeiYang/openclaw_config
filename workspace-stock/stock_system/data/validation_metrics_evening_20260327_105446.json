@@ -1,0 +1,112 @@
+{
+  "source_file": "/Users/thinkway/.openclaw/workspace/stock_system/data/predictions_evening_20260327_105435.json",
+  "analysis_type": "evening",
+  "bundle_timestamp": "2026-03-27T10:54:35.695246",
+  "evaluated_at": "2026-03-27T10:54:46.349226",
+  "neutral_band_percent": 0.8,
+  "total": 10,
+  "direction_matches": 8,
+  "direction_accuracy": 0.8,
+  "details": [
+    {
+      "symbol": "600519",
+      "name": "贵州茅台",
+      "signal": "卖出偏持有",
+      "change_percent": -0.89,
+      "expected_direction": 0,
+      "inferred_direction_from_change": -1,
+      "direction_match": false,
+      "data_provenance": null
+    },
+    {
+      "symbol": "600036",
+      "name": "招商银行",
+      "signal": "持有",
+      "change_percent": -0.48,
+      "expected_direction": 0,
+      "inferred_direction_from_change": 0,
+      "direction_match": true,
+      "data_provenance": null
+    },
+    {
+      "symbol": "000858",
+      "name": "五粮液",
+      "signal": "卖出偏持有",
+      "change_percent": -0.89,
+      "expected_direction": 0,
+      "inferred_direction_from_change": -1,
+      "direction_match": false,
+      "data_provenance": null
+    },
+    {
+      "symbol": "600276",
+      "name": "恒瑞医药",
+      "signal": "卖出偏持有",
+      "change_percent": -0.54,
+      "expected_direction": 0,
+      "inferred_direction_from_change": 0,
+      "direction_match": true,
+      "data_provenance": null
+    },
+    {
+      "symbol": "300750",
+      "name": "宁德时代",
+      "signal": "卖出",
+      "change_percent": -1.24,
+      "expected_direction": -1,
+      "inferred_direction_from_change": -1,
+      "direction_match": true,
+      "data_provenance": null
+    },
+    {
+      "symbol": "002415",
+      "name": "海康威视",
+      "signal": "卖出偏持有",
+      "change_percent": -0.79,
+      "expected_direction": 0,
+      "inferred_direction_from_change": 0,
+      "direction_match": true,
+      "data_provenance": null
+    },
+    {
+      "symbol": "600887",
+      "name": "伊利股份",
+      "signal": "卖出偏持有",
+      "change_percent": -0.68,
+      "expected_direction": 0,
+      "inferred_direction_from_change": 0,
+      "direction_match": true,
+      "data_provenance": null
+    },
+    {
+      "symbol": "000002",
+      "name": "万科A",
+      "signal": "卖出偏持有",
+      "change_percent": -0.54,
+      "expected_direction": 0,
+      "inferred_direction_from_change": 0,
+      "direction_match": true,
+      "data_provenance": null
+    },
+    {
+      "symbol": "000725",
+      "name": "京东方A",
+      "signal": "持有",
+      "change_percent": -0.47,
+      "expected_direction": 0,
+      "inferred_direction_from_change": 0,
+      "direction_match": true,
+      "data_provenance": null
+    },
+    {
+      "symbol": "002594",
+      "name": "比亚迪",
+      "signal": "卖出",
+      "change_percent": -1.35,
+      "expected_direction": -1,
+      "inferred_direction_from_change": -1,
+      "direction_match": true,
+      "data_provenance": null
+    }
+  ]
+}

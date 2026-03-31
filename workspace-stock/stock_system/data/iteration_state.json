@@ -1,0 +1,15 @@
+{
+  "updated_at": "2026-03-30T19:40:38.122430",
+  "as_of_trade_date": "20260330",
+  "window_effective_sessions": 2,
+  "mean_hit_rate_recent": 0.9,
+  "last_5_mean_hit_rate": 0.9,
+  "prev_5_mean_hit_rate": null,
+  "hit_rate_trend": "flat",
+  "hit_rate_trend_zh": "持平",
+  "symbol_attention": [],
+  "narrative_lines": [
+    "近 2 次复盘的方向一致率算术平均约 90%。",
+    "最近 2 次复盘平均一致率约 90%。"
+  ]
+}

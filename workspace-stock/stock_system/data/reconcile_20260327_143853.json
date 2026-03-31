@@ -1,0 +1,72 @@
+{
+  "kind": "reconcile",
+  "trade_date": "20260327",
+  "morning_source": "/Users/thinkway/.openclaw/workspace/stock_system/data/predictions_morning_20260327_105430.json",
+  "generated_at": "2026-03-27T14:38:53.138392",
+  "neutral_band_pct": 0.8,
+  "stats": {
+    "rows": 5,
+    "with_prices": 5,
+    "direction_hits": 4,
+    "direction_misses": 1,
+    "fetch_errors": 0,
+    "hit_rate": 0.8
+  },
+  "rows": [
+    {
+      "symbol": "600519",
+      "name": "贵州茅台",
+      "morning_price": 1666.0,
+      "evening_price": 1666.0,
+      "session_return_pct": 0.0,
+      "morning_signal": "卖出偏持有",
+      "expected_direction": 0,
+      "inferred_direction_from_session_return": 0,
+      "direction_match": true
+    },
+    {
+      "symbol": "600036",
+      "name": "招商银行",
+      "morning_price": 41.6,
+      "evening_price": 41.6,
+      "session_return_pct": 0.0,
+      "morning_signal": "持有",
+      "expected_direction": 0,
+      "inferred_direction_from_session_return": 0,
+      "direction_match": true
+    },
+    {
+      "symbol": "000858",
+      "name": "五粮液",
+      "morning_price": 132.11,
+      "evening_price": 132.11,
+      "session_return_pct": 0.0,
+      "morning_signal": "卖出偏持有",
+      "expected_direction": 0,
+      "inferred_direction_from_session_return": 0,
+      "direction_match": true
+    },
+    {
+      "symbol": "600276",
+      "name": "恒瑞医药",
+      "morning_price": 44.25,
+      "evening_price": 44.25,
+      "session_return_pct": 0.0,
+      "morning_signal": "卖出偏持有",
+      "expected_direction": 0,
+      "inferred_direction_from_session_return": 0,
+      "direction_match": true
+    },
+    {
+      "symbol": "300750",
+      "name": "宁德时代",
+      "morning_price": 205.01,
+      "evening_price": 205.01,
+      "session_return_pct": 0.0,
+      "morning_signal": "卖出",
+      "expected_direction": -1,
+      "inferred_direction_from_session_return": 0,
+      "direction_match": false
+    }
+  ]
+}

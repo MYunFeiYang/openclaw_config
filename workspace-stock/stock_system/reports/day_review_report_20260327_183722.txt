@@ -1,0 +1,30 @@
+【A股全日预测汇总】20260327
+生成时间: 2026-03-27T18:37:22.134004
+
+各时段落盘（若当日有跑过）:
+
+### morning
+- 文件: predictions_morning_20260327_105430.json
+- 股票数: 5 | 买入档≥7.0: 0 | 卖出档<5.0: 4
+
+### afternoon
+- 文件: predictions_afternoon_20260327_150615.json
+- 股票数: 10 | 买入档≥7.0: 0 | 卖出档<5.0: 2
+
+### evening
+- 文件: predictions_evening_20260327_160457.json
+- 股票数: 10 | 买入档≥7.0: 0 | 卖出档<5.0: 2
+
+### 收盘复盘 (reconcile)
+- 文件: reconcile_20260327_183722.json
+- 方向一致: 4 / 有效样本 5 (一致率 0.8)
+
+### 持续迭代（已写入 data/iteration_briefing.txt，下一交易日早盘预测报告将自动引用）
+
+当前仅有 1 次复盘记录，方向一致率约 80%；继续积累以便观察滚动趋势。
+
+### 规则自校准（已写入 config/calibration_overrides.json，下一交易日早盘预测生效）
+样本不足（有效方向样本 5 < 24），未调整阈值/权重。
+当前阈值: buy=7.0 hold=5.0 sell=3.5
+
+说明: 汇总不调用大模型；迭代与规则自校准依据 reconcile_history.jsonl；阈值/权重见 config/calibration_overrides.json。

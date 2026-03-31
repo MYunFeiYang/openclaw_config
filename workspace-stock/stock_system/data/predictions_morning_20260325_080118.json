@@ -1,0 +1,123 @@
+{
+  "timestamp": "2026-03-25T08:01:18.388145",
+  "analysis_type": "morning",
+  "data_provider": "openclaw",
+  "predictions": [
+    {
+      "stock": {
+        "name": "宁德时代",
+        "symbol": "300750",
+        "sector": "新能源",
+        "weight": 0.8
+      },
+      "current_price": 405.0,
+      "change_percent": 0.75,
+      "technical_score": 4.8,
+      "fundamental_score": 4.7,
+      "sentiment_score": 5.2,
+      "sector_score": 5.5,
+      "final_score": 4.9,
+      "signal": "卖出",
+      "confidence": 64,
+      "reasons": [
+        "处于震荡整理阶段",
+        "等待明确方向"
+      ],
+      "prediction_time": "2026-03-25T08:00:37.515154",
+      "data_provenance": "openclaw_agent_web"
+    },
+    {
+      "stock": {
+        "name": "五粮液",
+        "symbol": "000858",
+        "sector": "白酒",
+        "weight": 0.6
+      },
+      "current_price": 100.9,
+      "change_percent": 0.67,
+      "technical_score": 4.8,
+      "fundamental_score": 4.7,
+      "sentiment_score": 5.2,
+      "sector_score": 5.5,
+      "final_score": 4.9,
+      "signal": "卖出",
+      "confidence": 64,
+      "reasons": [
+        "处于震荡整理阶段",
+        "等待明确方向"
+      ],
+      "prediction_time": "2026-03-25T08:01:05.145839",
+      "data_provenance": "openclaw_agent_web"
+    },
+    {
+      "stock": {
+        "name": "贵州茅台",
+        "symbol": "600519",
+        "sector": "白酒",
+        "weight": 0.9
+      },
+      "current_price": 1445.0,
+      "change_percent": -0.54,
+      "technical_score": 4.4,
+      "fundamental_score": 4.7,
+      "sentiment_score": 5.2,
+      "sector_score": 5.5,
+      "final_score": 4.7,
+      "signal": "卖出",
+      "confidence": 63,
+      "reasons": [
+        "处于震荡整理阶段",
+        "等待明确方向"
+      ],
+      "prediction_time": "2026-03-25T08:00:23.341112",
+      "data_provenance": "openclaw_agent_web"
+    },
+    {
+      "stock": {
+        "name": "招商银行",
+        "symbol": "600036",
+        "sector": "银行",
+        "weight": 0.7
+      },
+      "current_price": 39.77,
+      "change_percent": -0.38,
+      "technical_score": 4.4,
+      "fundamental_score": 4.7,
+      "sentiment_score": 5.2,
+      "sector_score": 5.5,
+      "final_score": 4.7,
+      "signal": "卖出",
+      "confidence": 63,
+      "reasons": [
+        "处于震荡整理阶段",
+        "等待明确方向"
+      ],
+      "prediction_time": "2026-03-25T08:00:51.560266",
+      "data_provenance": "openclaw_agent_web"
+    },
+    {
+      "stock": {
+        "name": "恒瑞医药",
+        "symbol": "600276",
+        "sector": "医药",
+        "weight": 0.5
+      },
+      "current_price": 55.14,
+      "change_percent": -1.57,
+      "technical_score": 4.4,
+      "fundamental_score": 4.7,
+      "sentiment_score": 4.8,
+      "sector_score": 5.0,
+      "final_score": 4.6,
+      "signal": "卖出",
+      "confidence": 62,
+      "reasons": [
+        "处于震荡整理阶段",
+        "等待明确方向"
+      ],
+      "prediction_time": "2026-03-25T08:01:18.387793",
+      "data_provenance": "openclaw_agent_web"
+    }
+  ],
+  "prediction_count": 5
+}

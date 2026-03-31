@@ -1,0 +1,125 @@
+{
+  "timestamp": "2026-03-25T16:05:54.111426",
+  "analysis_type": "evening",
+  "summary": {
+    "report_time": "2026-03-25T16:05:54.109921",
+    "analysis_type": "evening",
+    "buy_recommendations": [],
+    "sell_recommendations": [
+      {
+        "stock": {
+          "name": "宁德时代",
+          "symbol": "300750",
+          "sector": "新能源",
+          "weight": 0.8
+        },
+        "current_price": 405.0,
+        "change_percent": 0.75,
+        "technical_score": 4.8,
+        "fundamental_score": 4.7,
+        "sentiment_score": 5.2,
+        "sector_score": 5.5,
+        "final_score": 4.9,
+        "signal": "卖出",
+        "confidence": 64,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-25T16:04:12.379497",
+        "data_provenance": "openclaw_agent_web"
+      },
+      {
+        "stock": {
+          "name": "五粮液",
+          "symbol": "000858",
+          "sector": "白酒",
+          "weight": 0.6
+        },
+        "current_price": 100.9,
+        "change_percent": 0.67,
+        "technical_score": 4.8,
+        "fundamental_score": 4.7,
+        "sentiment_score": 5.2,
+        "sector_score": 5.5,
+        "final_score": 4.9,
+        "signal": "卖出",
+        "confidence": 64,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-25T16:04:38.194690",
+        "data_provenance": "openclaw_agent_web"
+      }
+    ],
+    "hold_recommendations": [],
+    "market_overview": {
+      "total_stocks": 10,
+      "buy_count": 0,
+      "sell_count": 2,
+      "hold_count": 0,
+      "avg_buy_score": 0,
+      "avg_sell_score": 4.9,
+      "avg_hold_score": 0,
+      "buy_sectors": [],
+      "sell_sectors": [
+        "新能源",
+        "白酒"
+      ],
+      "hold_sectors": [],
+      "market_sentiment": "谨慎"
+    },
+    "sector_analysis": {
+      "新能源": {
+        "avg_score": 4.8,
+        "stock_count": 2,
+        "trend": "震荡"
+      },
+      "白酒": {
+        "avg_score": 4.8,
+        "stock_count": 2,
+        "trend": "震荡"
+      },
+      "科技": {
+        "avg_score": 4.9,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "银行": {
+        "avg_score": 4.7,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "消费": {
+        "avg_score": 4.7,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "医药": {
+        "avg_score": 4.6,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "面板": {
+        "avg_score": 4.3,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "地产": {
+        "avg_score": 4.2,
+        "stock_count": 1,
+        "trend": "震荡"
+      }
+    },
+    "risk_alerts": [
+      "市场卖出信号较多，注意风险控制"
+    ],
+    "next_actions": [
+      "总结全天市场表现",
+      "为次日交易做准备",
+      "关注晚间重要消息"
+    ]
+  },
+  "report_text": "【A股收盘总结报告】\n============================================================\n总结时间: 2026-03-25 16:05:54\n分析类型: 收盘\n============================================================\n\n【推荐总结】\n卖出推荐 (2只):\n  1. 宁德时代 (300750) - 评分:4.9\n  2. 五粮液 (000858) - 评分:4.9\n\n【市场概况】\n总股票数: 10\n买入推荐: 0只 | 平均评分: 0\n卖出推荐: 2只 | 平均评分: 4.9\n持有推荐: 0只 | 平均评分: 0\n市场情绪: 谨慎\n\n【行业分析】\n新能源: 平均评分4.8 (震荡, 2只股票)\n白酒: 平均评分4.8 (震荡, 2只股票)\n科技: 平均评分4.9 (震荡, 1只股票)\n银行: 平均评分4.7 (震荡, 1只股票)\n消费: 平均评分4.7 (震荡, 1只股票)\n医药: 平均评分4.6 (震荡, 1只股票)\n面板: 平均评分4.3 (震荡, 1只股票)\n地产: 平均评分4.2 (震荡, 1只股票)\n\n【风险提示】\n1. 市场卖出信号较多，注意风险控制\n\n【下一步行动】\n1. 总结全天市场表现\n2. 为次日交易做准备\n3. 关注晚间重要消息"
+}

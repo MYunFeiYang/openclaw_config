@@ -1,0 +1,187 @@
+{
+  "timestamp": "2026-03-27T10:54:35.695246",
+  "analysis_type": "evening",
+  "predictions": [
+    {
+      "stock": {
+        "name": "贵州茅台",
+        "symbol": "600519",
+        "sector": "面板"
+      },
+      "current_price": 1666.0,
+      "change_percent": -0.89,
+      "final_score": 4.0,
+      "signal": "卖出偏持有",
+      "confidence": 70,
+      "reasons": [
+        "收盘涨跌幅-0.89%",
+        "全天交易情绪偏谨慎",
+        "技术面偏弱"
+      ],
+      "prediction_time": "2026-03-27T10:54:35.695190"
+    },
+    {
+      "stock": {
+        "name": "招商银行",
+        "symbol": "600036",
+        "sector": "金融"
+      },
+      "current_price": 41.6,
+      "change_percent": -0.48,
+      "final_score": 5.0,
+      "signal": "持有",
+      "confidence": 70,
+      "reasons": [
+        "收盘涨跌幅-0.48%",
+        "全天交易情绪偏谨慎",
+        "技术面偏弱"
+      ],
+      "prediction_time": "2026-03-27T10:54:35.695209"
+    },
+    {
+      "stock": {
+        "name": "五粮液",
+        "symbol": "000858",
+        "sector": "面板"
+      },
+      "current_price": 132.11,
+      "change_percent": -0.89,
+      "final_score": 4.0,
+      "signal": "卖出偏持有",
+      "confidence": 70,
+      "reasons": [
+        "收盘涨跌幅-0.89%",
+        "全天交易情绪偏谨慎",
+        "技术面偏弱"
+      ],
+      "prediction_time": "2026-03-27T10:54:35.695214"
+    },
+    {
+      "stock": {
+        "name": "恒瑞医药",
+        "symbol": "600276",
+        "sector": "医药"
+      },
+      "current_price": 44.25,
+      "change_percent": -0.54,
+      "final_score": 4.0,
+      "signal": "卖出偏持有",
+      "confidence": 70,
+      "reasons": [
+        "收盘涨跌幅-0.54%",
+        "全天交易情绪偏谨慎",
+        "技术面偏弱"
+      ],
+      "prediction_time": "2026-03-27T10:54:35.695218"
+    },
+    {
+      "stock": {
+        "name": "宁德时代",
+        "symbol": "300750",
+        "sector": "新能源"
+      },
+      "current_price": 205.01,
+      "change_percent": -1.24,
+      "final_score": 3.0,
+      "signal": "卖出",
+      "confidence": 70,
+      "reasons": [
+        "收盘涨跌幅-1.24%",
+        "全天交易情绪偏谨慎",
+        "技术面偏弱"
+      ],
+      "prediction_time": "2026-03-27T10:54:35.695222"
+    },
+    {
+      "stock": {
+        "name": "海康威视",
+        "symbol": "002415",
+        "sector": "科技"
+      },
+      "current_price": 35.2,
+      "change_percent": -0.79,
+      "final_score": 4.0,
+      "signal": "卖出偏持有",
+      "confidence": 70,
+      "reasons": [
+        "收盘涨跌幅-0.79%",
+        "全天交易情绪偏谨慎",
+        "技术面偏弱"
+      ],
+      "prediction_time": "2026-03-27T10:54:35.695226"
+    },
+    {
+      "stock": {
+        "name": "伊利股份",
+        "symbol": "600887",
+        "sector": "消费"
+      },
+      "current_price": 28.5,
+      "change_percent": -0.68,
+      "final_score": 4.0,
+      "signal": "卖出偏持有",
+      "confidence": 70,
+      "reasons": [
+        "收盘涨跌幅-0.68%",
+        "全天交易情绪偏谨慎",
+        "技术面偏弱"
+      ],
+      "prediction_time": "2026-03-27T10:54:35.695229"
+    },
+    {
+      "stock": {
+        "name": "万科A",
+        "symbol": "000002",
+        "sector": "地产"
+      },
+      "current_price": 12.8,
+      "change_percent": -0.54,
+      "final_score": 4.0,
+      "signal": "卖出偏持有",
+      "confidence": 70,
+      "reasons": [
+        "收盘涨跌幅-0.54%",
+        "全天交易情绪偏谨慎",
+        "技术面偏弱"
+      ],
+      "prediction_time": "2026-03-27T10:54:35.695233"
+    },
+    {
+      "stock": {
+        "name": "京东方A",
+        "symbol": "000725",
+        "sector": "面板"
+      },
+      "current_price": 3.85,
+      "change_percent": -0.47,
+      "final_score": 5.0,
+      "signal": "持有",
+      "confidence": 70,
+      "reasons": [
+        "收盘涨跌幅-0.47%",
+        "全天交易情绪偏谨慎",
+        "技术面偏弱"
+      ],
+      "prediction_time": "2026-03-27T10:54:35.695237"
+    },
+    {
+      "stock": {
+        "name": "比亚迪",
+        "symbol": "002594",
+        "sector": "面板"
+      },
+      "current_price": 185.6,
+      "change_percent": -1.35,
+      "final_score": 3.0,
+      "signal": "卖出",
+      "confidence": 70,
+      "reasons": [
+        "收盘涨跌幅-1.35%",
+        "全天交易情绪偏谨慎",
+        "技术面偏弱"
+      ],
+      "prediction_time": "2026-03-27T10:54:35.695243"
+    }
+  ],
+  "prediction_count": 10
+}

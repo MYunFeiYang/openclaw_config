@@ -1,0 +1,248 @@
+{
+  "timestamp": "2026-03-27T16:04:10.737156",
+  "analysis_type": "evening",
+  "data_provider": "openclaw",
+  "predictions": [
+    {
+      "stock": {
+        "name": "贵州茅台",
+        "symbol": "600519",
+        "sector": "白酒",
+        "weight": 0.9
+      },
+      "current_price": 1666.0,
+      "change_percent": -0.89,
+      "technical_score": 4.4,
+      "fundamental_score": 4.7,
+      "sentiment_score": 5.2,
+      "sector_score": 5.5,
+      "final_score": 5.1,
+      "signal": "持有",
+      "confidence": 65,
+      "reasons": [
+        "估值合理，适合中长期持有",
+        "临近收盘，技术面信号需谨慎解读",
+        "收盘阶段交易平稳，观望情绪较浓"
+      ],
+      "prediction_time": "2026-03-27T16:01:22.253754",
+      "data_provenance": "openclaw_agent_web"
+    },
+    {
+      "stock": {
+        "name": "招商银行",
+        "symbol": "600036",
+        "sector": "银行",
+        "weight": 0.7
+      },
+      "current_price": 41.6,
+      "change_percent": -0.48,
+      "technical_score": 4.4,
+      "fundamental_score": 4.7,
+      "sentiment_score": 5.2,
+      "sector_score": 5.5,
+      "final_score": 5.1,
+      "signal": "持有",
+      "confidence": 65,
+      "reasons": [
+        "估值合理，适合中长期持有",
+        "临近收盘，技术面信号需谨慎解读",
+        "收盘阶段交易平稳，观望情绪较浓"
+      ],
+      "prediction_time": "2026-03-27T16:01:59.141798",
+      "data_provenance": "openclaw_agent_web"
+    },
+    {
+      "stock": {
+        "name": "五粮液",
+        "symbol": "000858",
+        "sector": "白酒",
+        "weight": 0.6
+      },
+      "current_price": 132.11,
+      "change_percent": -0.89,
+      "technical_score": 4.4,
+      "fundamental_score": 4.7,
+      "sentiment_score": 5.2,
+      "sector_score": 5.5,
+      "final_score": 5.1,
+      "signal": "持有",
+      "confidence": 65,
+      "reasons": [
+        "估值合理，适合中长期持有",
+        "临近收盘，技术面信号需谨慎解读",
+        "收盘阶段交易平稳，观望情绪较浓"
+      ],
+      "prediction_time": "2026-03-27T16:02:17.221614",
+      "data_provenance": "openclaw_agent_web"
+    },
+    {
+      "stock": {
+        "name": "恒瑞医药",
+        "symbol": "600276",
+        "sector": "医药",
+        "weight": 0.5
+      },
+      "current_price": 44.25,
+      "change_percent": -0.54,
+      "technical_score": 4.4,
+      "fundamental_score": 4.7,
+      "sentiment_score": 5.2,
+      "sector_score": 5.5,
+      "final_score": 5.1,
+      "signal": "持有",
+      "confidence": 65,
+      "reasons": [
+        "估值合理，适合中长期持有",
+        "临近收盘，技术面信号需谨慎解读",
+        "收盘阶段交易平稳，观望情绪较浓"
+      ],
+      "prediction_time": "2026-03-27T16:02:40.012276",
+      "data_provenance": "openclaw_agent_web"
+    },
+    {
+      "stock": {
+        "name": "海康威视",
+        "symbol": "002415",
+        "sector": "科技",
+        "weight": 0.3
+      },
+      "current_price": 30.2,
+      "change_percent": -0.79,
+      "technical_score": 4.4,
+      "fundamental_score": 4.7,
+      "sentiment_score": 5.2,
+      "sector_score": 5.5,
+      "final_score": 5.1,
+      "signal": "持有",
+      "confidence": 65,
+      "reasons": [
+        "估值合理，适合中长期持有",
+        "临近收盘，技术面信号需谨慎解读",
+        "收盘阶段交易平稳，观望情绪较浓"
+      ],
+      "prediction_time": "2026-03-27T16:03:22.918211",
+      "data_provenance": "openclaw_agent_web"
+    },
+    {
+      "stock": {
+        "name": "伊利股份",
+        "symbol": "600887",
+        "sector": "消费",
+        "weight": 0.2
+      },
+      "current_price": 29.16,
+      "change_percent": -0.68,
+      "technical_score": 4.4,
+      "fundamental_score": 4.7,
+      "sentiment_score": 5.2,
+      "sector_score": 5.5,
+      "final_score": 5.1,
+      "signal": "持有",
+      "confidence": 65,
+      "reasons": [
+        "估值合理，适合中长期持有",
+        "临近收盘，技术面信号需谨慎解读",
+        "收盘阶段交易平稳，观望情绪较浓"
+      ],
+      "prediction_time": "2026-03-27T16:03:39.351391",
+      "data_provenance": "openclaw_agent_web"
+    },
+    {
+      "stock": {
+        "name": "万科A",
+        "symbol": "000002",
+        "sector": "地产",
+        "weight": 0.1
+      },
+      "current_price": 7.35,
+      "change_percent": -0.54,
+      "technical_score": 4.4,
+      "fundamental_score": 4.7,
+      "sentiment_score": 5.2,
+      "sector_score": 5.5,
+      "final_score": 5.1,
+      "signal": "持有",
+      "confidence": 65,
+      "reasons": [
+        "估值合理，适合中长期持有",
+        "临近收盘，技术面信号需谨慎解读",
+        "收盘阶段交易平稳，观望情绪较浓"
+      ],
+      "prediction_time": "2026-03-27T16:03:55.236206",
+      "data_provenance": "openclaw_agent_web"
+    },
+    {
+      "stock": {
+        "name": "京东方A",
+        "symbol": "000725",
+        "sector": "面板",
+        "weight": 0.0
+      },
+      "current_price": 4.24,
+      "change_percent": -0.47,
+      "technical_score": 4.4,
+      "fundamental_score": 4.7,
+      "sentiment_score": 5.2,
+      "sector_score": 5.5,
+      "final_score": 5.1,
+      "signal": "持有",
+      "confidence": 65,
+      "reasons": [
+        "估值合理，适合中长期持有",
+        "临近收盘，技术面信号需谨慎解读",
+        "收盘阶段交易平稳，观望情绪较浓"
+      ],
+      "prediction_time": "2026-03-27T16:04:10.736676",
+      "data_provenance": "openclaw_agent_web"
+    },
+    {
+      "stock": {
+        "name": "宁德时代",
+        "symbol": "300750",
+        "sector": "新能源",
+        "weight": 0.8
+      },
+      "current_price": 205.01,
+      "change_percent": -1.24,
+      "technical_score": 4.4,
+      "fundamental_score": 4.7,
+      "sentiment_score": 4.5,
+      "sector_score": 5.2,
+      "final_score": 4.9,
+      "signal": "持有",
+      "confidence": 65,
+      "reasons": [
+        "估值合理，适合中长期持有",
+        "临近收盘，技术面信号需谨慎解读",
+        "收盘阶段交易平稳，观望情绪较浓"
+      ],
+      "prediction_time": "2026-03-27T16:01:43.979597",
+      "data_provenance": "openclaw_agent_web"
+    },
+    {
+      "stock": {
+        "name": "比亚迪",
+        "symbol": "002594",
+        "sector": "新能源",
+        "weight": 0.4
+      },
+      "current_price": 378.5,
+      "change_percent": -1.35,
+      "technical_score": 4.4,
+      "fundamental_score": 4.7,
+      "sentiment_score": 4.5,
+      "sector_score": 5.2,
+      "final_score": 4.9,
+      "signal": "持有",
+      "confidence": 65,
+      "reasons": [
+        "估值合理，适合中长期持有",
+        "临近收盘，技术面信号需谨慎解读",
+        "收盘阶段交易平稳，观望情绪较浓"
+      ],
+      "prediction_time": "2026-03-27T16:03:01.947706",
+      "data_provenance": "openclaw_agent_web"
+    }
+  ],
+  "prediction_count": 10
+}

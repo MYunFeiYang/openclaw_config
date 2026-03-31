@@ -1,0 +1,35 @@
+{
+  "timestamp": "2026-03-20T23:23:32.825365",
+  "analysis_type": "evening",
+  "summary": {
+    "report_time": "2026-03-20T23:23:32.825302",
+    "analysis_type": "evening",
+    "total_stocks": 20,
+    "buy_recommendations": [
+      {
+        "name": "贵州茅台",
+        "symbol": "600519",
+        "sector": "白酒",
+        "final_score": 7.8,
+        "signal": "买入",
+        "analysis_type": "morning",
+        "prediction_time": "2026-03-20T23:23:24.012228"
+      },
+      {
+        "name": "宁德时代",
+        "symbol": "300750",
+        "sector": "新能源",
+        "final_score": 7.2,
+        "signal": "买入",
+        "analysis_type": "morning",
+        "prediction_time": "2026-03-20T23:23:24.012237"
+      }
+    ],
+    "sell_recommendations": [],
+    "based_on_predictions": 20,
+    "prediction_sources": [
+      "morning",
+      "afternoon"
+    ]
+  }
+}

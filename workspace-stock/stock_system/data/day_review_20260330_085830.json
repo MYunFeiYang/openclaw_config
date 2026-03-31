@@ -1,0 +1,85 @@
+{
+  "kind": "day_review",
+  "trade_date": "20260330",
+  "generated_at": "2026-03-30T08:58:30.574893",
+  "meta": {
+    "trade_date": "20260330",
+    "slots": {
+      "morning": {
+        "file": "predictions_morning_20260330_085715.json",
+        "count": 5,
+        "timestamp": "2026-03-30T08:57:15.062179"
+      },
+      "afternoon": null,
+      "evening": null,
+      "weekly": null
+    }
+  },
+  "reconcile_summary": {
+    "file": "reconcile_20260330_085830.json",
+    "hit_rate": 1.0,
+    "hits": 5,
+    "misses": 0
+  },
+  "iteration": {
+    "mean_hit_rate_recent": 0.9,
+    "last_5_mean_hit_rate": 0.9,
+    "prev_5_mean_hit_rate": null,
+    "hit_rate_trend_zh": "持平",
+    "symbol_attention_count": 0,
+    "briefing_file": "iteration_briefing.txt",
+    "state_file": "iteration_state.json"
+  },
+  "auto_calibration": {
+    "updated_at": "2026-03-30T08:58:30.573947",
+    "stats": {
+      "n_buy": 0,
+      "miss_buy": 0,
+      "n_sell": 1,
+      "miss_sell": 1,
+      "n_hold": 9,
+      "miss_hold": 0,
+      "n_strong_buy": 0,
+      "miss_strong_buy": 0,
+      "n_norm_buy": 0,
+      "miss_norm_buy": 0,
+      "n_strong_sell": 0,
+      "miss_strong_sell": 0,
+      "n_norm_sell": 1,
+      "miss_norm_sell": 1,
+      "w_buy": 0.0,
+      "miss_buy_w": 0.0,
+      "w_sell": 0.92,
+      "miss_sell_w": 0.92,
+      "w_hold": 8.68,
+      "miss_hold_w": 0.0,
+      "w_strong_buy": 0.0,
+      "miss_strong_buy_w": 0.0,
+      "w_norm_buy": 0.0,
+      "miss_norm_buy_w": 0.0,
+      "w_strong_sell": 0.0,
+      "miss_strong_sell_w": 0.0,
+      "w_norm_sell": 0.92,
+      "miss_norm_sell_w": 0.92,
+      "sessions_used": 2,
+      "decay_per_session": 0.92,
+      "last_sessions_cap": 20
+    },
+    "notes": [
+      "样本不足（有效方向样本 10 < 24），未调整阈值/权重。"
+    ],
+    "signal_thresholds": {
+      "strong_buy": 8.5,
+      "buy": 7.0,
+      "hold": 5.0,
+      "sell": 3.5
+    },
+    "score_weights": {
+      "technical": 0.4,
+      "fundamental": 0.35,
+      "sentiment": 0.15,
+      "sector": 0.1
+    },
+    "config_file": "config/calibration_overrides.json"
+  }
+}

@@ -1,0 +1,168 @@
+{
+  "timestamp": "2026-03-19T14:39:34.175641",
+  "analysis_type": "weekly",
+  "summary": {
+    "report_time": "2026-03-19T14:39:34.174509",
+    "analysis_type": "weekly",
+    "buy_recommendations": [],
+    "sell_recommendations": [
+      {
+        "stock": {
+          "name": "比亚迪",
+          "symbol": "002594",
+          "sector": "新能源",
+          "weight": 0.4
+        },
+        "current_price": 121.29,
+        "change_percent": 1.07,
+        "technical_score": 4.0,
+        "fundamental_score": 5.3,
+        "sentiment_score": 5.8,
+        "sector_score": 6.2,
+        "final_score": 4.9,
+        "signal": "卖出",
+        "confidence": 60,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-19T14:39:34.174255"
+      },
+      {
+        "stock": {
+          "name": "宁德时代",
+          "symbol": "300750",
+          "sector": "新能源",
+          "weight": 0.8
+        },
+        "current_price": 140.34,
+        "change_percent": 0.25,
+        "technical_score": 3.6,
+        "fundamental_score": 6.0,
+        "sentiment_score": 4.5,
+        "sector_score": 4.0,
+        "final_score": 4.6,
+        "signal": "卖出",
+        "confidence": 70,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-19T14:39:34.174073"
+      }
+    ],
+    "hold_recommendations": [
+      {
+        "stock": {
+          "name": "海康威视",
+          "symbol": "002415",
+          "sector": "科技",
+          "weight": 0.3
+        },
+        "current_price": 112.08,
+        "change_percent": -2.54,
+        "technical_score": 6.0,
+        "fundamental_score": 6.0,
+        "sentiment_score": 4.8,
+        "sector_score": 7.5,
+        "final_score": 6.0,
+        "signal": "持有",
+        "confidence": 63,
+        "reasons": [
+          "技术面有所改善",
+          "估值相对合理"
+        ],
+        "prediction_time": "2026-03-19T14:39:34.174295"
+      },
+      {
+        "stock": {
+          "name": "万科A",
+          "symbol": "000002",
+          "sector": "地产",
+          "weight": 0.1
+        },
+        "current_price": 106.09,
+        "change_percent": 1.04,
+        "technical_score": 6.0,
+        "fundamental_score": 6.0,
+        "sentiment_score": 6.5,
+        "sector_score": 5.0,
+        "final_score": 6.0,
+        "signal": "持有",
+        "confidence": 65,
+        "reasons": [
+          "技术面有所改善",
+          "估值相对合理"
+        ],
+        "prediction_time": "2026-03-19T14:39:34.174375"
+      }
+    ],
+    "market_overview": {
+      "total_stocks": 10,
+      "buy_count": 0,
+      "sell_count": 2,
+      "hold_count": 2,
+      "avg_buy_score": 0,
+      "avg_sell_score": 4.8,
+      "avg_hold_score": 6.0,
+      "buy_sectors": [],
+      "sell_sectors": [
+        "新能源"
+      ],
+      "hold_sectors": [
+        "地产",
+        "科技"
+      ],
+      "market_sentiment": "谨慎"
+    },
+    "sector_analysis": {
+      "科技": {
+        "avg_score": 6.0,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "地产": {
+        "avg_score": 6.0,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "医药": {
+        "avg_score": 5.5,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "消费": {
+        "avg_score": 5.5,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "白酒": {
+        "avg_score": 5.2,
+        "stock_count": 2,
+        "trend": "震荡"
+      },
+      "面板": {
+        "avg_score": 5.3,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "银行": {
+        "avg_score": 5.2,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "新能源": {
+        "avg_score": 4.8,
+        "stock_count": 2,
+        "trend": "震荡"
+      }
+    },
+    "risk_alerts": [],
+    "next_actions": [
+      "回顾本周交易策略执行情况",
+      "制定下周投资计划",
+      "关注周末政策消息"
+    ]
+  },
+  "report_text": "【A股周度总结报告】\n============================================================\n总结时间: 2026-03-19 14:39:34\n分析类型: 周度\n============================================================\n\n【推荐总结】\n卖出推荐 (2只):\n  1. 比亚迪 (002594) - 评分:4.9\n  2. 宁德时代 (300750) - 评分:4.6\n持有推荐 (2只):\n  1. 海康威视 (002415) - 评分:6.0\n  2. 万科A (000002) - 评分:6.0\n\n【市场概况】\n总股票数: 10\n买入推荐: 0只 | 平均评分: 0\n卖出推荐: 2只 | 平均评分: 4.8\n持有推荐: 2只 | 平均评分: 6.0\n市场情绪: 谨慎\n\n【行业分析】\n科技: 平均评分6.0 (震荡, 1只股票)\n地产: 平均评分6.0 (震荡, 1只股票)\n医药: 平均评分5.5 (震荡, 1只股票)\n消费: 平均评分5.5 (震荡, 1只股票)\n白酒: 平均评分5.2 (震荡, 2只股票)\n面板: 平均评分5.3 (震荡, 1只股票)\n银行: 平均评分5.2 (震荡, 1只股票)\n新能源: 平均评分4.8 (震荡, 2只股票)\n\n【下一步行动】\n1. 回顾本周交易策略执行情况\n2. 制定下周投资计划\n3. 关注周末政策消息"
+}

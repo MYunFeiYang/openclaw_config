@@ -1,6 +1,10 @@
-# AGENTS.md - Your Workspace
+# AGENTS.md - Your Workspace（main / 通用）
 
 This folder is home. Treat it that way.
+
+**文档（不在此复述规则）：** [Multi-Agent](https://docs.openclaw.ai/concepts/multi-agent) · [Agent Workspace](https://docs.openclaw.ai/concepts/agent-workspace) · [Skills](https://docs.openclaw.ai/tools/skills)
+
+**本仓库补充：** `stock` 使用本机 `stock_system/` 时路径见 `cron` / `SETUP`。**各 agent 的 `workspace` 与 `identity` 以 `openclaw.json` 为准**（官方 [Agent Workspace](https://docs.openclaw.ai/concepts/agent-workspace) 所列文件为会话注入标准）。
 
 ## First Run
 
@@ -15,7 +19,6 @@ Before doing anything else:
 3. Read `USER.md` — this is who you're helping
 4. Read `memory/YYYY-MM-DD.md` (today + yesterday) for recent context
 5. **If in MAIN SESSION** (direct chat with your human): Also read `MEMORY.md`
-6. **Role overlay:** If this session’s agent id is `main`, `frontend`, `backend`, `ui`, or `stock`, read `roles/<id>.md` when that file exists (通用 / 前端 / 后端 / UI / 股票分工).
 
 Don't ask permission. Just do it.
 
@@ -25,23 +28,15 @@ Don't ask permission. Just do it.
 
 When the user asks who you are, what model you are, your name, or what you do:
 
-1. **Start from the section「自我介绍（被问「你是谁」时用）」** in `roles/<agent-id>.md` for **this session’s agent id** — quote or paraphrase it so the answer clearly reflects **only** that role (`main` vs `frontend` vs `backend` vs `ui` vs `stock`).
+1. Use **`openclaw.json`** `agents.list[]` **identity** for this agent id + **`SOUL.md`** section「本代理职责」— answer must reflect **only** this session’s agent id and workspace. Do not blend other agents’ scope.
 2. Then, if `IDENTITY.md` has real values (not template placeholders), add name / emoji / vibe on top.
 3. **Do not claim** you are “Claude”, “GPT”, “ChatGPT”, “豆包”, “Kimi”, etc., **unless** the runtime system prompt or tool metadata for **this turn** explicitly names that provider/model. If unsure, say the **underlying model is whatever the gateway configured for this session** (用户可在 Control UI 或 `openclaw.json` 中查看)，不要猜。
 4. If the agent id is not visible in context, say you are the OpenClaw agent for this workspace and ask the user to confirm the selected agent in the Control UI; still avoid a generic “one size fits all” bio.
 5. **Do not** list AgentSkills you cannot see in the injected skills list; **do not** use names like `stock-analysis` unless that exact `name` appears in the prompt (the real skill may be `stock-analyzer`, or absent for this agent).
 
-## Skills vs tools (do not confuse them)
+## Skills vs tools
 
-- **Tools** are built-in gateway capabilities (e.g. `read`, `write`, `edit`, `exec`, `process`, `sessions_*`, `browser`, …). They appear in the tool schema, **not** as entries under `workspace/skills/`.
-- **Skills** (AgentSkills) are workspace packages: each has a `SKILL.md` with a `name` (e.g. `stock-analyzer`, `ui-development`). OpenClaw injects the **eligible** skills list into the **system prompt** (often as a compact XML/list of names + descriptions).
-
-**When the user asks (in any language) which *skills* / AgentSkills / 「技能包」you have:** List **only** those **AgentSkills** from the injected skills section of your system context — by **exact `name`**. Do **not** answer with a list of tool functions (`read`/`exec`/…) unless they explicitly ask what **tools** or **终端** you can use.
-
-**When they ask broadly what you can do:** You may briefly separate (1) **tools** — general file/shell/session actions, (2) **AgentSkills** — the named skills from the prompt, and (3) optional **role** from `roles/<agent-id>.md`.
-
-- **Where AgentSkills come from:** Eligibility depends on this session’s **agent id**, global `skills.entries`, and any **per-agent allowlist** in `openclaw.json` (`agents.list[].skills`).
-- **If you cannot see the AgentSkills list** in context: Say so honestly and suggest **Control UI → Agents → select this agent → Skills**, or on the gateway host: `openclaw skills list`. Do not invent skill names.
+加载顺序与配置见 [Skills](https://docs.openclaw.ai/tools/skills)。对用户说明时：**工具**（`read` / `exec` / …）在 tool schema；**技能包**以系统提示里列出的 **AgentSkills 名为准**，勿编造；分不清时建议用户看 Control UI → Agents → Skills 或执行 `openclaw skills list`。
 
 ## Memory
 

@@ -1,0 +1,169 @@
+{
+  "timestamp": "2026-03-19T11:45:15.526544",
+  "analysis_type": "afternoon",
+  "summary": {
+    "report_time": "2026-03-19T11:45:15.523574",
+    "analysis_type": "afternoon",
+    "buy_recommendations": [],
+    "sell_recommendations": [
+      {
+        "stock": {
+          "name": "贵州茅台",
+          "symbol": "600519",
+          "sector": "白酒",
+          "weight": 0.9
+        },
+        "current_price": 141.42,
+        "change_percent": -2.47,
+        "technical_score": 4.2,
+        "fundamental_score": 5.7,
+        "sentiment_score": 3.8,
+        "sector_score": 6.0,
+        "final_score": 4.8,
+        "signal": "卖出",
+        "confidence": 62,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-19T11:45:15.522346"
+      },
+      {
+        "stock": {
+          "name": "万科A",
+          "symbol": "000002",
+          "sector": "地产",
+          "weight": 0.1
+        },
+        "current_price": 106.08,
+        "change_percent": 1.03,
+        "technical_score": 3.2,
+        "fundamental_score": 6.3,
+        "sentiment_score": 3.2,
+        "sector_score": 4.8,
+        "final_score": 4.4,
+        "signal": "卖出",
+        "confidence": 63,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-19T11:45:15.523294"
+      }
+    ],
+    "hold_recommendations": [
+      {
+        "stock": {
+          "name": "京东方A",
+          "symbol": "000725",
+          "sector": "面板",
+          "weight": 0.0
+        },
+        "current_price": 99.65,
+        "change_percent": -0.35,
+        "technical_score": 6.0,
+        "fundamental_score": 6.3,
+        "sentiment_score": 6.0,
+        "sector_score": 4.2,
+        "final_score": 5.9,
+        "signal": "持有",
+        "confidence": 66,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-19T11:45:15.523365"
+      },
+      {
+        "stock": {
+          "name": "五粮液",
+          "symbol": "000858",
+          "sector": "白酒",
+          "weight": 0.6
+        },
+        "current_price": 129.64,
+        "change_percent": -0.28,
+        "technical_score": 6.0,
+        "fundamental_score": 6.0,
+        "sentiment_score": 5.5,
+        "sector_score": 5.0,
+        "final_score": 5.8,
+        "signal": "持有",
+        "confidence": 61,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-03-19T11:45:15.522594"
+      }
+    ],
+    "market_overview": {
+      "total_stocks": 10,
+      "buy_count": 0,
+      "sell_count": 2,
+      "hold_count": 2,
+      "avg_buy_score": 0,
+      "avg_sell_score": 4.6,
+      "avg_hold_score": 5.8,
+      "buy_sectors": [],
+      "sell_sectors": [
+        "白酒",
+        "地产"
+      ],
+      "hold_sectors": [
+        "白酒",
+        "面板"
+      ],
+      "market_sentiment": "谨慎"
+    },
+    "sector_analysis": {
+      "面板": {
+        "avg_score": 5.9,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "白酒": {
+        "avg_score": 5.3,
+        "stock_count": 2,
+        "trend": "震荡"
+      },
+      "消费": {
+        "avg_score": 5.7,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "新能源": {
+        "avg_score": 5.3,
+        "stock_count": 2,
+        "trend": "震荡"
+      },
+      "银行": {
+        "avg_score": 5.5,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "科技": {
+        "avg_score": 5.5,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "医药": {
+        "avg_score": 5.2,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "地产": {
+        "avg_score": 4.4,
+        "stock_count": 1,
+        "trend": "震荡"
+      }
+    },
+    "risk_alerts": [],
+    "next_actions": [
+      "关注午后资金动向",
+      "观察上午强势股的持续性",
+      "留意尾盘异动情况"
+    ]
+  },
+  "report_text": "【A股午盘总结报告】\n============================================================\n总结时间: 2026-03-19 11:45:15\n分析类型: 午盘\n============================================================\n\n【推荐总结】\n卖出推荐 (2只):\n  1. 贵州茅台 (600519) - 评分:4.8\n  2. 万科A (000002) - 评分:4.4\n持有推荐 (2只):\n  1. 京东方A (000725) - 评分:5.9\n  2. 五粮液 (000858) - 评分:5.8\n\n【市场概况】\n总股票数: 10\n买入推荐: 0只 | 平均评分: 0\n卖出推荐: 2只 | 平均评分: 4.6\n持有推荐: 2只 | 平均评分: 5.8\n市场情绪: 谨慎\n\n【行业分析】\n面板: 平均评分5.9 (震荡, 1只股票)\n白酒: 平均评分5.3 (震荡, 2只股票)\n消费: 平均评分5.7 (震荡, 1只股票)\n新能源: 平均评分5.3 (震荡, 2只股票)\n银行: 平均评分5.5 (震荡, 1只股票)\n科技: 平均评分5.5 (震荡, 1只股票)\n医药: 平均评分5.2 (震荡, 1只股票)\n地产: 平均评分4.4 (震荡, 1只股票)\n\n【下一步行动】\n1. 关注午后资金动向\n2. 观察上午强势股的持续性\n3. 留意尾盘异动情况"
+}
