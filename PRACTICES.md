@@ -54,6 +54,8 @@ openclaw doctor
 | 当天流水、临时上下文 | `memory/YYYY-MM-DD.md` |
 | 仅私聊主会话的长期沉淀 | `MEMORY.md`（勿在群聊加载，见各 `AGENTS.md`） |
 
+**定时蒸馏（Cron）**：[`cron/jobs.json`](cron/jobs.json) 中为 **main / frontend / backend / ui / stock** 各有一条 **「记忆蒸馏 …」** 任务（`sessionTarget: isolated`、**每周日**错峰：`04:00`～`08:00` `Asia/Shanghai`、**不投递**企微）。模型按 [`~/.openclaw/skills/openclaw-agent-optimize/references/memory-patterns.md`](skills/openclaw-agent-optimize/references/memory-patterns.md)（任务内为 `$OPENCLAW_HOME/skills/...`）将日记忆合并进各 workspace 的 `MEMORY.md`；用 **`memory/.distill-watermark`**（单行日期）避免重复读取已蒸馏过的 `memory/YYYY-MM-DD.md`。与官方会话内 [compaction 前的 memory flush](https://docs.openclaw.ai/concepts/memory) 互补（flush 保对话落盘，Cron 做周期性策展）。验收：`openclaw cron list`，再 `openclaw cron run <jobId>`（网关需运行），检查对应目录的 `MEMORY.md` 与水印文件。
+
 - [ ] 日记忆：本仓库**当前**将各 workspace 的 **`memory/` 纳入 Git**（便于换机与协作延续上下文）；若日后日文件含敏感内容，可改回忽略并依赖本地备份（见 [SETUP.md](SETUP.md) §1.3）。
 
 ---

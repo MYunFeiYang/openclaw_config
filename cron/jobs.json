@@ -114,6 +114,146 @@
         "consecutiveErrors": 0,
         "lastDelivered": true
       }
+    },
+    {
+      "id": "7e8bf87a-b254-48a5-8f03-2db4830e2bd1",
+      "agentId": "main",
+      "name": "记忆蒸馏 main",
+      "enabled": true,
+      "createdAtMs": 1774937706151,
+      "updatedAtMs": 1774937706151,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 4 * * 0",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "【记忆蒸馏·定时】本任务 workspace 根目录：${OPENCLAW_HOME:-$HOME/.openclaw}/workspace。若读写文件需 cwd，请先 cd 到该目录。助手输出开头请用 NO_REPLY。\n\n1) 读取 memory/.distill-watermark（单行 YYYY-MM-DD）。若不存在或为空：仅考虑「过去14天内」可能存在的 memory/YYYY-MM-DD.md；处理成功后把水印写为本轮处理过的最大日期。\n2) 若水印已存在：只读取「日期严格大于水印」的 memory/YYYY-MM-DD.md（升序）；某日文件不存在则跳过。\n3) 读取 MEMORY.md（若存在），将日文件中仍值得长期保留的偏好、决策、规则合并进 MEMORY.md并去重；禁止密钥与完整私聊原文。\n4) 成功更新 MEMORY.md 后，将 memory/.distill-watermark 更新为本轮处理过的最大日文件日期；若本轮无可处理的新日文件则不修改水印。\n5) 末尾用一两句说明本轮处理日期与水印。\n\n蒸馏原则见 ${OPENCLAW_HOME:-$HOME/.openclaw}/skills/openclaw-agent-optimize/references/memory-patterns.md。",
+        "thinking": "off",
+        "timeoutSeconds": 900
+      },
+      "delivery": {
+        "mode": "none",
+        "channel": "last"
+      },
+      "state": {
+        "nextRunAtMs": 1775332800000
+      }
+    },
+    {
+      "id": "6964e8d2-ddc0-4d23-a7ac-3fb044761816",
+      "agentId": "frontend",
+      "name": "记忆蒸馏 frontend",
+      "enabled": true,
+      "createdAtMs": 1774937706151,
+      "updatedAtMs": 1774937706151,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 5 * * 0",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "【记忆蒸馏·定时】本任务 workspace 根目录：${OPENCLAW_HOME:-$HOME/.openclaw}/workspace-frontend。若读写文件需 cwd，请先 cd 到该目录。助手输出开头请用 NO_REPLY。\n\n1) 读取 memory/.distill-watermark（单行 YYYY-MM-DD）。若不存在或为空：仅考虑「过去14天内」可能存在的 memory/YYYY-MM-DD.md；处理成功后把水印写为本轮处理过的最大日期。\n2) 若水印已存在：只读取「日期严格大于水印」的 memory/YYYY-MM-DD.md（升序）；某日文件不存在则跳过。\n3) 读取 MEMORY.md（若存在），将日文件中仍值得长期保留的偏好、决策、规则合并进 MEMORY.md并去重；禁止密钥与完整私聊原文。\n4) 成功更新 MEMORY.md 后，将 memory/.distill-watermark 更新为本轮处理过的最大日文件日期；若本轮无可处理的新日文件则不修改水印。\n5) 末尾用一两句说明本轮处理日期与水印。\n\n蒸馏原则见 ${OPENCLAW_HOME:-$HOME/.openclaw}/skills/openclaw-agent-optimize/references/memory-patterns.md。",
+        "thinking": "off",
+        "timeoutSeconds": 900
+      },
+      "delivery": {
+        "mode": "none",
+        "channel": "last"
+      },
+      "state": {
+        "nextRunAtMs": 1775332800000
+      }
+    },
+    {
+      "id": "265ebe2f-db8e-429b-b988-aa611d663494",
+      "agentId": "backend",
+      "name": "记忆蒸馏 backend",
+      "enabled": true,
+      "createdAtMs": 1774937706151,
+      "updatedAtMs": 1774937706151,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 6 * * 0",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "【记忆蒸馏·定时】本任务 workspace 根目录：${OPENCLAW_HOME:-$HOME/.openclaw}/workspace-backend。若读写文件需 cwd，请先 cd 到该目录。助手输出开头请用 NO_REPLY。\n\n1) 读取 memory/.distill-watermark（单行 YYYY-MM-DD）。若不存在或为空：仅考虑「过去14天内」可能存在的 memory/YYYY-MM-DD.md；处理成功后把水印写为本轮处理过的最大日期。\n2) 若水印已存在：只读取「日期严格大于水印」的 memory/YYYY-MM-DD.md（升序）；某日文件不存在则跳过。\n3) 读取 MEMORY.md（若存在），将日文件中仍值得长期保留的偏好、决策、规则合并进 MEMORY.md并去重；禁止密钥与完整私聊原文。\n4) 成功更新 MEMORY.md 后，将 memory/.distill-watermark 更新为本轮处理过的最大日文件日期；若本轮无可处理的新日文件则不修改水印。\n5) 末尾用一两句说明本轮处理日期与水印。\n\n蒸馏原则见 ${OPENCLAW_HOME:-$HOME/.openclaw}/skills/openclaw-agent-optimize/references/memory-patterns.md。",
+        "thinking": "off",
+        "timeoutSeconds": 900
+      },
+      "delivery": {
+        "mode": "none",
+        "channel": "last"
+      },
+      "state": {
+        "nextRunAtMs": 1775332800000
+      }
+    },
+    {
+      "id": "80184103-ad4f-439a-adcd-4434212a539c",
+      "agentId": "ui",
+      "name": "记忆蒸馏 ui",
+      "enabled": true,
+      "createdAtMs": 1774937706151,
+      "updatedAtMs": 1774937706151,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 7 * * 0",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "【记忆蒸馏·定时】本任务 workspace 根目录：${OPENCLAW_HOME:-$HOME/.openclaw}/workspace-ui。若读写文件需 cwd，请先 cd 到该目录。助手输出开头请用 NO_REPLY。\n\n1) 读取 memory/.distill-watermark（单行 YYYY-MM-DD）。若不存在或为空：仅考虑「过去14天内」可能存在的 memory/YYYY-MM-DD.md；处理成功后把水印写为本轮处理过的最大日期。\n2) 若水印已存在：只读取「日期严格大于水印」的 memory/YYYY-MM-DD.md（升序）；某日文件不存在则跳过。\n3) 读取 MEMORY.md（若存在），将日文件中仍值得长期保留的偏好、决策、规则合并进 MEMORY.md并去重；禁止密钥与完整私聊原文。\n4) 成功更新 MEMORY.md 后，将 memory/.distill-watermark 更新为本轮处理过的最大日文件日期；若本轮无可处理的新日文件则不修改水印。\n5) 末尾用一两句说明本轮处理日期与水印。\n\n蒸馏原则见 ${OPENCLAW_HOME:-$HOME/.openclaw}/skills/openclaw-agent-optimize/references/memory-patterns.md。",
+        "thinking": "off",
+        "timeoutSeconds": 900
+      },
+      "delivery": {
+        "mode": "none",
+        "channel": "last"
+      },
+      "state": {
+        "nextRunAtMs": 1775332800000
+      }
+    },
+    {
+      "id": "73c9dffb-1a40-43fa-b748-aaa8bb1d0df8",
+      "agentId": "stock",
+      "name": "记忆蒸馏 stock",
+      "enabled": true,
+      "createdAtMs": 1774937706151,
+      "updatedAtMs": 1774937706151,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 8 * * 0",
+        "tz": "Asia/Shanghai"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "【记忆蒸馏·定时】本任务 workspace 根目录：${OPENCLAW_HOME:-$HOME/.openclaw}/workspace-stock。若读写文件需 cwd，请先 cd 到该目录。助手输出开头请用 NO_REPLY。\n\n1) 读取 memory/.distill-watermark（单行 YYYY-MM-DD）。若不存在或为空：仅考虑「过去14天内」可能存在的 memory/YYYY-MM-DD.md；处理成功后把水印写为本轮处理过的最大日期。\n2) 若水印已存在：只读取「日期严格大于水印」的 memory/YYYY-MM-DD.md（升序）；某日文件不存在则跳过。\n3) 读取 MEMORY.md（若存在），将日文件中仍值得长期保留的偏好、决策、规则合并进 MEMORY.md并去重；禁止密钥与完整私聊原文。\n4) 成功更新 MEMORY.md 后，将 memory/.distill-watermark 更新为本轮处理过的最大日文件日期；若本轮无可处理的新日文件则不修改水印。\n5) 末尾用一两句说明本轮处理日期与水印。\n\n蒸馏原则见 ${OPENCLAW_HOME:-$HOME/.openclaw}/skills/openclaw-agent-optimize/references/memory-patterns.md。",
+        "thinking": "off",
+        "timeoutSeconds": 900
+      },
+      "delivery": {
+        "mode": "none",
+        "channel": "last"
+      },
+      "state": {
+        "nextRunAtMs": 1775332800000
+      }
     }
   ]
 }
