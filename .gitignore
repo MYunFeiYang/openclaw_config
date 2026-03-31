@@ -13,6 +13,8 @@ ssl/
 
 # Runtime logs and app state
 logs/
+# Per-workspace OpenClaw UI/state (regenerated at runtime)
+**/.openclaw/workspace-state.json
 memory/
 media/
 delivery-queue/

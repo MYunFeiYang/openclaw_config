@@ -36,6 +36,46 @@ OpenClaw **2026.3.x 起已在安装包内捆绑 `acpx`**（`openclaw/dist/extens
 
 仅当你**刻意**要用比内置更新/不同的 `acpx` 时，才保留外置路径并承受该告警（或按官方文档关闭内置，二选一）。
 
+### 1.3 与 OpenClaw 官方文档对齐（多代理、技能、路由）
+
+以下与 [Multi-Agent](https://docs.openclaw.ai/concepts/multi-agent)、[Skills](https://docs.openclaw.ai/tools/skills)、[Agent Workspace](https://docs.openclaw.ai/concepts/agent-workspace) 一致，便于排查「为什么进线不是某个 agent」等问题。
+
+**入站路由（`bindings`）**
+
+- 多代理时，渠道消息默认由 **`bindings`** 将 `(channel, accountId, peer …)` 映射到 `agentId`；详见 [Channel routing](https://docs.openclaw.ai/channels/channel-routing)。
+- **若未配置 `bindings`**，入站通常会落到**默认 agent**（由 `agents.list` 的 `default` 或列表顺序决定），不一定等于你在 Control UI 里手选的专用 agent。
+- 若需例如企业微信**按账号/会话**把流量分到 `frontend`、`stock` 等，请在 `openclaw.json` 中增加 `bindings`（占位示例，请把 `agentId`、渠道字段换成你环境真实值）：
+
+```json5
+{
+  "bindings": [
+    // 示例：某渠道账号整体落到指定 agent（字段名以当前 OpenClaw 版本为准）
+    { "agentId": "main", "match": { "channel": "wecom", "accountId": "default" } }
+    // 更细粒度可用 match.peer 等，见官方 Multi-Agent / Channel routing 文档
+  ]
+}
+```
+
+**技能加载顺序（简要）**
+
+- 每个 agent 的 **`workspace-*/skills/`** 为该 agent 的 workspace 技能，优先级高。
+- 本仓库根目录 **`skills/`** 即本机 **`~/.openclaw/skills`**（managed/共享层）；与 workspace 同名技能冲突时，**以 workspace 为准**（见官方 [Skills → Locations and precedence](https://docs.openclaw.ai/tools/skills)）。
+
+**`tools.agentToAgent`**
+
+- 官方示例中跨 agent 能力常配合 **allowlist**（`allow: ["agentId1", …]`）。若当前为 `enabled: true` 且无 `allow`，且你希望收紧跨 agent 调用，可在确认文档字段名后增加 `allow` 数组。
+
+**日记忆与 Git**
+
+- `.gitignore` 已忽略各 workspace 下 **`memory/`**，因此**日记忆不会随本仓库备份**。这与官方「可把 `memory/` 纳入私有 workspace 仓库」的示例不同；若需长期备份日记忆，请另用本机备份或加密归档，勿推送到不可信远端。
+
+### 1.4 密钥外置（可选，与官方「勿提交密钥」一致）
+
+官方建议密钥放在环境变量、密码管理或 `openclaw.json` 支持的 Secret 引用中，而非长期明文写在提交树里（见 [Agent Workspace](https://docs.openclaw.ai/concepts/agent-workspace)、[Skills 安全说明](https://docs.openclaw.ai/tools/skills)）。
+
+- 占位变量名见仓库根目录 [.env.example](.env.example)；复制为 `.env` 后由本机或启动脚本注入（`.env` 已被 gitignore）。
+- 将 `models.providers.*.apiKey`、`gateway.auth.token`、`channels.wecom.secret` 等改为 **SecretRef 或 env** 的具体字段名，请以当前安装的 OpenClaw 版本文档 / `openclaw config` / `openclaw secrets` 为准；**迁移后务必重启 Gateway 并验证渠道与模型可用**，再提交去掉明文后的配置。
+
 ## 2. 网络与密钥
 
 - 确保能访问内网 OneAPI（`openclaw.json` 中 `models.providers`）与网关端口（默认 `18789`）。
