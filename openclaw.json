@@ -321,6 +321,7 @@
     "list": [
       {
         "id": "main",
+        "default": true,
         "model": "oneapi/kimi-k2-250905",
         "workspace": "~/.openclaw/workspace",
         "identity": {
@@ -366,6 +367,15 @@
       }
     ]
   },
+  "bindings": [
+    {
+      "agentId": "stock",
+      "match": {
+        "channel": "wecom",
+        "accountId": "*"
+      }
+    }
+  ],
   "tools": {
     "profile": "full",
     "web": {
@@ -380,7 +390,14 @@
       "visibility": "all"
     },
     "agentToAgent": {
-      "enabled": true
+      "enabled": true,
+      "allow": [
+        "main",
+        "frontend",
+        "backend",
+        "ui",
+        "stock"
+      ]
     }
   },
   "commands": {

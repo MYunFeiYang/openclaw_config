@@ -11,6 +11,7 @@
 
 ## 快速链接
 
+- [更好用实践清单（龙虾）](PRACTICES.md)
 - [安装与运行说明](SETUP.md)
 - 主配置：`openclaw.json`（唯一主配置；路径已尽量使用 `~/.openclaw` / `~/.nvm`）
 - 股票定时分析：`cron/jobs.json`（命令里使用 `OPENCLAW_HOME` 或默认 `$HOME/.openclaw`）

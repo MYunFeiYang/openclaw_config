@@ -1,5 +1,7 @@
 # 安装与运行
 
+日常多代理与记忆习惯见 [PRACTICES.md](PRACTICES.md)。
+
 ## 1. 克隆与位置
 
 将本仓库置于本机的 OpenClaw 主目录，例如：
