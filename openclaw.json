@@ -1,7 +1,7 @@
 {
   "meta": {
-    "lastTouchedVersion": "2026.3.24",
-    "lastTouchedAt": "2026-03-27T02:05:35.735Z"
+    "lastTouchedVersion": "2026.3.28",
+    "lastTouchedAt": "2026-03-31T06:55:40.700Z"
   },
   "env": {
     "shellEnv": {
@@ -9,8 +9,8 @@
     }
   },
   "wizard": {
-    "lastRunAt": "2026-03-27T02:05:35.651Z",
-    "lastRunVersion": "2026.3.24",
+    "lastRunAt": "2026-03-31T06:55:40.641Z",
+    "lastRunVersion": "2026.3.28",
     "lastRunCommand": "onboard",
     "lastRunMode": "local"
   },
@@ -18,6 +18,14 @@
     "channel": "stable",
     "auto": {
       "enabled": true
+    }
+  },
+  "auth": {
+    "profiles": {
+      "ollama:default": {
+        "provider": "ollama",
+        "mode": "api_key"
+      }
     }
   },
   "acp": {
@@ -288,13 +296,52 @@
             "maxTokens": 8192
           }
         ]
+      },
+      "ollama": {
+        "baseUrl": "http://127.0.0.1:11434",
+        "apiKey": "OLLAMA_API_KEY",
+        "api": "ollama",
+        "models": [
+          {
+            "id": "glm-4.7-flash",
+            "name": "glm-4.7-flash",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 128000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "qwen2.5:7b",
+            "name": "qwen2.5:7b",
+            "reasoning": false,
+            "input": [
+              "text"
+            ],
+            "cost": {
+              "input": 0,
+              "output": 0,
+              "cacheRead": 0,
+              "cacheWrite": 0
+            },
+            "contextWindow": 32768,
+            "maxTokens": 8192
+          }
+        ]
       }
     }
   },
   "agents": {
     "defaults": {
       "model": {
-        "primary": "oneapi/kimi-k2-250905"
+        "primary": "ollama/qwen2.5:7b"
       },
       "imageGenerationModel": {
         "primary": "google/gemini-3-pro-image-preview"
@@ -331,8 +378,8 @@
       {
         "id": "main",
         "default": true,
-        "model": "oneapi/kimi-k2-250905",
         "workspace": "~/.openclaw/workspace",
+        "model": "oneapi/kimi-k2-250905",
         "identity": {
           "name": "通用助手",
           "emoji": "🦞"
@@ -348,8 +395,8 @@
       },
       {
         "id": "frontend",
-        "model": "oneapi/doubao-seed-1-6-flash-250828",
         "workspace": "~/.openclaw/workspace-frontend",
+        "model": "oneapi/doubao-seed-1-6-flash-250828",
         "identity": {
           "name": "前端工程",
           "emoji": "⚛️"
@@ -357,8 +404,8 @@
       },
       {
         "id": "backend",
-        "model": "oneapi/kimi-k2-250905",
         "workspace": "~/.openclaw/workspace-backend",
+        "model": "oneapi/kimi-k2-250905",
         "identity": {
           "name": "后端服务",
           "emoji": "🧱"
@@ -366,8 +413,8 @@
       },
       {
         "id": "ui",
-        "model": "oneapi/doubao-seed-1-6-vision-250815",
         "workspace": "~/.openclaw/workspace-ui",
+        "model": "oneapi/doubao-seed-1-6-vision-250815",
         "identity": {
           "name": "UI 视觉",
           "emoji": "🎨"
@@ -375,8 +422,8 @@
       },
       {
         "id": "stock",
-        "model": "oneapi/kimi-k2-250905",
         "workspace": "~/.openclaw/workspace-stock",
+        "model": "oneapi/kimi-k2-250905",
         "identity": {
           "name": "股票分析",
           "emoji": "📈"
@@ -384,15 +431,6 @@
       }
     ]
   },
-  "bindings": [
-    {
-      "agentId": "stock",
-      "match": {
-        "channel": "wecom",
-        "accountId": "*"
-      }
-    }
-  ],
   "tools": {
     "profile": "full",
     "web": {
@@ -417,6 +455,15 @@
       ]
     }
   },
+  "bindings": [
+    {
+      "agentId": "stock",
+      "match": {
+        "channel": "wecom",
+        "accountId": "*"
+      }
+    }
+  ],
   "commands": {
     "native": "auto",
     "nativeSkills": "auto",
@@ -587,6 +634,27 @@
       },
       "alicloud-ai-multimodal-qwen-vl": {
         "enabled": false
+      },
+      "agent-reach": {
+        "enabled": true
+      },
+      "skill-vetter": {
+        "enabled": true
+      },
+      "research-analyzer": {
+        "enabled": true
+      },
+      "skill-creator": {
+        "enabled": true
+      },
+      "critical-code-reviewer": {
+        "enabled": true
+      },
+      "self-improving-agent": {
+        "enabled": true
+      },
+      "web-search-preferences": {
+        "enabled": true
       }
     }
   },
@@ -603,10 +671,12 @@
     },
     "entries": {
       "acpx": {
-        "enabled": true
+        "enabled": true,
+        "config": {}
       },
       "wecom-openclaw-plugin": {
-        "enabled": true
+        "enabled": true,
+        "config": {}
       },
       "duckduckgo": {
         "enabled": true,
