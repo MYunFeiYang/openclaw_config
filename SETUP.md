@@ -88,6 +88,22 @@ OpenClaw **2026.3.x 起已在安装包内捆绑 `acpx`**（`openclaw/dist/extens
 
 **`.env` 不会自动被所有启动方式加载**：若 `openclaw gateway` 作为服务启动且读不到变量，可在服务配置里使用 `EnvironmentFile=$HOME/.openclaw/.env`，或在交互式终端先执行 `set -a && source ~/.openclaw/.env && set +a` 再启动；也可用仓库内 [`scripts/openclaw-with-dotenv.sh`](scripts/openclaw-with-dotenv.sh) 包装调用（`alias openclaw=/path/to/scripts/openclaw-with-dotenv.sh`）。
 
+#### 1.4.2 macOS LaunchAgent：让网关进程加载 `.env`
+
+`launchd` 启动的 Gateway **不会**读 shell 配置；若 `openclaw.json` 使用 env SecretRef，须让 **ProgramArguments** 在 exec Node 之前注入变量。推荐在 `~/.openclaw/scripts/` 使用包装脚本（本仓库已提供 [`scripts/gateway-launchd.sh`](scripts/gateway-launchd.sh)）：
+
+1. `chmod +x ~/.openclaw/scripts/gateway-launchd.sh`
+2. 编辑 `~/Library/LaunchAgents/ai.openclaw.gateway.plist`：在 `<array>` 里 **把原来的 `node` 路径挪到第二位**，并在**第一位**插入包装脚本路径，例如：
+   - `…/gateway-launchd.sh`
+   - `…/bin/node`
+   - `…/openclaw/dist/entry.js`
+   - `gateway`、`--port`、`18789`（与原先一致）
+3. `launchctl unload ~/Library/LaunchAgents/ai.openclaw.gateway.plist && launchctl load ~/Library/LaunchAgents/ai.openclaw.gateway.plist`
+
+升级 OpenClaw 若 **重写 plist**，需按上法重新插入包装脚本一行。
+
+**关于 `gateway restart` 时的告警** `Unable to verify gateway token drift: gateway.auth.token SecretRef is configured but unavailable in this command path`：这是 **当前终端里的 `openclaw` CLI** 未加载 `.env`，做 drift 检查时解析不到 SecretRef；**不一定表示正在运行的网关未加载密钥**。消除告警可在执行前 `source ~/.openclaw/.env`，或使用上面的 `openclaw-with-dotenv.sh` 别名。
+
 ## 2. 网络与密钥
 
 - 确保能访问内网 OneAPI（`openclaw.json` 中 `models.providers`）与网关端口（默认 `18789`）。
