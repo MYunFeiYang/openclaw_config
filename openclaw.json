@@ -327,6 +327,14 @@
         "identity": {
           "name": "通用助手",
           "emoji": "🦞"
+        },
+        "subagents": {
+          "allowAgents": [
+            "frontend",
+            "backend",
+            "ui",
+            "stock"
+          ]
         }
       },
       {

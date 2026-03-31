@@ -33,6 +33,12 @@ openclaw doctor
 
 - [ ] 在 **Control UI** 或 CLI 里**显式选 agent**，少依赖对话里「口头切换」。
 
+**main 协调其它 agent（两种机制）**
+
+- **`tools.agentToAgent`**：跨 agent **会话**定向（如 `sessions_send` 指向其它 agent 的会话）；需 `allow` 白名单，与 `tools.sessions.visibility` 等配合。
+- **`agents.list[].subagents.allowAgents`**（本仓库在 `main` 上已配置 `frontend` / `backend` / `ui` / `stock`）：`sessions_spawn` 的 **`agentId`** 可在这些身份下跑子任务；仅开 `agentToAgent` 不足以让 main 把子任务派到其它 agent。
+- 改后需 **重启 Gateway**；验收：在 **main** 会话用 `sessions_spawn` 将 `agentId` 设为 `stock`（或 `frontend`），确认不被策略拒绝；可选 `openclaw doctor`。
+
 ---
 
 ## 3. 工作区记忆（AGENTS / SOUL / memory / MEMORY）
@@ -61,7 +67,7 @@ openclaw doctor
 
 ## 5. 网关与安全
 
-- [ ] **跨 agent 调用**：`tools.agentToAgent` 已配置 `allow` 白名单（与本仓库 `agents.list` id 一致）；若新增 agent，记得同步 `allow`。
+- [ ] **跨 agent 调用**：`tools.agentToAgent` 已配置 `allow` 白名单（与本仓库 `agents.list` id 一致）；若新增 agent，记得同步 `allow`。**`sessions_spawn` 派发到其它 `agentId`** 另需 `main.subagents.allowAgents`（见上文 §2）。
 - [ ] **密钥**：长期目标为环境变量或 Secret 引用，见 [SETUP.md](SETUP.md) §1.4 与 [.env.example](.env.example)。
 - [ ] 外网暴露 Control UI 时：核对 `gateway.auth`、`controlUi.allowedOrigins`。
 
