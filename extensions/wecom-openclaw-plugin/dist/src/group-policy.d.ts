@@ -3,7 +3,8 @@
  *
  * 负责群组策略检查（groupPolicy、群组白名单、群内发送者白名单）
  */
-import type { OpenClawConfig, RuntimeEnv } from "openclaw/plugin-sdk";
+import type { OpenClawConfig } from "openclaw/plugin-sdk/core";
+import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
 import type { ResolvedWeComAccount } from "./utils.js";
 /**
  * 群组策略检查结果

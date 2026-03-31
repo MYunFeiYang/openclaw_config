@@ -104,6 +104,8 @@ OpenClaw **2026.3.x 起已在安装包内捆绑 `acpx`**（`openclaw/dist/extens
 
 **关于 `gateway restart` 时的告警** `Unable to verify gateway token drift: gateway.auth.token SecretRef is configured but unavailable in this command path`：这是 **当前终端里的 `openclaw` CLI** 未加载 `.env`，做 drift 检查时解析不到 SecretRef；**不一定表示正在运行的网关未加载密钥**。消除告警可在执行前 `source ~/.openclaw/.env`，或使用上面的 `openclaw-with-dotenv.sh` 别名。
 
+**企微插件与 `channels.wecom.secret`：** `@wecom/wecom-openclaw-plugin@2026.3.x` 在启动时会执行 `account.secret?.trim()`，需要 **已是字符串** 的 Secret。若 OpenClaw 网关（如 2026.3.28）在 **渠道层未把 SecretRef 解析成字符串** 就传给插件，会出现 `channel startup failed: account.secret?.trim is not a function`，表现为 **企微完全收不到消息**。此时请把 **`channels.wecom.secret` 保持为明文**（与企微后台一致），或等 OpenClaw / 插件后续版本在渠道侧完成 SecretRef 解析后再改回 env 引用。`ONEAPI_API_KEY`、`gateway.auth.token` 的 env SecretRef 不受影响。
+
 ## 2. 网络与密钥
 
 - 确保能访问内网 OneAPI（`openclaw.json` 中 `models.providers`）与网关端口（默认 `18789`）。

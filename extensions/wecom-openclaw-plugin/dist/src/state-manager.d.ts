@@ -60,10 +60,14 @@ export declare function getReqIdForChat(chatId: string, accountId?: string): str
 export declare function deleteReqIdForChat(chatId: string, accountId?: string): void;
 /**
  * 启动时预热 reqId 缓存（从磁盘加载到内存）
+ *
+ * 注意：由于移除了磁盘存储，此函数现在只返回 0（无预热条目）
  */
 export declare function warmupReqIdStore(accountId?: string, log?: (...args: unknown[]) => void): Promise<number>;
 /**
  * 立即将 reqId 数据刷写到磁盘（用于优雅退出）
+ *
+ * 注意：由于移除了磁盘存储，此函数现在是无操作
  */
 export declare function flushReqIdStore(accountId?: string): Promise<void>;
 /**

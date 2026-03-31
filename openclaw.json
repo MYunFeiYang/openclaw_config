@@ -449,11 +449,7 @@
     "wecom": {
       "enabled": true,
       "botId": "aibJAWBk1hySO4V-FBjS-_7c-5PcljzpfBq",
-      "secret": {
-        "source": "env",
-        "provider": "default",
-        "id": "WECOM_BOT_SECRET"
-      }
+      "secret": "A9mhytygj1sQwBiO9weRGnFCdELcDUKwC3dy105Letb"
     }
   },
   "gateway": {
@@ -627,14 +623,13 @@
         "source": "npm",
         "spec": "@wecom/wecom-openclaw-plugin",
         "installPath": "~/.openclaw/extensions/wecom-openclaw-plugin",
-        "version": "1.0.11",
+        "version": "2026.3.30",
         "resolvedName": "@wecom/wecom-openclaw-plugin",
-        "resolvedVersion": "1.0.11",
-        "resolvedSpec": "@wecom/wecom-openclaw-plugin@1.0.11",
-        "integrity": "sha512-TqyWvi8AxPyii/fUZk/rVR4a5jXl6PHte6wuqgtbrWXFoOfYyKtnyjmtGJk3/kf1ZOjgHu2N6lfhz5fA6bTCyw==",
-        "shasum": "188b313b0413498d10a53b6112b4dc1284b9b1f5",
-        "resolvedAt": "2026-03-16T11:35:12.199Z",
-        "installedAt": "2026-03-16T11:35:15.965Z"
+        "resolvedVersion": "2026.3.30",
+        "resolvedSpec": "@wecom/wecom-openclaw-plugin@2026.3.30",
+        "integrity": "sha512-nEFEliWjQhoBwiSuMniC4P6U8kSLTlGu3EV+jojIVMeL/z1m2PSu17w0u33YwYDvpJH/59GwipEQGmle+VO4aQ==",
+        "resolvedAt": "2026-03-31T12:00:00.000Z",
+        "installedAt": "2026-03-31T12:00:00.000Z"
       }
     }
   }

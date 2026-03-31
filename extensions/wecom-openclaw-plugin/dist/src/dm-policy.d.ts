@@ -3,7 +3,7 @@
  *
  * 负责私聊策略检查、配对流程
  */
-import type { RuntimeEnv } from "openclaw/plugin-sdk";
+import type { RuntimeEnv } from "openclaw/plugin-sdk/runtime-env";
 import type { WSClient, WsFrame } from "@wecom/aibot-node-sdk";
 import type { ResolvedWeComAccount } from "./utils.js";
 /**

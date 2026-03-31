@@ -1,10 +1,10 @@
-import { OpenClawPluginApi } from 'openclaw/plugin-sdk';
+import { OpenClawPluginApi } from 'openclaw/plugin-sdk/core';
 
 declare const plugin: {
     id: string;
     name: string;
     description: string;
-    configSchema: any;
+    configSchema: Record<string, unknown>;
     register(api: OpenClawPluginApi): void;
 };
 

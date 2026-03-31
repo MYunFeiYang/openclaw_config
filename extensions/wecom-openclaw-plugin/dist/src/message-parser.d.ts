@@ -9,6 +9,7 @@ export interface MessageBody {
     chatid?: string;
     chattype: "single" | "group";
     from: {
+        corpid?: string;
         userid: string;
     };
     response_url?: string;
@@ -56,6 +57,22 @@ export interface MessageBody {
             aeskey?: string;
         };
     };
+    event?: {
+        eventtype?: string;
+        template_card_event?: {
+            card_type?: string;
+            event_key?: string;
+            task_id?: string;
+            selected_items?: {
+                selected_item?: Array<{
+                    question_key?: string;
+                    option_ids?: {
+                        option_id?: string[];
+                    };
+                }>;
+            };
+        };
+    };
 }
 export interface ParsedMessageContent {
     textParts: string[];
@@ -66,7 +83,7 @@ export interface ParsedMessageContent {
     quoteContent: string | undefined;
 }
 /**
- * 解析消息内容（支持单条消息、图文混排和引用消息）
+ * 解析消息内容（支持单条消息、图文混排、事件回调和引用消息）
  * @returns 提取的文本数组、图片URL数组和引用消息内容
  */
 export declare function parseMessageContent(body: MessageBody): ParsedMessageContent;
