@@ -3,6 +3,11 @@
     "lastTouchedVersion": "2026.3.24",
     "lastTouchedAt": "2026-03-27T02:05:35.735Z"
   },
+  "env": {
+    "shellEnv": {
+      "enabled": true
+    }
+  },
   "wizard": {
     "lastRunAt": "2026-03-27T02:05:35.651Z",
     "lastRunVersion": "2026.3.24",
@@ -36,7 +41,11 @@
     "providers": {
       "oneapi": {
         "baseUrl": "https://zhuge-oneapi.sangfor.com/v1",
-        "apiKey": "sk-XygyzbgawEUi7wpQ0CFm1Ce8lU1lMoPhOYLDR5UiLfNao3A4",
+        "apiKey": {
+          "source": "env",
+          "provider": "default",
+          "id": "ONEAPI_API_KEY"
+        },
         "api": "openai-completions",
         "models": [
           {
@@ -440,7 +449,11 @@
     "wecom": {
       "enabled": true,
       "botId": "aibJAWBk1hySO4V-FBjS-_7c-5PcljzpfBq",
-      "secret": "A9mhytygj1sQwBiO9weRGnFCdELcDUKwC3dy105Letb"
+      "secret": {
+        "source": "env",
+        "provider": "default",
+        "id": "WECOM_BOT_SECRET"
+      }
     }
   },
   "gateway": {
@@ -456,7 +469,11 @@
     },
     "auth": {
       "mode": "token",
-      "token": "c5ade0dfe235f65bd6388f6c9378cb6abc104a4f534c21a5"
+      "token": {
+        "source": "env",
+        "provider": "default",
+        "id": "GATEWAY_AUTH_TOKEN"
+      }
     },
     "tailscale": {
       "mode": "off",

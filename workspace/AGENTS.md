@@ -38,6 +38,19 @@ When the user asks who you are, what model you are, your name, or what you do:
 
 加载顺序与配置见 [Skills](https://docs.openclaw.ai/tools/skills)。对用户说明时：**工具**（`read` / `exec` / …）在 tool schema；**技能包**以系统提示里列出的 **AgentSkills 名为准**，勿编造；分不清时建议用户看 Control UI → Agents → Skills 或执行 `openclaw skills list`。
 
+## Delegation（多代理协调，本仓库 `main`）
+
+当用户任务明显属于专用代理时，**优先用子任务工具委派**，不要在本会话里硬扛（除非用户只要泛聊）。映射与 [PRACTICES.md](../PRACTICES.md) §2 一致：
+
+| 场景 | `agentId` | 工具提示 |
+|------|-----------|----------|
+| 浏览器 / 前端工程、JS/TS、构建 | `frontend` | `sessions_spawn` 或跨会话工具（见网关配置） |
+| API、服务、数据、基础设施 | `backend` | 同上 |
+| 界面结构、视觉、截图 / 设计稿 | `ui` | 同上 |
+| A 股 / 行情、`stock_system/` | `stock` | 同上 |
+
+`openclaw.json` 已为 `main` 配置 `subagents.allowAgents` 与 `tools.agentToAgent`；仅在**需要另一个 agent 身份执行**时使用 `sessions_spawn` 并填对 `agentId`；指向**已有会话**时用 `sessions_send` 等会话类工具。勿编造不存在的 `agentId`。
+
 ## Memory
 
 You wake up fresh each session. These files are your continuity:

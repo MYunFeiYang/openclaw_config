@@ -15,7 +15,7 @@ ssl/
 logs/
 # Per-workspace OpenClaw UI/state (regenerated at runtime)
 **/.openclaw/workspace-state.json
-memory/
+# memory/ — 暂随 Git 跟踪日记忆；若含敏感信息可恢复忽略
 media/
 delivery-queue/
 exec-approvals.json

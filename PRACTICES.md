@@ -8,6 +8,8 @@
 
 ## 1. 入站进对「人」（优先做）
 
+**本仓库配置已核对（`openclaw.json`）：** `main` 带 `default: true`；`bindings` 含 `wecom` + `accountId: "*"` → `stock`。若你本地行为不一致，按下列 checklist 排查，勿仅改配置不碰会话存储。
+
 - [ ] 确认 `openclaw.json` 里 **`agents.list` 中默认 agent** 已用 `default: true` 标在期望的 `agentId` 上（本仓库为 `main`）。
 - [ ] 确认 **`bindings`** 与渠道一致：未配置时，入站常落到默认 agent；企业微信等需按 [Channel routing](https://docs.openclaw.ai/channels/channel-routing) 配置 `match`（渠道、账号、peer 等）。本仓库当前为 **`wecom` → `stock`**（`match.accountId` 为 `"*"`，避免仅匹配「默认账号」导致回退到 `main`）。若要多账号/多群分流或改回龙虾（`main`），请改 `openclaw.json` 的 `bindings` 并**把更具体的匹配写在前面**（官方规则：更具体者优先）。
 - [ ] 若改绑定后仍自称 `main`：**重启 Gateway**；若仍不对，多半是 **旧会话键仍在 `main` 的 session store 里**（键形如 `agent:main:wecom:direct:<peer>`，见 `~/.openclaw/agents/main/sessions/sessions.json`）。改 `bindings` **不会**自动迁移历史会话；需在 **`main`** 侧删除对应会话条目（并备份该文件），下次企微消息才会为 **`stock`** 新建 `agent:stock:wecom:direct:...`。可用 `openclaw sessions --agent main --json` 核对键名；子会话若 `spawnedBy` 指向该企微会话，可一并删或 `sessions cleanup --fix-missing` 按需整理。
@@ -52,7 +54,7 @@ openclaw doctor
 | 当天流水、临时上下文 | `memory/YYYY-MM-DD.md` |
 | 仅私聊主会话的长期沉淀 | `MEMORY.md`（勿在群聊加载，见各 `AGENTS.md`） |
 
-- [ ] 日记忆：本仓库 `.gitignore` 忽略 **`memory/`**，**不会随 Git 备份**；换机若要保留日记式记忆，需另做本机备份或加密归档（见 [SETUP.md](SETUP.md) §1.3）。
+- [ ] 日记忆：本仓库**当前**将各 workspace 的 **`memory/` 纳入 Git**（便于换机与协作延续上下文）；若日后日文件含敏感内容，可改回忽略并依赖本地备份（见 [SETUP.md](SETUP.md) §1.3）。
 
 ---
 
@@ -68,14 +70,15 @@ openclaw doctor
 ## 5. 网关与安全
 
 - [ ] **跨 agent 调用**：`tools.agentToAgent` 已配置 `allow` 白名单（与本仓库 `agents.list` id 一致）；若新增 agent，记得同步 `allow`。**`sessions_spawn` 派发到其它 `agentId`** 另需 `main.subagents.allowAgents`（见上文 §2）。
-- [ ] **密钥**：长期目标为环境变量或 Secret 引用，见 [SETUP.md](SETUP.md) §1.4 与 [.env.example](.env.example)。
+- [ ] **密钥**：本仓库 `openclaw.json` 已用 **env SecretRef**（`ONEAPI_API_KEY` / `GATEWAY_AUTH_TOKEN` / `WECOM_BOT_SECRET`），值放在 **`~/.openclaw/.env`**（见 [.env.example](.env.example) 与 [SETUP.md](SETUP.md) §1.4）。服务启动若读不到环境变量，见 SETUP 中 `.env` 加载说明。
 - [ ] 外网暴露 Control UI 时：核对 `gateway.auth`、`controlUi.allowedOrigins`。
 
 ---
 
 ## 6. 运维小习惯
 
-- [ ] 大改配置后跑 `openclaw doctor`（若可用）或看网关日志。
+- [ ] 大改配置后跑 `openclaw doctor`（若可用）或看网关日志。若提示 **`openclaw.json` 权限过宽**，可 `chmod 600 ~/.openclaw/openclaw.json`。
+- [ ] **插件**：`plugins.load.paths` 仅加载企微扩展即可；若日志出现 **duplicate plugin id（acpx）**，勿在 paths 中再挂一份 `node_modules/acpx`（见 [SETUP.md](SETUP.md) §1.2）。
 - [ ] 多 workspace 时**固定路径**、少搬目录，避免记忆与插件路径漂移。
 
 ---

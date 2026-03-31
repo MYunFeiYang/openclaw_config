@@ -69,14 +69,24 @@ OpenClaw **2026.3.x 起已在安装包内捆绑 `acpx`**（`openclaw/dist/extens
 
 **日记忆与 Git**
 
-- `.gitignore` 已忽略各 workspace 下 **`memory/`**，因此**日记忆不会随本仓库备份**。这与官方「可把 `memory/` 纳入私有 workspace 仓库」的示例不同；若需长期备份日记忆，请另用本机备份或加密归档，勿推送到不可信远端。
+- 本仓库**当前**未忽略 **`memory/`**，日记忆可随 Git 备份；推送到不可信远端前请自行检查日文件是否含密钥或隐私。若改回忽略 `memory/`，则与官方「仅私有 workspace 纳入 `memory/`」的常见做法一致，长期备份需另做本机或加密归档。
 
 ### 1.4 密钥外置（可选，与官方「勿提交密钥」一致）
 
 官方建议密钥放在环境变量、密码管理或 `openclaw.json` 支持的 Secret 引用中，而非长期明文写在提交树里（见 [Agent Workspace](https://docs.openclaw.ai/concepts/agent-workspace)、[Skills 安全说明](https://docs.openclaw.ai/tools/skills)）。
 
-- 占位变量名见仓库根目录 [.env.example](.env.example)；复制为 `.env` 后由本机或启动脚本注入（`.env` 已被 gitignore）。
-- 将 `models.providers.*.apiKey`、`gateway.auth.token`、`channels.wecom.secret` 等改为 **SecretRef 或 env** 的具体字段名，请以当前安装的 OpenClaw 版本文档 / `openclaw config` / `openclaw secrets` 为准；**迁移后务必重启 Gateway 并验证渠道与模型可用**，再提交去掉明文后的配置。
+- 占位变量名见仓库根目录 [.env.example](.env.example)；复制为 `~/.openclaw/.env` 后填入密钥（`.env` 已被 gitignore）。
+- 本仓库的 `openclaw.json` 已将 **`models.providers.oneapi.apiKey`**、**`gateway.auth.token`**、**`channels.wecom.secret`** 配置为 **env SecretRef**（`ONEAPI_API_KEY`、`GATEWAY_AUTH_TOKEN`、`WECOM_BOT_SECRET`），并启用 **`env.shellEnv`**，便于从登录 shell 继承已 `export` 的变量。
+- 字段名与 `openclaw config set … --ref-source env --ref-provider default --ref-id VAR` 一致；也可用 `openclaw secrets` / `openclaw config schema` 核对。**修改密钥后务必重启 Gateway** 并验证模型与企微。
+
+#### 1.4.1 首次使用或从旧明文配置迁移
+
+1. 若你仍有带明文的备份（例如 `openclaw.json.bak`），从中抄出三项填入 `~/.openclaw/.env`（见 [.env.example](.env.example) 变量名）。
+2. 若无备份，从 OneAPI / 网关 / 企微后台重新生成或复制密钥。
+3. 执行 `openclaw config validate`，再 `openclaw gateway restart`；打开 Control UI 与企微各测一条消息。
+4. 可选：`openclaw secrets audit` 检查是否还有明文泄漏。
+
+**`.env` 不会自动被所有启动方式加载**：若 `openclaw gateway` 作为服务启动且读不到变量，可在服务配置里使用 `EnvironmentFile=$HOME/.openclaw/.env`，或在交互式终端先执行 `set -a && source ~/.openclaw/.env && set +a` 再启动；也可用仓库内 [`scripts/openclaw-with-dotenv.sh`](scripts/openclaw-with-dotenv.sh) 包装调用（`alias openclaw=/path/to/scripts/openclaw-with-dotenv.sh`）。
 
 ## 2. 网络与密钥
 
