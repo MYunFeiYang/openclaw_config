@@ -1,7 +1,7 @@
 {
   "meta": {
-    "lastTouchedVersion": "2026.3.28",
-    "lastTouchedAt": "2026-03-31T06:55:40.700Z"
+    "lastTouchedVersion": "2026.4.14",
+    "lastTouchedAt": "2026-04-16T02:19:53.051Z"
   },
   "env": {
     "shellEnv": {
@@ -662,7 +662,9 @@
     "allow": [
       "wecom-openclaw-plugin",
       "acpx",
-      "duckduckgo"
+      "duckduckgo",
+      "ollama",
+      "memory-core"
     ],
     "load": {
       "paths": [
@@ -684,6 +686,16 @@
           "webSearch": {
             "region": "cn-zh",
             "safeSearch": "moderate"
+          }
+        }
+      },
+      "ollama": {
+        "enabled": true
+      },
+      "memory-core": {
+        "config": {
+          "dreaming": {
+            "enabled": true
           }
         }
       }
