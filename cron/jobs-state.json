@@ -2,20 +2,20 @@
   "version": 1,
   "jobs": {
     "ca38d074-c454-4f80-adbe-f10b8c2fc3ed": {
-      "updatedAtMs": 1777261411139,
+      "updatedAtMs": 1777273819712,
       "state": {
         "nextRunAtMs": 1777334400000,
-        "lastRunAtMs": 1777261347565,
+        "lastRunAtMs": 1777273761060,
         "lastRunStatus": "ok",
         "lastStatus": "ok",
-        "lastDurationMs": 63574,
+        "lastDurationMs": 58652,
         "lastDeliveryStatus": "delivered",
         "consecutiveErrors": 0,
         "lastDelivered": true
       }
     },
     "1d736a97-6ff1-4f1f-865a-e5882d61438c": {
-      "updatedAtMs": 1777260907635,
+      "updatedAtMs": 1777262340533,
       "state": {
         "nextRunAtMs": 1777284600000,
         "lastRunAtMs": 1777260891945,
@@ -28,7 +28,7 @@
       }
     },
     "cf7fa95f-64c0-4dec-b430-493bab61a45f": {
-      "updatedAtMs": 1777260949425,
+      "updatedAtMs": 1777262350839,
       "state": {
         "nextRunAtMs": 1777312800000,
         "lastRunAtMs": 1777260932010,
@@ -41,7 +41,7 @@
       }
     },
     "2b122c44-0850-4ddf-b082-fc0c842b2289": {
-      "updatedAtMs": 1777256924881,
+      "updatedAtMs": 1777274098785,
       "state": {
         "nextRunAtMs": 1777316400000,
         "lastRunAtMs": 1777256853415,

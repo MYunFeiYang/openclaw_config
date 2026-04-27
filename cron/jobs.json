@@ -18,7 +18,7 @@
       "payload": {
         "kind": "agentTurn",
         "message": "执行A股早盘分析：cd \"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace-stock/stock_system\" && python3 refactored/openclaw_cron_analyzer.py morning",
-        "model": "openrouter/auto",
+        "model": "openrouter/free",
         "thinking": "off",
         "timeoutSeconds": 1200
       },
@@ -50,7 +50,7 @@
         "message": "执行A股收盘流程（先复盘再汇总与规则自校准）：cd \"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace-stock/stock_system\" && python3 refactored/openclaw_cron_analyzer.py post_close",
         "thinking": "off",
         "timeoutSeconds": 2400,
-        "model": "openrouter/auto"
+        "model": "openrouter/free"
       },
       "delivery": {
         "mode": "announce",
@@ -80,7 +80,7 @@
         "message": "执行股票系统定期清理：cd \"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace-stock/stock_system\" && bash scripts/cleanup_stock_system.sh",
         "thinking": "off",
         "timeoutSeconds": 180,
-        "model": "openrouter/auto"
+        "model": "openrouter/free"
       },
       "delivery": {
         "mode": "announce",
@@ -102,11 +102,15 @@
         "expr": "0 3 * * *",
         "tz": "Asia/Shanghai"
       },
-      "sessionTarget": "main",
+      "sessionTarget": "isolated",
       "wakeMode": "now",
       "payload": {
-        "kind": "systemEvent",
-        "text": "__openclaw_memory_core_short_term_promotion_dream__"
+        "kind": "agentTurn",
+        "message": "__openclaw_memory_core_short_term_promotion_dream__",
+        "lightContext": true
+      },
+      "delivery": {
+        "mode": "none"
       },
       "state": {}
     }

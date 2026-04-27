@@ -9,7 +9,7 @@
     "openrouter:default": {
       "type": "api_key",
       "provider": "openrouter",
-      "key": "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"
+      "key": "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"
     }
   }
 }

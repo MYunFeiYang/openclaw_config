@@ -1,0 +1,1 @@
+/Users/thinkway/.nvm/versions/node/v24.14.0/lib/node_modules/openclaw/dist/global-singleton-CG85P2R2.js

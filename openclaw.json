@@ -1,7 +1,7 @@
 {
   "meta": {
     "lastTouchedVersion": "2026.4.23",
-    "lastTouchedAt": "2026-04-27T03:10:34.817Z"
+    "lastTouchedAt": "2026-04-27T06:21:55.155Z"
   },
   "env": {
     "shellEnv": {
@@ -9,7 +9,7 @@
     }
   },
   "wizard": {
-    "lastRunAt": "2026-04-27T02:53:23.271Z",
+    "lastRunAt": "2026-04-27T06:21:54.957Z",
     "lastRunVersion": "2026.4.23",
     "lastRunCommand": "onboard",
     "lastRunMode": "local"
@@ -345,7 +345,7 @@
   "agents": {
     "defaults": {
       "model": {
-        "primary": "openrouter/auto"
+        "primary": "openrouter/free"
       },
       "imageGenerationModel": {
         "primary": "google/gemini-3-pro-image-preview"
@@ -368,7 +368,8 @@
         "ollama/qwen2.5:7b": {},
         "openrouter/auto": {
           "alias": "OpenRouter"
-        }
+        },
+        "openrouter/free": {}
       },
       "workspace": "~/.openclaw/workspace",
       "userTimezone": "Asia/Shanghai",
@@ -386,7 +387,7 @@
         "id": "main",
         "default": true,
         "workspace": "/Users/thinkway/.openclaw/workspace",
-        "model": "openrouter/auto",
+        "model": "openrouter/openrouter/free",
         "identity": {
           "name": "通用助手",
           "emoji": "🦞"
@@ -403,7 +404,7 @@
       {
         "id": "frontend",
         "workspace": "/Users/thinkway/.openclaw/workspace-frontend",
-        "model": "openrouter/openrouter/auto",
+        "model": "openrouter/free",
         "identity": {
           "name": "前端工程",
           "emoji": "⚛️"
@@ -412,7 +413,7 @@
       {
         "id": "backend",
         "workspace": "/Users/thinkway/.openclaw/workspace-backend",
-        "model": "openrouter/openrouter/auto",
+        "model": "openrouter/free",
         "identity": {
           "name": "后端服务",
           "emoji": "🧱"
@@ -421,7 +422,7 @@
       {
         "id": "ui",
         "workspace": "/Users/thinkway/.openclaw/workspace-ui",
-        "model": "openrouter/openrouter/auto",
+        "model": "openrouter/free",
         "identity": {
           "name": "UI 视觉",
           "emoji": "🎨"
@@ -430,7 +431,7 @@
       {
         "id": "stock",
         "workspace": "/Users/thinkway/.openclaw/workspace-stock",
-        "model": "openrouter/openrouter/auto",
+        "model": "openrouter/openrouter/free",
         "identity": {
           "name": "股票分析",
           "emoji": "📈"

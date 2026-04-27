@@ -1,0 +1,1 @@
+/Users/thinkway/.nvm/versions/node/v24.14.0/lib/node_modules/openclaw/dist/gpt5-prompt-overlay-DIaFSR3O.js
