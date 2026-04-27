@@ -28,13 +28,13 @@
       }
     },
     "cf7fa95f-64c0-4dec-b430-493bab61a45f": {
-      "updatedAtMs": 1777262350839,
+      "updatedAtMs": 1777294425827,
       "state": {
         "nextRunAtMs": 1777312800000,
-        "lastRunAtMs": 1777260932010,
+        "lastRunAtMs": 1777294329761,
         "lastRunStatus": "ok",
         "lastStatus": "ok",
-        "lastDurationMs": 17415,
+        "lastDurationMs": 96066,
         "lastDeliveryStatus": "delivered",
         "consecutiveErrors": 0,
         "lastDelivered": true

@@ -711,21 +711,6 @@
       "openrouter": {
         "enabled": true
       }
-    },
-    "installs": {
-      "wecom-openclaw-plugin": {
-        "source": "npm",
-        "spec": "@wecom/wecom-openclaw-plugin",
-        "installPath": "~/.openclaw/extensions/wecom-openclaw-plugin",
-        "version": "2026.4.23",
-        "resolvedName": "@wecom/wecom-openclaw-plugin",
-        "resolvedVersion": "2026.4.23",
-        "resolvedSpec": "@wecom/wecom-openclaw-plugin@2026.4.23",
-        "integrity": "sha512-bnzfdIEEu1/LFvcdyjaTkyxt27w6c7dqhkPezU62OWaqmcdFsUGR3T55USK/O9pIKsNcnL1Tnu1pqKYCWHFgWQ==",
-        "resolvedAt": "2026-04-24T08:23:15.691Z",
-        "installedAt": "2026-04-24T08:23:28.372Z",
-        "shasum": "34f76a1dc3e416ea7664f31b2f0d0239b1fd0939"
-      }
     }
   }
 }
