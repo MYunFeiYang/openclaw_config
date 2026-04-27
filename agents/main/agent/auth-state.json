@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "lastGood": {
+    "ollama": "ollama:default",
+    "openrouter": "openrouter:default"
+  },
+  "usageStats": {
+    "ollama:default": {
+      "errorCount": 0,
+      "lastUsed": 1774941368831
+    },
+    "openrouter:default": {
+      "errorCount": 0,
+      "lastUsed": 1777258562506
+    }
+  }
+}

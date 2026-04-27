@@ -1,7 +1,7 @@
 {
   "meta": {
-    "lastTouchedVersion": "2026.4.22",
-    "lastTouchedAt": "2026-04-24T08:23:28.600Z"
+    "lastTouchedVersion": "2026.4.23",
+    "lastTouchedAt": "2026-04-27T02:56:23.271Z"
   },
   "env": {
     "shellEnv": {
@@ -9,8 +9,8 @@
     }
   },
   "wizard": {
-    "lastRunAt": "2026-03-31T06:55:40.641Z",
-    "lastRunVersion": "2026.3.28",
+    "lastRunAt": "2026-04-27T02:53:23.271Z",
+    "lastRunVersion": "2026.4.23",
     "lastRunCommand": "onboard",
     "lastRunMode": "local"
   },
@@ -24,6 +24,10 @@
     "profiles": {
       "ollama:default": {
         "provider": "ollama",
+        "mode": "api_key"
+      },
+      "openrouter:default": {
+        "provider": "openrouter",
         "mode": "api_key"
       }
     }
@@ -341,7 +345,7 @@
   "agents": {
     "defaults": {
       "model": {
-        "primary": "ollama/qwen2.5:7b"
+        "primary": "openrouter/auto"
       },
       "imageGenerationModel": {
         "primary": "google/gemini-3-pro-image-preview"
@@ -361,7 +365,10 @@
         "oneapi/sf-gpt5": {},
         "oneapi/QwQ-32B": {},
         "oneapi/doubao-seed-1-6-250615": {},
-        "ollama/qwen2.5:7b": {}
+        "ollama/qwen2.5:7b": {},
+        "openrouter/auto": {
+          "alias": "OpenRouter"
+        }
       },
       "workspace": "~/.openclaw/workspace",
       "userTimezone": "Asia/Shanghai",
@@ -378,8 +385,8 @@
       {
         "id": "main",
         "default": true,
-        "workspace": "~/.openclaw/workspace",
-        "model": "oneapi/kimi-k2-250905",
+        "workspace": "/Users/thinkway/.openclaw/workspace",
+        "model": "openrouter/auto",
         "identity": {
           "name": "通用助手",
           "emoji": "🦞"
@@ -395,7 +402,7 @@
       },
       {
         "id": "frontend",
-        "workspace": "~/.openclaw/workspace-frontend",
+        "workspace": "/Users/thinkway/.openclaw/workspace-frontend",
         "model": "oneapi/doubao-seed-1-6-flash-250828",
         "identity": {
           "name": "前端工程",
@@ -404,7 +411,7 @@
       },
       {
         "id": "backend",
-        "workspace": "~/.openclaw/workspace-backend",
+        "workspace": "/Users/thinkway/.openclaw/workspace-backend",
         "model": "oneapi/kimi-k2-250905",
         "identity": {
           "name": "后端服务",
@@ -413,7 +420,7 @@
       },
       {
         "id": "ui",
-        "workspace": "~/.openclaw/workspace-ui",
+        "workspace": "/Users/thinkway/.openclaw/workspace-ui",
         "model": "oneapi/doubao-seed-1-6-vision-250815",
         "identity": {
           "name": "UI 视觉",
@@ -422,7 +429,7 @@
       },
       {
         "id": "stock",
-        "workspace": "~/.openclaw/workspace-stock",
+        "workspace": "/Users/thinkway/.openclaw/workspace-stock",
         "model": "oneapi/kimi-k2-250905",
         "identity": {
           "name": "股票分析",
@@ -664,7 +671,8 @@
       "acpx",
       "duckduckgo",
       "ollama",
-      "memory-core"
+      "memory-core",
+      "openrouter"
     ],
     "load": {
       "paths": [
@@ -698,6 +706,9 @@
             "enabled": true
           }
         }
+      },
+      "openrouter": {
+        "enabled": true
       }
     },
     "installs": {
