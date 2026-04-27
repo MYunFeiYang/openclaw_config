@@ -1,2 +1,2 @@
-/** 插件版本号，来源于 package.json */
+/** 插件版本号，运行时从 package.json 读取 */
 export declare const PLUGIN_VERSION: string;

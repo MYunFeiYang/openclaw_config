@@ -32,3 +32,21 @@ export declare function sendWeComReply(params: {
     /** 指定 streamId，用于流式回复时保持相同的 streamId */
     streamId?: string;
 }): Promise<string>;
+/**
+ * 非阻塞流式文本回复
+ *
+ * 基于 SDK 的 replyStreamNonBlocking 方法：
+ * - 如果上一条同 reqId 的消息尚未收到 ack，则跳过本次发送（返回 'skipped'），
+ *   避免流式中间帧排队积压导致延迟。
+ * - finish=true 的最终帧不受此限制，始终保证发送。
+ *
+ * @returns 'skipped' 表示被跳过，否则返回 streamId
+ */
+export declare function sendWeComReplyNonBlocking(params: {
+    wsClient: WSClient;
+    frame: WsFrame;
+    text: string;
+    runtime: RuntimeEnv;
+    streamId: string;
+    finish?: boolean;
+}): Promise<string | 'skipped'>;

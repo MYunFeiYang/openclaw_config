@@ -7,6 +7,8 @@
  * 本模块在加载时一次性探测 SDK 导出，存在则直接 re-export SDK 版本，
  * 不存在则导出 fallback 实现。其他模块统一从本文件导入，无需关心底层兼容细节。
  */
+import { resolveStateDir } from "./state-dir-resolve.js";
+export { resolveStateDir };
 export declare const DEFAULT_ACCOUNT_ID = "default";
 /** 与 openclaw plugin-sdk 中 WebMediaResult 兼容的类型 */
 export type WebMediaResult = {
@@ -94,3 +96,50 @@ export declare function buildAccountScopedDmSecurityPolicy(params: {
  * @returns 配对审批提示字符串
  */
 export declare function formatPairingApproveHint(channelId: string): string;
+/**
+ * 与 openclaw plugin-sdk/channel-policy 中 ChannelSecurityDmPolicy 兼容的类型。
+ * 低版本 SDK 未导出该方法时，使用此 fallback。
+ */
+export type ChannelSecurityDmPolicyCompat = {
+    policy: string;
+    allowFrom?: Array<string | number> | null;
+    policyPath?: string;
+    allowFromPath: string;
+    approveHint: string;
+    normalizeEntry?: (raw: string) => string;
+};
+declare global {
+    namespace openclaw.plugin.sdk {
+        interface ChannelSecurityDmPolicy {
+            policy: string;
+            allowFrom?: Array<string | number> | null;
+            policyPath?: string;
+            allowFromPath: string;
+            approveHint: string;
+            normalizeEntry?: (raw: string) => string;
+        }
+    }
+}
+export type BuildAccountScopedDmSecurityPolicyParams = {
+    cfg: {
+        channels?: Record<string, unknown>;
+    };
+    channelKey: string;
+    accountId?: string | null;
+    fallbackAccountId?: string | null;
+    policy?: string | null;
+    allowFrom?: Array<string | number> | null;
+    defaultPolicy?: string;
+    allowFromPathSuffix?: string;
+    policyPathSuffix?: string;
+    approveChannelId?: string;
+    approveHint?: string;
+    normalizeEntry?: (raw: string) => string;
+};
+/**
+ * 构建多账号作用域的 DM 安全策略（兼容入口）
+ *
+ * 优先使用 SDK 版本（openclaw/plugin-sdk/channel-policy），
+ * 不可用时使用 fallback 实现。
+ */
+export declare function buildAccountScopedDmSecurityPolicyCompat(params: BuildAccountScopedDmSecurityPolicyParams): Promise<ChannelSecurityDmPolicyCompat>;

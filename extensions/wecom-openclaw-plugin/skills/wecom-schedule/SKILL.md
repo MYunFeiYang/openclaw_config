@@ -64,9 +64,9 @@ metadata:
 - 添加参与人：使用 `wecom_mcp` tool 调用 `wecom_mcp call schedule add_schedule_attendees '{"schedule_id": "SCHEDULE_ID", "attendees": [{"userid": "USER_ID"}]}'`
 - 移除参与人：使用 `wecom_mcp` tool 调用 `wecom_mcp call schedule del_schedule_attendees '{"schedule_id": "SCHEDULE_ID", "attendees": [{"userid": "USER_ID"}]}'`
 
-### check_availablity — 查询闲忙
+### check_availability — 查询闲忙
 
-使用 `wecom_mcp` tool 调用 `wecom_mcp call schedule check_availablity '{"check_user_list": ["USER_ID_1", "USER_ID_2"], "start_time": "YYYY-MM-DD HH:MM:SS", "end_time": "YYYY-MM-DD HH:MM:SS"}'`
+使用 `wecom_mcp` tool 调用 `wecom_mcp call schedule check_availability '{"check_user_list": ["USER_ID_1", "USER_ID_2"], "start_time": "YYYY-MM-DD HH:MM:SS", "end_time": "YYYY-MM-DD HH:MM:SS"}'`
 
 支持 1~10 个用户，返回各用户的忙碌时段列表。参见 [API 详情](references/api-check-availability.md)。
 
@@ -156,6 +156,6 @@ metadata:
 
 **流程：**
 1. 通过 **wecom-contact-lookup** 获取相关人员 userid
-2. 调用 `check_availablity` 查询指定时间范围内各用户的忙碌时段
+2. 调用 `check_availability` 查询指定时间范围内各用户的忙碌时段
 3. 分析所有用户的忙碌时段，计算出共同空闲时段并推荐给用户
 4. 用户确认时段后，调用 `create_schedule` 创建会议并自动添加参与人

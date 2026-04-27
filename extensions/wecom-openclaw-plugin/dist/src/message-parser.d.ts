@@ -11,6 +11,8 @@ export interface MessageBody {
     from: {
         corpid?: string;
         userid: string;
+        /** 会话 ID（权限变更事件回调中携带） */
+        chat_id?: string;
     };
     response_url?: string;
     msgtype: string;
@@ -71,6 +73,11 @@ export interface MessageBody {
                     };
                 }>;
             };
+        };
+        /** 权限变更事件回调（如文档授权） */
+        auth_change_event?: {
+            /** 当前权限列表：1-新建和编辑文档；2-获取成员文档内容 */
+            auth_list?: number[];
         };
     };
 }

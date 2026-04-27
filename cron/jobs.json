@@ -8,7 +8,6 @@
       "name": "股票早盘分析",
       "enabled": true,
       "createdAtMs": 1773886616628,
-      "updatedAtMs": 1776297619840,
       "schedule": {
         "kind": "cron",
         "expr": "0 8 * * 1-5",
@@ -28,18 +27,7 @@
         "channel": "wecom",
         "to": "thinkway"
       },
-      "state": {
-        "nextRunAtMs": 1776384000000,
-        "lastRunAtMs": 1776297600004,
-        "lastRunStatus": "error",
-        "lastStatus": "error",
-        "lastDurationMs": 19836,
-        "lastDeliveryStatus": "delivered",
-        "consecutiveErrors": 2,
-        "lastDelivered": true,
-        "lastErrorReason": "timeout",
-        "lastError": "LLM request failed: network connection error."
-      }
+      "state": {}
     },
     {
       "id": "1d736a97-6ff1-4f1f-865a-e5882d61438c",
@@ -48,7 +36,6 @@
       "name": "股票收盘复盘与全日汇总（含自校准）",
       "enabled": true,
       "createdAtMs": 1774600000000,
-      "updatedAtMs": 1776248096681,
       "schedule": {
         "kind": "cron",
         "expr": "10 18 * * 1-5",
@@ -68,19 +55,7 @@
         "channel": "wecom",
         "to": "thinkway"
       },
-      "state": {
-        "nextRunAtMs": 1776334200000,
-        "lastRunAtMs": 1776248068221,
-        "lastRunStatus": "error",
-        "lastStatus": "error",
-        "lastDurationMs": 28460,
-        "lastDeliveryStatus": "not-delivered",
-        "consecutiveErrors": 1,
-        "lastDelivered": false,
-        "lastError": "LLM request failed: network connection error.",
-        "lastErrorReason": "timeout",
-        "lastDeliveryError": "LLM request failed: network connection error."
-      }
+      "state": {}
     },
     {
       "id": "cf7fa95f-64c0-4dec-b430-493bab61a45f",
@@ -89,7 +64,6 @@
       "name": "股票系统定期清理",
       "enabled": true,
       "createdAtMs": 1773886651960,
-      "updatedAtMs": 1776276021348,
       "schedule": {
         "kind": "cron",
         "expr": "0 2 * * *",
@@ -109,208 +83,7 @@
         "channel": "wecom",
         "to": "thinkway"
       },
-      "state": {
-        "nextRunAtMs": 1776362400000,
-        "lastRunAtMs": 1776276000003,
-        "lastRunStatus": "error",
-        "lastStatus": "error",
-        "lastDurationMs": 21345,
-        "lastDeliveryStatus": "delivered",
-        "consecutiveErrors": 2,
-        "lastDelivered": true,
-        "lastErrorReason": "timeout",
-        "lastError": "LLM request failed: network connection error."
-      }
-    },
-    {
-      "id": "7e8bf87a-b254-48a5-8f03-2db4830e2bd1",
-      "agentId": "main",
-      "name": "记忆蒸馏 main",
-      "enabled": true,
-      "createdAtMs": 1774937706151,
-      "updatedAtMs": 1776248158186,
-      "schedule": {
-        "kind": "cron",
-        "expr": "0 4 * * 0",
-        "tz": "Asia/Shanghai"
-      },
-      "sessionTarget": "isolated",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "agentTurn",
-        "message": "【记忆蒸馏·定时】本任务 workspace 根目录：${OPENCLAW_HOME:-$HOME/.openclaw}/workspace。若读写文件需 cwd，请先 cd 到该目录。助手输出开头请用 NO_REPLY。\n\n1) 读取 memory/.distill-watermark（单行 YYYY-MM-DD）。若不存在或为空：仅考虑「过去14天内」可能存在的 memory/YYYY-MM-DD.md；处理成功后把水印写为本轮处理过的最大日期。\n2) 若水印已存在：只读取「日期严格大于水印」的 memory/YYYY-MM-DD.md（升序）；某日文件不存在则跳过。\n3) 读取 MEMORY.md（若存在），将日文件中仍值得长期保留的偏好、决策、规则合并进 MEMORY.md并去重；禁止密钥与完整私聊原文。\n4) 成功更新 MEMORY.md 后，将 memory/.distill-watermark 更新为本轮处理过的最大日文件日期；若本轮无可处理的新日文件则不修改水印。\n5) 末尾用一两句说明本轮处理日期与水印。\n\n蒸馏原则见 ${OPENCLAW_HOME:-$HOME/.openclaw}/skills/openclaw-agent-optimize/references/memory-patterns.md。",
-        "thinking": "off",
-        "timeoutSeconds": 900
-      },
-      "delivery": {
-        "mode": "none",
-        "channel": "last"
-      },
-      "state": {
-        "nextRunAtMs": 1776542400000,
-        "lastError": "LLM request failed: network connection error.",
-        "lastRunAtMs": 1776248135931,
-        "lastRunStatus": "error",
-        "lastStatus": "error",
-        "lastDurationMs": 22255,
-        "lastErrorReason": "timeout",
-        "lastDelivered": false,
-        "lastDeliveryStatus": "not-delivered",
-        "lastDeliveryError": "LLM request failed: network connection error.",
-        "consecutiveErrors": 1
-      }
-    },
-    {
-      "id": "6964e8d2-ddc0-4d23-a7ac-3fb044761816",
-      "agentId": "frontend",
-      "name": "记忆蒸馏 frontend",
-      "enabled": true,
-      "createdAtMs": 1774937706151,
-      "updatedAtMs": 1776248179677,
-      "schedule": {
-        "kind": "cron",
-        "expr": "0 5 * * 0",
-        "tz": "Asia/Shanghai"
-      },
-      "sessionTarget": "isolated",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "agentTurn",
-        "message": "【记忆蒸馏·定时】本任务 workspace 根目录：${OPENCLAW_HOME:-$HOME/.openclaw}/workspace-frontend。若读写文件需 cwd，请先 cd 到该目录。助手输出开头请用 NO_REPLY。\n\n1) 读取 memory/.distill-watermark（单行 YYYY-MM-DD）。若不存在或为空：仅考虑「过去14天内」可能存在的 memory/YYYY-MM-DD.md；处理成功后把水印写为本轮处理过的最大日期。\n2) 若水印已存在：只读取「日期严格大于水印」的 memory/YYYY-MM-DD.md（升序）；某日文件不存在则跳过。\n3) 读取 MEMORY.md（若存在），将日文件中仍值得长期保留的偏好、决策、规则合并进 MEMORY.md并去重；禁止密钥与完整私聊原文。\n4) 成功更新 MEMORY.md 后，将 memory/.distill-watermark 更新为本轮处理过的最大日文件日期；若本轮无可处理的新日文件则不修改水印。\n5) 末尾用一两句说明本轮处理日期与水印。\n\n蒸馏原则见 ${OPENCLAW_HOME:-$HOME/.openclaw}/skills/openclaw-agent-optimize/references/memory-patterns.md。",
-        "thinking": "off",
-        "timeoutSeconds": 900
-      },
-      "delivery": {
-        "mode": "none",
-        "channel": "last"
-      },
-      "state": {
-        "nextRunAtMs": 1776546000000,
-        "lastError": "LLM request failed: network connection error.",
-        "lastRunAtMs": 1776248158186,
-        "lastRunStatus": "error",
-        "lastStatus": "error",
-        "lastDurationMs": 21491,
-        "lastErrorReason": "timeout",
-        "lastDelivered": false,
-        "lastDeliveryStatus": "not-delivered",
-        "lastDeliveryError": "LLM request failed: network connection error.",
-        "consecutiveErrors": 1
-      }
-    },
-    {
-      "id": "265ebe2f-db8e-429b-b988-aa611d663494",
-      "agentId": "backend",
-      "name": "记忆蒸馏 backend",
-      "enabled": true,
-      "createdAtMs": 1774937706151,
-      "updatedAtMs": 1776248206747,
-      "schedule": {
-        "kind": "cron",
-        "expr": "0 6 * * 0",
-        "tz": "Asia/Shanghai"
-      },
-      "sessionTarget": "isolated",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "agentTurn",
-        "message": "【记忆蒸馏·定时】本任务 workspace 根目录：${OPENCLAW_HOME:-$HOME/.openclaw}/workspace-backend。若读写文件需 cwd，请先 cd 到该目录。助手输出开头请用 NO_REPLY。\n\n1) 读取 memory/.distill-watermark（单行 YYYY-MM-DD）。若不存在或为空：仅考虑「过去14天内」可能存在的 memory/YYYY-MM-DD.md；处理成功后把水印写为本轮处理过的最大日期。\n2) 若水印已存在：只读取「日期严格大于水印」的 memory/YYYY-MM-DD.md（升序）；某日文件不存在则跳过。\n3) 读取 MEMORY.md（若存在），将日文件中仍值得长期保留的偏好、决策、规则合并进 MEMORY.md并去重；禁止密钥与完整私聊原文。\n4) 成功更新 MEMORY.md 后，将 memory/.distill-watermark 更新为本轮处理过的最大日文件日期；若本轮无可处理的新日文件则不修改水印。\n5) 末尾用一两句说明本轮处理日期与水印。\n\n蒸馏原则见 ${OPENCLAW_HOME:-$HOME/.openclaw}/skills/openclaw-agent-optimize/references/memory-patterns.md。",
-        "thinking": "off",
-        "timeoutSeconds": 900
-      },
-      "delivery": {
-        "mode": "none",
-        "channel": "last"
-      },
-      "state": {
-        "nextRunAtMs": 1776549600000,
-        "lastRunAtMs": 1776248184700,
-        "lastRunStatus": "error",
-        "lastStatus": "error",
-        "lastDurationMs": 22047,
-        "lastError": "LLM request failed: network connection error.",
-        "lastErrorReason": "timeout",
-        "lastDelivered": false,
-        "lastDeliveryStatus": "not-delivered",
-        "lastDeliveryError": "LLM request failed: network connection error.",
-        "consecutiveErrors": 1
-      }
-    },
-    {
-      "id": "80184103-ad4f-439a-adcd-4434212a539c",
-      "agentId": "ui",
-      "name": "记忆蒸馏 ui",
-      "enabled": true,
-      "createdAtMs": 1774937706151,
-      "updatedAtMs": 1776248230882,
-      "schedule": {
-        "kind": "cron",
-        "expr": "0 7 * * 0",
-        "tz": "Asia/Shanghai"
-      },
-      "sessionTarget": "isolated",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "agentTurn",
-        "message": "【记忆蒸馏·定时】本任务 workspace 根目录：${OPENCLAW_HOME:-$HOME/.openclaw}/workspace-ui。若读写文件需 cwd，请先 cd 到该目录。助手输出开头请用 NO_REPLY。\n\n1) 读取 memory/.distill-watermark（单行 YYYY-MM-DD）。若不存在或为空：仅考虑「过去14天内」可能存在的 memory/YYYY-MM-DD.md；处理成功后把水印写为本轮处理过的最大日期。\n2) 若水印已存在：只读取「日期严格大于水印」的 memory/YYYY-MM-DD.md（升序）；某日文件不存在则跳过。\n3) 读取 MEMORY.md（若存在），将日文件中仍值得长期保留的偏好、决策、规则合并进 MEMORY.md并去重；禁止密钥与完整私聊原文。\n4) 成功更新 MEMORY.md 后，将 memory/.distill-watermark 更新为本轮处理过的最大日文件日期；若本轮无可处理的新日文件则不修改水印。\n5) 末尾用一两句说明本轮处理日期与水印。\n\n蒸馏原则见 ${OPENCLAW_HOME:-$HOME/.openclaw}/skills/openclaw-agent-optimize/references/memory-patterns.md。",
-        "thinking": "off",
-        "timeoutSeconds": 900
-      },
-      "delivery": {
-        "mode": "none",
-        "channel": "last"
-      },
-      "state": {
-        "nextRunAtMs": 1776553200000,
-        "lastRunAtMs": 1776248208933,
-        "lastRunStatus": "error",
-        "lastStatus": "error",
-        "lastDurationMs": 21949,
-        "lastError": "LLM request failed: network connection error.",
-        "lastErrorReason": "timeout",
-        "lastDelivered": false,
-        "lastDeliveryStatus": "not-delivered",
-        "lastDeliveryError": "LLM request failed: network connection error.",
-        "consecutiveErrors": 1
-      }
-    },
-    {
-      "id": "73c9dffb-1a40-43fa-b748-aaa8bb1d0df8",
-      "agentId": "stock",
-      "name": "记忆蒸馏 stock",
-      "enabled": true,
-      "createdAtMs": 1774937706151,
-      "updatedAtMs": 1776248251159,
-      "schedule": {
-        "kind": "cron",
-        "expr": "0 8 * * 0",
-        "tz": "Asia/Shanghai"
-      },
-      "sessionTarget": "isolated",
-      "wakeMode": "now",
-      "payload": {
-        "kind": "agentTurn",
-        "message": "【记忆蒸馏·定时】本任务 workspace 根目录：${OPENCLAW_HOME:-$HOME/.openclaw}/workspace-stock。若读写文件需 cwd，请先 cd 到该目录。助手输出开头请用 NO_REPLY。\n\n1) 读取 memory/.distill-watermark（单行 YYYY-MM-DD）。若不存在或为空：仅考虑「过去14天内」可能存在的 memory/YYYY-MM-DD.md；处理成功后把水印写为本轮处理过的最大日期。\n2) 若水印已存在：只读取「日期严格大于水印」的 memory/YYYY-MM-DD.md（升序）；某日文件不存在则跳过。\n3) 读取 MEMORY.md（若存在），将日文件中仍值得长期保留的偏好、决策、规则合并进 MEMORY.md并去重；禁止密钥与完整私聊原文。\n4) 成功更新 MEMORY.md 后，将 memory/.distill-watermark 更新为本轮处理过的最大日文件日期；若本轮无可处理的新日文件则不修改水印。\n5) 末尾用一两句说明本轮处理日期与水印。\n\n蒸馏原则见 ${OPENCLAW_HOME:-$HOME/.openclaw}/skills/openclaw-agent-optimize/references/memory-patterns.md。",
-        "thinking": "off",
-        "timeoutSeconds": 900
-      },
-      "delivery": {
-        "mode": "none",
-        "channel": "last"
-      },
-      "state": {
-        "nextRunAtMs": 1776556800000,
-        "lastRunAtMs": 1776248230882,
-        "lastRunStatus": "error",
-        "lastStatus": "error",
-        "lastDurationMs": 20277,
-        "lastError": "LLM request failed: network connection error.",
-        "lastErrorReason": "timeout",
-        "lastDelivered": false,
-        "lastDeliveryStatus": "not-delivered",
-        "lastDeliveryError": "LLM request failed: network connection error.",
-        "consecutiveErrors": 1
-      }
+      "state": {}
     },
     {
       "id": "2b122c44-0850-4ddf-b082-fc0c842b2289",
@@ -318,7 +91,6 @@
       "description": "[managed-by=memory-core.short-term-promotion] Promote weighted short-term recalls into MEMORY.md (limit=10, minScore=0.800, minRecallCount=3, minUniqueQueries=3, recencyHalfLifeDays=14, maxAgeDays=30).",
       "enabled": true,
       "createdAtMs": 1776306014274,
-      "updatedAtMs": 1776306014274,
       "schedule": {
         "kind": "cron",
         "expr": "0 3 * * *",
@@ -330,9 +102,7 @@
         "kind": "systemEvent",
         "text": "__openclaw_memory_core_short_term_promotion_dream__"
       },
-      "state": {
-        "nextRunAtMs": 1776366000000
-      }
+      "state": {}
     }
   ]
 }

@@ -1,0 +1,227 @@
+{
+  "version": 3,
+  "files": {
+    "stock:sessions/14a92411-b261-42eb-8529-81ef53a5764a.jsonl.deleted.2026-04-24T18-05-28.911Z": {
+      "mtimeMs": 1776967228977,
+      "size": 3403,
+      "contentHash": "7cebd9c0db7e7f3a89376953dc2a7a00a7f3379d9c9fbbc026c276b028dd40bb",
+      "lineCount": 1,
+      "lastContentLine": 1
+    },
+    "stock:sessions/20b6a46e-cc09-42b8-95e6-ab2a1c7bb2e5.jsonl": {
+      "mtimeMs": 1777053628470,
+      "size": 3097,
+      "contentHash": "d7c4d49710896cd6858e003594bde6c6c31e5b50161c709e51586ffd9bc2737b",
+      "lineCount": 1,
+      "lastContentLine": 1
+    },
+    "stock:sessions/20b6a46e-cc09-42b8-95e6-ab2a1c7bb2e5.trajectory.jsonl": {
+      "mtimeMs": 1777053628547,
+      "size": 248056,
+      "contentHash": "75a11da44c802486bc6f65640aa48a730f0f684c5c07a42ba3cd1735eb3fb070",
+      "lineCount": 0,
+      "lastContentLine": 0
+    },
+    "stock:sessions/2bd4f545-5f78-4969-8815-a856eaa58528.jsonl": {
+      "mtimeMs": 1776646318972,
+      "size": 4116,
+      "contentHash": "2aadb60e9ed48d715b80e21f02dd222805a1255e2a590de8feb8e48d86b76f72",
+      "lineCount": 1,
+      "lastContentLine": 1
+    },
+    "stock:sessions/338fbd4e-de5d-4232-b04c-87f6d1db9afe.jsonl.deleted.2026-04-24T04-46-37.520Z": {
+      "mtimeMs": 1776919354014,
+      "size": 3406,
+      "contentHash": "d2384c12f7f91c43b11666bc20aaa186efc30d36865934e4dd9b70b2948b297a",
+      "lineCount": 1,
+      "lastContentLine": 1
+    },
+    "stock:sessions/3b46782e-b6d9-47f0-8bee-04cb05082288.jsonl.deleted.2026-04-24T04-51-37.640Z": {
+      "mtimeMs": 1776919728475,
+      "size": 3408,
+      "contentHash": "f5ea820d9713132481d940c96882da368215d2689bda6680c2ead39cd38dd283",
+      "lineCount": 1,
+      "lastContentLine": 1
+    },
+    "stock:sessions/44ae890c-6898-48bf-8bc1-2ea7b4306c14.jsonl.deleted.2026-04-24T04-41-37.396Z": {
+      "mtimeMs": 1776919317833,
+      "size": 3486,
+      "contentHash": "4ceae013fd8adeeda9ac575dbe19d43dbbe31098ee2a357ef7cbb439adca89ca",
+      "lineCount": 1,
+      "lastContentLine": 1
+    },
+    "stock:sessions/550d4ef3-f339-4244-8afe-4bc0e993f6d3.jsonl": {
+      "mtimeMs": 1777025431257,
+      "size": 3175,
+      "contentHash": "72af3d02584a9b2cbb8b8fb1cfff0f72463e64c2ac7971f2600f3a3baafbcb83",
+      "lineCount": 1,
+      "lastContentLine": 1
+    },
+    "stock:sessions/550d4ef3-f339-4244-8afe-4bc0e993f6d3.trajectory.jsonl": {
+      "mtimeMs": 1777025431401,
+      "size": 248447,
+      "contentHash": "75a11da44c802486bc6f65640aa48a730f0f684c5c07a42ba3cd1735eb3fb070",
+      "lineCount": 0,
+      "lastContentLine": 0
+    },
+    "stock:sessions/784e39e6-e35c-4c06-b610-da107bcf4491.jsonl": {
+      "mtimeMs": 1775523082000,
+      "size": 3843,
+      "contentHash": "933fc9f160cfeaf930a9a0bd4319ab75f387b13561f1ec283cffb876ff3f3ec6",
+      "lineCount": 1,
+      "lastContentLine": 1
+    },
+    "stock:sessions/877e9a0f-7a8a-42a4-ae00-059119f57a60.jsonl": {
+      "mtimeMs": 1776420612040,
+      "size": 2302,
+      "contentHash": "fefaeb408c6fef2e4ebd23adadaa5dc6e59724d241d51bae63624807ea9edff3",
+      "lineCount": 1,
+      "lastContentLine": 1
+    },
+    "stock:sessions/87b2af71-da6f-4ab6-ba90-7df5742017e6.jsonl": {
+      "mtimeMs": 1776248251018,
+      "size": 3846,
+      "contentHash": "06f9b06e044b18ec18c17b230c9748459e46a6390d63a991939ffaae5ec4bc9a",
+      "lineCount": 1,
+      "lastContentLine": 1
+    },
+    "stock:sessions/8b627e8e-3957-4fff-a275-2366d219dc66.jsonl": {
+      "mtimeMs": 1775005238000,
+      "size": 9163,
+      "contentHash": "71bbcc58d844f4688db843f6d659ba7606e4b322f78e47f9259e1563d860b2e1",
+      "lineCount": 5,
+      "lastContentLine": 5
+    },
+    "stock:sessions/91db443b-8ace-4e88-8e85-32708302a8a2.jsonl": {
+      "mtimeMs": 1776988829171,
+      "size": 3405,
+      "contentHash": "0cb7f244acdf7c51f8b134f59d5522efa25276e1592af137c7ec12dc7623b244",
+      "lineCount": 1,
+      "lastContentLine": 1
+    },
+    "stock:sessions/974e5665-c564-405d-9fe3-5c76f178580c.jsonl.reset.2026-04-01T01-00-01.483Z": {
+      "mtimeMs": 1774922847000,
+      "size": 2004,
+      "contentHash": "82f646e131f20adf2a46bf80497799ec006cdfbc399b090a3b3577e63ab191d1",
+      "lineCount": 2,
+      "lastContentLine": 2
+    },
+    "stock:sessions/a4ddf3c4-d775-4d9c-9439-f169633aef4c.jsonl": {
+      "mtimeMs": 1776418917111,
+      "size": 3404,
+      "contentHash": "a8efb935e60ff18be3ad8ff6124a36f096b019d1cff15e755cf9d530d4a1ddf9",
+      "lineCount": 1,
+      "lastContentLine": 1
+    },
+    "stock:sessions/b419822f-fe4c-4ebc-81a4-8ac4a24460d6.jsonl": {
+      "mtimeMs": 1777256852793,
+      "size": 2355,
+      "contentHash": "6b4430269fee8d282b6fec25c8bf3137b92d247356ef5eca485269997edc02f8",
+      "lineCount": 1,
+      "lastContentLine": 1
+    },
+    "stock:sessions/b419822f-fe4c-4ebc-81a4-8ac4a24460d6.trajectory.jsonl": {
+      "mtimeMs": 1777256852905,
+      "size": 250253,
+      "contentHash": "75a11da44c802486bc6f65640aa48a730f0f684c5c07a42ba3cd1735eb3fb070",
+      "lineCount": 0,
+      "lastContentLine": 0
+    },
+    "stock:sessions/bd0a0e87-bce8-4e87-bdad-724058c35c79.jsonl.deleted.2026-04-24T14-24-38.824Z": {
+      "mtimeMs": 1776954071351,
+      "size": 3486,
+      "contentHash": "4a1a60042d89fdcd673d5fd2c0241c54119a65a2d026db1bb0dd2dadebefd8ee",
+      "lineCount": 1,
+      "lastContentLine": 1
+    },
+    "stock:sessions/c7d4ab56-6bb2-4345-b08b-55c47a1183a8.jsonl": {
+      "mtimeMs": 1776248357427,
+      "size": 2962,
+      "contentHash": "f6a9195c55ab93aebb15de50aee55950270e3a688e34a01d6248fa52f053889c",
+      "lineCount": 1,
+      "lastContentLine": 1
+    },
+    "stock:sessions/dd2d488a-0542-41d5-9b6d-b121f7f73976.jsonl.reset.2026-04-15T10-18-55.784Z": {
+      "mtimeMs": 1774942345000,
+      "size": 34849,
+      "contentHash": "38511019716f618ccd60c06f482962b002eca16287007e24df362ef7345571cc",
+      "lineCount": 11,
+      "lastContentLine": 11
+    }
+  },
+  "seenMessages": {
+    "stock:392d52f7-b154-4bdd-af73-a557845c2519": [
+      "a3d4cab94cda83eb3aea9483ce6e406ecfe2b386"
+    ],
+    "stock:3a1d1928-240c-4a28-a5a8-fd37a88889c9": [
+      "bfb5b6b342e0b4e297771e1517d56034dd8be458"
+    ],
+    "stock:3cacc1b2-506a-41cc-b12a-3980d2fb38e1": [
+      "dbed5b674acec888222726ac753053e5037284c1"
+    ],
+    "stock:6d69dc6f-e309-436a-b373-a27e0a36f1ab": [
+      "9f1cea9772b5eb5d7958e76fa405600b6da9c081"
+    ],
+    "stock:87b2af71-da6f-4ab6-ba90-7df5742017e6": [
+      "f0720da4965866b9885a70ecbb8cf74c7809ebed"
+    ],
+    "stock:c7d4ab56-6bb2-4345-b08b-55c47a1183a8": [
+      "514c9109b25311a31a7f9cbc7e014e4652419fab"
+    ],
+    "stock:c9721db3-9d8e-4b69-b0c6-80d2d415e300": [
+      "f708925bab0d30e9c76dd3c365c6412868884d63"
+    ],
+    "stock:d648df69-11e9-4368-80e3-f2f6775dd6dc": [
+      "9869df3b7dd6c6196d9cd8dec943994be4ba2bc7"
+    ],
+    "stock:e55aba62-366e-4374-b5f4-59a980aa8230": [
+      "2d97efa4e438620e998022aa12b0a7d5a4b1a3f2"
+    ],
+    "stock:776e4faa-c572-4825-aef9-99409751b12e": [
+      "49a8a01e37e6a7da83310c8ec08877a7082f1c37"
+    ],
+    "stock:2bd4f545-5f78-4969-8815-a856eaa58528": [
+      "bbc5225c6b8c88090aa227eae6daa3a99d247f81"
+    ],
+    "stock:608eea21-f3b8-4230-b343-d8c0591dfae2": [
+      "7c6cdd33675a65f28b17707a3ac9e074eae1d3f3"
+    ],
+    "stock:bdcb78e8-b0a2-4f00-94f6-16ba1ee3aa55": [
+      "0a557d5f6cb73755f6520a631d0f5f10db7bdddd"
+    ],
+    "stock:fee0397c-78b1-4b5f-9309-b9ac3bc5af8a": [
+      "311333d8d5299f88b09b332132d7f0bc8944fef8"
+    ],
+    "stock:338fbd4e-de5d-4232-b04c-87f6d1db9afe": [
+      "b42ab8ac5417aa9dc2bad3625b203dbef02a2123"
+    ],
+    "stock:44ae890c-6898-48bf-8bc1-2ea7b4306c14": [
+      "bb9700d882a53a91806fc03b740a19ed1cc3f7bf"
+    ],
+    "stock:f29c66a9-3233-4693-a500-edcc422cba9d": [
+      "2829a6171c671daa449d30cce3dd343ecc4d5594"
+    ],
+    "stock:14a92411-b261-42eb-8529-81ef53a5764a": [
+      "0ee4d4da9778955e58a56f9aa5dec434d3500c26"
+    ],
+    "stock:3b46782e-b6d9-47f0-8bee-04cb05082288": [
+      "8d719538c8eb8472fddd852a0f22452f3937e190"
+    ],
+    "stock:bd0a0e87-bce8-4e87-bdad-724058c35c79": [
+      "eb2d44e0ead93e0de0f900f92110b548ac5463fc"
+    ],
+    "stock:20b6a46e-cc09-42b8-95e6-ab2a1c7bb2e5": [
+      "70a03ed424b7758c587ffcbffe93f3fffe4c4a49"
+    ],
+    "stock:550d4ef3-f339-4244-8afe-4bc0e993f6d3": [
+      "d8639a7aa1bcedb1155c7fe74a3db73f3c88c476"
+    ],
+    "stock:91db443b-8ace-4e88-8e85-32708302a8a2": [
+      "15206a59bcd3b6ab6335349679e4a375f362c150"
+    ],
+    "stock:b419822f-fe4c-4ebc-81a4-8ac4a24460d6": [
+      "c4a51271784276bec193d17c0651cc25f1eb7b45"
+    ],
+    "stock:b419822f-fe4c-4ebc-81a4-8ac4a24460d6.trajectory": []
+  }
+}

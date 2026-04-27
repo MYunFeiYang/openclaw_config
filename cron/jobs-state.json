@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "jobs": {
+    "ca38d074-c454-4f80-adbe-f10b8c2fc3ed": {
+      "updatedAtMs": 1777256934205,
+      "state": {
+        "nextRunAtMs": 1777334400000,
+        "lastRunAtMs": 1777256924881,
+        "lastRunStatus": "error",
+        "lastStatus": "error",
+        "lastDurationMs": 9324,
+        "lastDeliveryStatus": "delivered",
+        "consecutiveErrors": 8,
+        "lastDelivered": true,
+        "lastErrorReason": "model_not_found",
+        "lastError": "404 The model or endpoint kimi-k2-250905 does not exist or you do not have access to it. Request id: 0217772569337335b683ea6c70a7e1d7277ef2ab8257e0ffc1ee1"
+      }
+    },
+    "1d736a97-6ff1-4f1f-865a-e5882d61438c": {
+      "updatedAtMs": 1777025431838,
+      "state": {
+        "nextRunAtMs": 1777284600000,
+        "lastRunAtMs": 1777025400005,
+        "lastRunStatus": "error",
+        "lastStatus": "error",
+        "lastDurationMs": 31833,
+        "lastDeliveryStatus": "delivered",
+        "consecutiveErrors": 7,
+        "lastDelivered": true,
+        "lastErrorReason": "timeout",
+        "lastError": "LLM request failed: network connection error."
+      }
+    },
+    "cf7fa95f-64c0-4dec-b430-493bab61a45f": {
+      "updatedAtMs": 1777256853415,
+      "state": {
+        "nextRunAtMs": 1777312800000,
+        "lastRunAtMs": 1777256709897,
+        "lastRunStatus": "error",
+        "lastStatus": "error",
+        "lastDurationMs": 143518,
+        "lastDeliveryStatus": "not-delivered",
+        "consecutiveErrors": 9,
+        "lastDelivered": false,
+        "lastErrorReason": "model_not_found",
+        "lastError": "404 The model or endpoint kimi-k2-250905 does not exist or you do not have access to it. Request id: 0217772568526486d9f60949772f201f97c75c8f7e6aaf5298c15",
+        "lastDeliveryError": "404 The model or endpoint kimi-k2-250905 does not exist or you do not have access to it. Request id: 0217772568526486d9f60949772f201f97c75c8f7e6aaf5298c15"
+      }
+    },
+    "2b122c44-0850-4ddf-b082-fc0c842b2289": {
+      "updatedAtMs": 1777256924881,
+      "state": {
+        "nextRunAtMs": 1777316400000,
+        "lastRunAtMs": 1777256853415,
+        "lastRunStatus": "ok",
+        "lastStatus": "ok",
+        "lastDurationMs": 71466,
+        "lastDeliveryStatus": "not-requested",
+        "consecutiveErrors": 0
+      }
+    }
+  }
+}

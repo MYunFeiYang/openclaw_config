@@ -70,6 +70,25 @@ export declare function warmupReqIdStore(accountId?: string, log?: (...args: unk
  * 注意：由于移除了磁盘存储，此函数现在是无操作
  */
 export declare function flushReqIdStore(accountId?: string): Promise<void>;
+/** 会话 chat 信息 */
+export interface SessionChatInfo {
+    /** 原始大小写的 chatId（群 ID 或用户 ID） */
+    chatId: string;
+    /** 聊天类型：single（单聊）或 group（群聊） */
+    chatType: "single" | "group";
+}
+/**
+ * 记录 sessionKey 对应的原始会话信息（由 monitor.ts 在消息入站时调用）
+ */
+export declare function setSessionChatInfo(sessionKey: string, info: SessionChatInfo): void;
+/**
+ * 获取 sessionKey 对应的原始会话信息（由 registerTool 闭包调用）
+ */
+export declare function getSessionChatInfo(sessionKey: string | undefined): SessionChatInfo | undefined;
+/**
+ * 删除 sessionKey 对应的会话信息（会话结束时可选调用）
+ */
+export declare function deleteSessionChatInfo(sessionKey: string): void;
 /**
  * 清理指定账户的所有资源
  */

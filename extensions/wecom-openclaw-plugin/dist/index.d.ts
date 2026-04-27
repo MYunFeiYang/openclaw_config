@@ -1,5 +1,4 @@
-import { OpenClawPluginApi } from 'openclaw/plugin-sdk/core';
-
+import type { OpenClawPluginApi } from "openclaw/plugin-sdk/core";
 declare const plugin: {
     id: string;
     name: string;
@@ -7,5 +6,4 @@ declare const plugin: {
     configSchema: Record<string, unknown>;
     register(api: OpenClawPluginApi): void;
 };
-
-export { plugin as default };
+export default plugin;
