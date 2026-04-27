@@ -1,1 +1,0 @@
-/Users/thinkway/.nvm/versions/node/v24.14.0/lib/node_modules/openclaw/dist/boundary-file-read-BDEvfiRb.js

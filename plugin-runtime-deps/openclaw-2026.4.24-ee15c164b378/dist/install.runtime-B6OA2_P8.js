@@ -1,1 +1,0 @@
-/Users/thinkway/.nvm/versions/node/v24.14.0/lib/node_modules/openclaw/dist/install.runtime-B6OA2_P8.js

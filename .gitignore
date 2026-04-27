@@ -52,3 +52,5 @@ workspace/stock_system/*.txt
 workspace/stock_system/*.log
 workspace/stock_system/predictions.db
 workspace/stock_system/config/calibration_overrides.json
+
+plugin-runtime-deps/
