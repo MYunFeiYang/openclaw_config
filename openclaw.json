@@ -1,7 +1,7 @@
 {
   "meta": {
     "lastTouchedVersion": "2026.4.23",
-    "lastTouchedAt": "2026-04-27T02:56:23.271Z"
+    "lastTouchedAt": "2026-04-27T03:10:34.817Z"
   },
   "env": {
     "shellEnv": {
@@ -403,7 +403,7 @@
       {
         "id": "frontend",
         "workspace": "/Users/thinkway/.openclaw/workspace-frontend",
-        "model": "oneapi/doubao-seed-1-6-flash-250828",
+        "model": "openrouter/openrouter/auto",
         "identity": {
           "name": "前端工程",
           "emoji": "⚛️"
@@ -412,7 +412,7 @@
       {
         "id": "backend",
         "workspace": "/Users/thinkway/.openclaw/workspace-backend",
-        "model": "oneapi/kimi-k2-250905",
+        "model": "openrouter/openrouter/auto",
         "identity": {
           "name": "后端服务",
           "emoji": "🧱"
@@ -421,7 +421,7 @@
       {
         "id": "ui",
         "workspace": "/Users/thinkway/.openclaw/workspace-ui",
-        "model": "oneapi/doubao-seed-1-6-vision-250815",
+        "model": "openrouter/openrouter/auto",
         "identity": {
           "name": "UI 视觉",
           "emoji": "🎨"
@@ -430,7 +430,7 @@
       {
         "id": "stock",
         "workspace": "/Users/thinkway/.openclaw/workspace-stock",
-        "model": "oneapi/kimi-k2-250905",
+        "model": "openrouter/openrouter/auto",
         "identity": {
           "name": "股票分析",
           "emoji": "📈"
