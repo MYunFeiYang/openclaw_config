@@ -1,0 +1,103 @@
+{
+  "timestamp": "2026-04-28T09:05:12.739394",
+  "analysis_type": "morning",
+  "summary": {
+    "report_time": "2026-04-28T09:05:12.737918",
+    "analysis_type": "morning",
+    "buy_recommendations": [],
+    "sell_recommendations": [],
+    "hold_recommendations": [
+      {
+        "stock": {
+          "name": "招商银行",
+          "symbol": "600036",
+          "sector": "银行",
+          "weight": 0.7
+        },
+        "current_price": 39.59,
+        "change_percent": 0.53,
+        "technical_score": 5.2,
+        "fundamental_score": 6.0,
+        "sentiment_score": 5.2,
+        "sector_score": 5.5,
+        "final_score": 5.5,
+        "signal": "持有",
+        "confidence": 66,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-04-28T08:56:46.274088",
+        "data_provenance": "openclaw_agent_web"
+      },
+      {
+        "stock": {
+          "name": "五粮液",
+          "symbol": "000858",
+          "sector": "白酒",
+          "weight": 0.6
+        },
+        "current_price": 100.2,
+        "change_percent": -1.06,
+        "technical_score": 5.2,
+        "fundamental_score": 6.0,
+        "sentiment_score": 4.5,
+        "sector_score": 5.2,
+        "final_score": 5.4,
+        "signal": "持有",
+        "confidence": 66,
+        "reasons": [
+          "处于震荡整理阶段",
+          "等待明确方向"
+        ],
+        "prediction_time": "2026-04-28T08:59:55.679051",
+        "data_provenance": "openclaw_agent_web"
+      }
+    ],
+    "market_overview": {
+      "total_stocks": 5,
+      "buy_count": 0,
+      "sell_count": 0,
+      "hold_count": 2,
+      "avg_buy_score": 0,
+      "avg_sell_score": 0,
+      "avg_hold_score": 5.5,
+      "buy_sectors": [],
+      "sell_sectors": [],
+      "hold_sectors": [
+        "白酒",
+        "银行"
+      ],
+      "market_sentiment": "中性"
+    },
+    "sector_analysis": {
+      "银行": {
+        "avg_score": 5.5,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "白酒": {
+        "avg_score": 5.2,
+        "stock_count": 2,
+        "trend": "震荡"
+      },
+      "医药": {
+        "avg_score": 5.4,
+        "stock_count": 1,
+        "trend": "震荡"
+      },
+      "新能源": {
+        "avg_score": 5.0,
+        "stock_count": 1,
+        "trend": "震荡"
+      }
+    },
+    "risk_alerts": [],
+    "next_actions": [
+      "关注开盘后的量价配合情况",
+      "观察昨夜美股对A股的影响",
+      "留意早盘资金流入方向"
+    ]
+  },
+  "report_text": "【A股早盘总结报告】\n============================================================\n总结时间: 2026-04-28 09:05:12\n分析类型: 早盘\n============================================================\n\n【持续迭代简报】\n------------------------------------------------------------\n截至 20260427 晚间（由全日汇总生成，供下一交易日早盘对照）\n\n近 2 次复盘的方向一致率算术平均约 90%。\n最近 2 次复盘平均一致率约 90%。\n\n说明: 一致率依赖 OpenClaw 拉价与早盘落盘价；仅作流程迭代参考，不构成投资建议。\n------------------------------------------------------------\n\n【推荐总结】\n持有推荐 (2只):\n  1. 招商银行 (600036) - 评分:5.5\n  2. 五粮液 (000858) - 评分:5.4\n\n【市场概况】\n总股票数: 5\n买入推荐: 0只 | 平均评分: 0\n卖出推荐: 0只 | 平均评分: 0\n持有推荐: 2只 | 平均评分: 5.5\n市场情绪: 中性\n\n【行业分析】\n银行: 平均评分5.5 (震荡, 1只股票)\n白酒: 平均评分5.2 (震荡, 2只股票)\n医药: 平均评分5.4 (震荡, 1只股票)\n新能源: 平均评分5.0 (震荡, 1只股票)\n\n【下一步行动】\n1. 关注开盘后的量价配合情况\n2. 观察昨夜美股对A股的影响\n3. 留意早盘资金流入方向"
+}

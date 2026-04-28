@@ -1,7 +1,7 @@
 {
   "meta": {
-    "lastTouchedVersion": "2026.4.23",
-    "lastTouchedAt": "2026-04-27T06:21:55.155Z"
+    "lastTouchedVersion": "2026.4.25",
+    "lastTouchedAt": "2026-04-28T01:39:20.491Z"
   },
   "env": {
     "shellEnv": {
@@ -9,8 +9,8 @@
     }
   },
   "wizard": {
-    "lastRunAt": "2026-04-27T06:21:54.957Z",
-    "lastRunVersion": "2026.4.23",
+    "lastRunAt": "2026-04-28T01:38:27.612Z",
+    "lastRunVersion": "2026.4.25",
     "lastRunCommand": "onboard",
     "lastRunMode": "local"
   },
@@ -28,6 +28,10 @@
       },
       "openrouter:default": {
         "provider": "openrouter",
+        "mode": "api_key"
+      },
+      "nvidia:default": {
+        "provider": "nvidia",
         "mode": "api_key"
       }
     }
@@ -345,7 +349,7 @@
   "agents": {
     "defaults": {
       "model": {
-        "primary": "openrouter/free"
+        "primary": "deepseek/deepseek-v4-pro"
       },
       "imageGenerationModel": {
         "primary": "google/gemini-3-pro-image-preview"
@@ -369,7 +373,8 @@
         "openrouter/auto": {
           "alias": "OpenRouter"
         },
-        "openrouter/free": {}
+        "openrouter/free": {},
+        "deepseek/deepseek-v4-pro": {}
       },
       "workspace": "~/.openclaw/workspace",
       "userTimezone": "Asia/Shanghai",
@@ -673,7 +678,8 @@
       "duckduckgo",
       "ollama",
       "memory-core",
-      "openrouter"
+      "openrouter",
+      "deepseek"
     ],
     "load": {
       "paths": [
@@ -709,6 +715,9 @@
         }
       },
       "openrouter": {
+        "enabled": true
+      },
+      "deepseek": {
         "enabled": true
       }
     }

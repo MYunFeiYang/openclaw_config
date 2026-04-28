@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updatedAt": "2026-04-27T02:28:31.101Z",
+  "updatedAt": "2026-04-27T19:00:50.251Z",
   "entries": {
     "memory:memory/.dreams/session-corpus/2026-04-15.txt:1:1": {
       "key": "memory:memory/.dreams/session-corpus/2026-04-15.txt:1:1",
@@ -28,10 +28,10 @@
         "workspace-stock/stock-system",
         "scripts/cleanup-stock-system.sh",
         "asia/shanghai",
-        "user",
         "cron:cf7fa95f",
         "64c0",
-        "4dec"
+        "4dec",
+        "b430"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-15.txt:2:2": {
@@ -59,11 +59,11 @@
         "openclaw-home",
         "workspace-stock/stock-system",
         "asia/shanghai",
-        "user",
         "cron:ca38d074",
         "c454",
         "4f80",
-        "adbe"
+        "adbe",
+        "f10b8c2fc3ed"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-15.txt:3:3": {
@@ -94,8 +94,8 @@
         "distill-watermark",
         "yyyy-mm-dd",
         "memory/yyyy-mm-dd.md",
-        "user",
-        "cron"
+        "cron",
+        "73c9dffb"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-15.txt:4:4": {
@@ -122,12 +122,12 @@
       "conceptTags": [
         "message-id",
         "sender-id",
-        "user",
         "conversation",
         "info",
         "untrusted",
         "metadata",
-        "a914cc3b03f04f85f9973a54d3640066"
+        "a914cc3b03f04f85f9973a54d3640066",
+        "thinkway"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-15.txt:5:5": {
@@ -156,10 +156,10 @@
         "workspace-stock/stock-system",
         "post-close",
         "asia/shan",
-        "user",
         "cron",
         "1d736a97",
-        "6ff1"
+        "6ff1",
+        "4f1f"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-16.txt:1:1": {
@@ -188,10 +188,10 @@
         "workspace-stock/stock-system",
         "post-close",
         "asia/shang",
-        "user",
         "cron",
         "1d736a97",
-        "6ff1"
+        "6ff1",
+        "4f1f"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-16.txt:2:2": {
@@ -219,11 +219,11 @@
         "openclaw-home",
         "workspace-stock/stock-system",
         "asia/shanghai",
-        "user",
         "cron:ca38d074",
         "c454",
         "4f80",
-        "adbe"
+        "adbe",
+        "f10b8c2fc3ed"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-16.txt:3:3": {
@@ -252,10 +252,10 @@
         "workspace-stock/stock-system",
         "scripts/cleanup-stock-system.sh",
         "asia/shanghai",
-        "user",
         "cron:cf7fa95f",
         "64c0",
-        "4dec"
+        "4dec",
+        "b430"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-17.txt:1:1": {
@@ -283,10 +283,10 @@
         "workspace-stock/stock-system",
         "scripts/cleanup-stock-system.sh",
         "asia/shanghai",
-        "user",
         "cron:cf7fa95f",
         "64c0",
-        "4dec"
+        "4dec",
+        "b430"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-20.txt:1:1": {
@@ -314,10 +314,10 @@
         "workspace-stock/stock-system",
         "scripts/cleanup-stock-system.sh",
         "asia/shanghai",
-        "user",
         "cron:cf7fa95f",
         "64c0",
-        "4dec"
+        "4dec",
+        "b430"
       ]
     },
     "memory:memory/2026-04-17.md:53:56": {
@@ -352,8 +352,8 @@
         "3-3",
         "reflections",
         "theme",
-        "user",
-        "kept"
+        "kept",
+        "surfacing"
       ]
     },
     "memory:memory/2026-04-17.md:57:60": {
@@ -506,12 +506,12 @@
       "source": "memory",
       "snippet": "Reflections: Theme: `user` kept surfacing across 11 memories.; confidence: 1.00; evidence: memory/.dreams/session-corpus/2026-04-15.txt:1-1, memory/.dreams/session-corpus/2026-04-15.txt:2-2, memory/.dreams/session-corpus/2026-04-15.txt:3-3; note: reflection",
       "recallCount": 0,
-      "dailyCount": 5,
+      "dailyCount": 6,
       "groundedCount": 0,
-      "totalScore": 3.1,
+      "totalScore": 3.72,
       "maxScore": 0.62,
       "firstRecalledAt": "2026-04-22T04:49:15.163Z",
-      "lastRecalledAt": "2026-04-27T02:28:31.101Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
       "queryHashes": [
         "511fd8111b88"
       ],
@@ -520,7 +520,8 @@
         "2026-04-23",
         "2026-04-24",
         "2026-04-25",
-        "2026-04-27"
+        "2026-04-27",
+        "2026-04-28"
       ],
       "conceptTags": [
         "1.00",
@@ -529,8 +530,8 @@
         "3-3",
         "reflections",
         "theme",
-        "user",
-        "kept"
+        "kept",
+        "surfacing"
       ]
     },
     "memory:memory/2026-04-20.md:17:20": {
@@ -541,12 +542,12 @@
       "source": "memory",
       "snippet": "Reflections: Theme: `openclaw-home` kept surfacing across 10 memories.; confidence: 1.00; evidence: memory/.dreams/session-corpus/2026-04-15.txt:1-1, memory/.dreams/session-corpus/2026-04-15.txt:2-2, memory/.dreams/session-corpus/2026-04-15.txt:3-3; note: reflection",
       "recallCount": 0,
-      "dailyCount": 5,
+      "dailyCount": 6,
       "groundedCount": 0,
-      "totalScore": 3.1,
+      "totalScore": 3.72,
       "maxScore": 0.62,
       "firstRecalledAt": "2026-04-22T04:49:15.163Z",
-      "lastRecalledAt": "2026-04-27T02:28:31.101Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
       "queryHashes": [
         "511fd8111b88"
       ],
@@ -555,7 +556,8 @@
         "2026-04-23",
         "2026-04-24",
         "2026-04-25",
-        "2026-04-27"
+        "2026-04-27",
+        "2026-04-28"
       ],
       "conceptTags": [
         "openclaw-home",
@@ -576,12 +578,12 @@
       "source": "memory",
       "snippet": "Reflections: Theme: `workspace-stock/stock-system` kept surfacing across 9 memories.; confidence: 1.00; evidence: memory/.dreams/session-corpus/2026-04-15.txt:1-1, memory/.dreams/session-corpus/2026-04-15.txt:2-2, memory/.dreams/session-corpus/2026-04-15.txt:5-5; note: reflection",
       "recallCount": 0,
-      "dailyCount": 5,
+      "dailyCount": 6,
       "groundedCount": 0,
-      "totalScore": 3.1,
+      "totalScore": 3.72,
       "maxScore": 0.62,
       "firstRecalledAt": "2026-04-22T04:49:15.163Z",
-      "lastRecalledAt": "2026-04-27T02:28:31.101Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
       "queryHashes": [
         "511fd8111b88"
       ],
@@ -590,7 +592,8 @@
         "2026-04-23",
         "2026-04-24",
         "2026-04-25",
-        "2026-04-27"
+        "2026-04-27",
+        "2026-04-28"
       ],
       "conceptTags": [
         "workspace-stock/stock-system",
@@ -611,12 +614,12 @@
       "source": "memory",
       "snippet": "Reflections: Theme: `asia/shanghai` kept surfacing across 7 memories.; confidence: 0.93; evidence: memory/.dreams/session-corpus/2026-04-15.txt:1-1, memory/.dreams/session-corpus/2026-04-15.txt:2-2, memory/.dreams/session-corpus/2026-04-16.txt:2-2; note: reflection",
       "recallCount": 0,
-      "dailyCount": 5,
+      "dailyCount": 6,
       "groundedCount": 0,
-      "totalScore": 3.1,
+      "totalScore": 3.72,
       "maxScore": 0.62,
       "firstRecalledAt": "2026-04-22T04:49:15.163Z",
-      "lastRecalledAt": "2026-04-27T02:28:31.101Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
       "queryHashes": [
         "511fd8111b88"
       ],
@@ -625,7 +628,8 @@
         "2026-04-23",
         "2026-04-24",
         "2026-04-25",
-        "2026-04-27"
+        "2026-04-27",
+        "2026-04-28"
       ],
       "conceptTags": [
         "asia/shanghai",
@@ -646,12 +650,12 @@
       "source": "memory",
       "snippet": "Possible Lasting Truths: User: [cron:1d736a97-6ff1-4f1f-865a-e5882d61438c 股票收盘复盘与全日汇总（含自校准）] 执行A股收盘流程（先复盘再汇总与规则自校准）：cd \"${OPENCLAW_HOME:-$HOME/.openclaw}/workspace-stock/stock_system\" && python3 refactored/openclaw_cron_analyzer.py post_close Current time: Thursday, April 16th, 2",
       "recallCount": 0,
-      "dailyCount": 5,
+      "dailyCount": 6,
       "groundedCount": 0,
-      "totalScore": 3.1,
+      "totalScore": 3.72,
       "maxScore": 0.62,
       "firstRecalledAt": "2026-04-22T04:49:15.163Z",
-      "lastRecalledAt": "2026-04-27T02:28:31.101Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
       "queryHashes": [
         "511fd8111b88"
       ],
@@ -660,7 +664,8 @@
         "2026-04-23",
         "2026-04-24",
         "2026-04-25",
-        "2026-04-27"
+        "2026-04-27",
+        "2026-04-28"
       ],
       "conceptTags": [
         "openclaw-home",
@@ -669,8 +674,8 @@
         "possible",
         "lasting",
         "truths",
-        "user",
-        "cron"
+        "cron",
+        "1d736a97"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-20.txt:2:2": {
@@ -700,8 +705,8 @@
         "distill-watermark",
         "yyyy-mm-dd",
         "memory/yyyy-mm-dd.md",
-        "user",
-        "cron"
+        "cron",
+        "73c9dffb"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-20.txt:3:3": {
@@ -728,11 +733,11 @@
         "openclaw-home",
         "workspace-stock/stock-system",
         "asia/shanghai",
-        "user",
         "cron:ca38d074",
         "c454",
         "4f80",
-        "adbe"
+        "adbe",
+        "f10b8c2fc3ed"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-22.txt:1:1": {
@@ -760,10 +765,10 @@
         "workspace-stock/stock-system",
         "post-close",
         "asia/sha",
-        "user",
         "cron",
         "1d736a97",
-        "6ff1"
+        "6ff1",
+        "4f1f"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-22.txt:2:2": {
@@ -791,10 +796,10 @@
         "workspace-stock/stock-system",
         "scripts/cleanup-stock-system.sh",
         "asia/shanghai",
-        "user",
         "cron:cf7fa95f",
         "64c0",
-        "4dec"
+        "4dec",
+        "b430"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-22.txt:3:3": {
@@ -821,11 +826,11 @@
         "openclaw-home",
         "workspace-stock/stock-system",
         "asia/shanghai",
-        "user",
         "cron:ca38d074",
         "c454",
         "4f80",
-        "adbe"
+        "adbe",
+        "f10b8c2fc3ed"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-23.txt:1:1": {
@@ -853,10 +858,10 @@
         "workspace-stock/stock-system",
         "scripts/cleanup-stock-system.sh",
         "asia/shanghai",
-        "user",
         "cron:cf7fa95f",
         "64c0",
-        "4dec"
+        "4dec",
+        "b430"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-23.txt:2:2": {
@@ -884,10 +889,10 @@
         "workspace-stock/stock-system",
         "post-close",
         "asia/shan",
-        "user",
         "cron",
         "1d736a97",
-        "6ff1"
+        "6ff1",
+        "4f1f"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-23.txt:3:3": {
@@ -915,11 +920,11 @@
         "openclaw-home",
         "workspace-stock/stock-system",
         "asia/shanghai",
-        "user",
         "cron:ca38d074",
         "c454",
         "4f80",
-        "adbe"
+        "adbe",
+        "f10b8c2fc3ed"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-23.txt:4:4": {
@@ -948,10 +953,10 @@
         "workspace-stock/stock-system",
         "post-close",
         "asia/shan",
-        "user",
         "cron",
         "1d736a97",
-        "6ff1"
+        "6ff1",
+        "4f1f"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-24.txt:1:1": {
@@ -980,10 +985,10 @@
         "workspace-stock/stock-system",
         "scripts/cleanup-stock-system.sh",
         "asia/shanghai",
-        "user",
         "cron:cf7fa95f",
         "64c0",
-        "4dec"
+        "4dec",
+        "b430"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-24.txt:2:2": {
@@ -1012,10 +1017,10 @@
         "workspace-stock/stock-system",
         "post-close",
         "asia/shangha",
-        "user",
         "cron",
         "1d736a97",
-        "6ff1"
+        "6ff1",
+        "4f1f"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-24.txt:3:3": {
@@ -1043,11 +1048,11 @@
         "openclaw-home",
         "workspace-stock/stock-system",
         "asia/shanghai",
-        "user",
         "cron:ca38d074",
         "c454",
         "4f80",
-        "adbe"
+        "adbe",
+        "f10b8c2fc3ed"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-25.txt:1:1": {
@@ -1076,10 +1081,10 @@
         "workspace-stock/stock-system",
         "scripts/cleanup-stock-system.sh",
         "asia/shanghai",
-        "user",
         "cron:cf7fa95f",
         "64c0",
-        "4dec"
+        "4dec",
+        "b430"
       ]
     },
     "memory:memory/.dreams/session-corpus/2026-04-27.txt:1:1": {
@@ -1107,10 +1112,1004 @@
         "workspace-stock/stock-system",
         "scripts/cleanup-stock-system.sh",
         "asia/shanghai",
-        "user",
         "cron:cf7fa95f",
         "64c0",
-        "4dec"
+        "4dec",
+        "b430"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:2:2": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:2:2",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 2,
+      "endLine": 2,
+      "source": "memory",
+      "snippet": "Assistant: 股票早盘分析已启动，见空白数据即为分析完成结果。约10分钟后自动通知结果。",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "股票",
+        "分析",
+        "启动",
+        "空白",
+        "数据",
+        "即为",
+        "完成",
+        "结果"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:3:3": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:3:3",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 3,
+      "endLine": 3,
+      "source": "memory",
+      "snippet": "User: [Bootstrap pending] Please read BOOTSTRAP.md from the workspace and follow it before replying normally. If this run can complete the BOOTSTRAP.md workflow, do so. If it cannot, explain the blocker briefly, continue with any bootstrap steps that are still possible here, and",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "bootstrap.md",
+        "bootstrap",
+        "pending",
+        "please",
+        "read",
+        "follow",
+        "replying",
+        "normally"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:4:4": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:4:4",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 4,
+      "endLine": 4,
+      "source": "memory",
+      "snippet": "User: [Bootstrap pending] Please read BOOTSTRAP.md from the workspace and follow it before replying normally. If this run can complete the BOOTSTRAP.md workflow, do so. If it cannot, explain the blocker briefly, continue with any bootstrap steps that are still possible here, and",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "bootstrap.md",
+        "bootstrap",
+        "pending",
+        "please",
+        "read",
+        "follow",
+        "replying",
+        "normally"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:5:5": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:5:5",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 5,
+      "endLine": 5,
+      "source": "memory",
+      "snippet": "User: [Bootstrap pending] Please read BOOTSTRAP.md from the workspace and follow it before replying normally. If this run can complete the BOOTSTRAP.md workflow, do so. If it cannot, explain the blocker briefly, continue with any bootstrap steps that are still possible here, and",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "bootstrap.md",
+        "bootstrap",
+        "pending",
+        "please",
+        "read",
+        "follow",
+        "replying",
+        "normally"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:6:6": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:6:6",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 6,
+      "endLine": 6,
+      "source": "memory",
+      "snippet": "User: [Bootstrap pending] Please read BOOTSTRAP.md from the workspace and follow it before replying normally. If this run can complete the BOOTSTRAP.md workflow, do so. If it cannot, explain the blocker briefly, continue with any bootstrap steps that are still possible here, and",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "bootstrap.md",
+        "bootstrap",
+        "pending",
+        "please",
+        "read",
+        "follow",
+        "replying",
+        "normally"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:7:7": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:7:7",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 7,
+      "endLine": 7,
+      "source": "memory",
+      "snippet": "User: [Bootstrap pending] Please read BOOTSTRAP.md from the workspace and follow it before replying normally. If this run can complete the BOOTSTRAP.md workflow, do so. If it cannot, explain the blocker briefly, continue with any bootstrap steps that are still possible here, and",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "bootstrap.md",
+        "bootstrap",
+        "pending",
+        "please",
+        "read",
+        "follow",
+        "replying",
+        "normally"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:8:8": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:8:8",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 8,
+      "endLine": 8,
+      "source": "memory",
+      "snippet": "User: 什么意思，之前使用其他模型还可以运行的啊",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "什么",
+        "意思",
+        "之前",
+        "使用",
+        "其他",
+        "模型",
+        "可以",
+        "运行"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:9:9": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:9:9",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 9,
+      "endLine": 9,
+      "source": "memory",
+      "snippet": "User: 什么意思，之前使用其他模型还可以运行的啊",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "什么",
+        "意思",
+        "之前",
+        "使用",
+        "其他",
+        "模型",
+        "可以",
+        "运行"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:10:10": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:10:10",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 10,
+      "endLine": 10,
+      "source": "memory",
+      "snippet": "User: [Bootstrap pending] Please read BOOTSTRAP.md from the workspace and follow it before replying normally. If this run can complete the BOOTSTRAP.md workflow, do so. If it cannot, explain the blocker briefly, continue with any bootstrap steps that are still possible here, and",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "bootstrap.md",
+        "bootstrap",
+        "pending",
+        "please",
+        "read",
+        "follow",
+        "replying",
+        "normally"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:11:11": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:11:11",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 11,
+      "endLine": 11,
+      "source": "memory",
+      "snippet": "Assistant: [assistant turn failed before producing content]",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "turn",
+        "failed",
+        "producing",
+        "content"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:12:12": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:12:12",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 12,
+      "endLine": 12,
+      "source": "memory",
+      "snippet": "User: [Bootstrap pending] Please read BOOTSTRAP.md from the workspace and follow it before replying normally. If this run can complete the BOOTSTRAP.md workflow, do so. If it cannot, explain the blocker briefly, continue with any bootstrap steps that are still possible here, and",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "bootstrap.md",
+        "bootstrap",
+        "pending",
+        "please",
+        "read",
+        "follow",
+        "replying",
+        "normally"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:13:13": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:13:13",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 13,
+      "endLine": 13,
+      "source": "memory",
+      "snippet": "Assistant: [assistant turn failed before producing content]",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "turn",
+        "failed",
+        "producing",
+        "content"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:14:14": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:14:14",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 14,
+      "endLine": 14,
+      "source": "memory",
+      "snippet": "User: [Bootstrap pending] Please read BOOTSTRAP.md from the workspace and follow it before replying normally. If this run can complete the BOOTSTRAP.md workflow, do so. If it cannot, explain the blocker briefly, continue with any bootstrap steps that are still possible here, and",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "bootstrap.md",
+        "bootstrap",
+        "pending",
+        "please",
+        "read",
+        "follow",
+        "replying",
+        "normally"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:15:15": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:15:15",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 15,
+      "endLine": 15,
+      "source": "memory",
+      "snippet": "Assistant: [assistant turn failed before producing content]",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "turn",
+        "failed",
+        "producing",
+        "content"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:16:16": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:16:16",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 16,
+      "endLine": 16,
+      "source": "memory",
+      "snippet": "Assistant: 抱歉，工作区根目录下找不到 **BOOTSTRAP.md**，因此无法读取并执行其中的引导步骤。 如果该文件已经被移除，说明引导可能已经完成；如果仍需执行引导，请将 **BOOTSTRAP.md** 内容提供给我，或把文件放回工作区根目录，我随后会按照其中的指示完成后续步骤。",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "bootstrap.md",
+        "抱歉",
+        "工作",
+        "目录",
+        "找不到",
+        "因此",
+        "无法",
+        "执行"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:17:17": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:17:17",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 17,
+      "endLine": 17,
+      "source": "memory",
+      "snippet": "User: 你是subagent啊，也要BOOTSTRAP.md？",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "也要bootstrap.md",
+        "你是",
+        "也要",
+        "bootstrap.md"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:18:18": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:18:18",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 18,
+      "endLine": 18,
+      "source": "memory",
+      "snippet": "Assistant: 你说得对。**BOOTSTRAP.md** 不存在，所以 bootstrap 本身已经完成了，不需要再走那个流程。 我是 **小股** 🤓，股票专家。这个工作区负责股票相关的事情，有什么股票问题可以问我。",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "bootstrap.md",
+        "说得",
+        "不存在",
+        "所以",
+        "bootstrap",
+        "本身",
+        "已经",
+        "完成"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:19:19": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:19:19",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 19,
+      "endLine": 19,
+      "source": "memory",
+      "snippet": "User: 你主要的任务是什么",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "主要",
+        "任务",
+        "什么"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:20:20": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:20:20",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 20,
+      "endLine": 20,
+      "source": "memory",
+      "snippet": "Assistant: 我的主要任务是 **在 `stock_system/` 目录下提供 A 股行情分析和相关脚本支持**，包括： - 使用 `stock-analyzer` 等技能快速获取实时行情、技术指标和基本面数据 - 编写、运行和维护用于数据抓取、信号生成、报告生成的脚本 - 根据需要结合网页搜索或研究工具补充外部信息 - 为你提供清晰、可靠的股票分析、投资提示和风险提示，帮助你更好地进行 A 股投资决策 如果有具体的股票、时间段或分析需求，直接告诉我，我会立刻着手处理。",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "stock-system",
+        "stock-analyzer",
+        "我的",
+        "主要",
+        "任务",
+        "目录",
+        "提供",
+        "行情"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:21:21": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:21:21",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 21,
+      "endLine": 21,
+      "source": "memory",
+      "snippet": "User: 有什么可以优化的点吗",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "什么",
+        "可以"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:22:22": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:22:22",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 22,
+      "endLine": 22,
+      "source": "memory",
+      "snippet": "Assistant: ## 1️⃣ 工作区现状小结 - **资产**：`stock_system/` — 主业务脚本、调度、数据仓库 - **已积累**：每日 cron、heartbeat、sub‑agent 调度； - **工具**：`stock-analyzer`、`web_search`、web_fetch 等已装载； - **默认模型**：`openrouter/openrouter/free`（免费且通用） - **记录**：`memory/2026-04-27.md` 等日记（已节省）； - **配置**：通过 Gateway 统一，未手动改",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "gateway",
+        "router",
+        "stock-system",
+        "stock-analyzer",
+        "web-search",
+        "web-fetch",
+        "openrouter/openrouter/free",
+        "memory/2026-04-27.md"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:23:23": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:23:23",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 23,
+      "endLine": 23,
+      "source": "memory",
+      "snippet": "Assistant: `context=\"fork\"` 时调用；<br>2️⃣ 在 `heartbeat`、`cron` 成功路径末尾加 `noop` 或 `notify`，将长文本发送到 `message` 频道而非 chat；<br>3️⃣ 在 `sessions_spawn` 时使用 `lightContext:true` 启用轻级别历史传递 | 低 token 使用 + 快速回复；减少并发子会话导致的“聊天过热” | 若聊天精度下降，恢复原始 `prompt` / `history` 长度 | | **可靠性** | 调度精准、失败警报、日志收集",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "sessions-spawn",
+        "context",
+        "fork",
+        "heartbeat",
+        "cron",
+        "成功",
+        "路径",
+        "末尾"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:24:24": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:24:24",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 24,
+      "endLine": 24,
+      "source": "memory",
+      "snippet": "Assistant: `message` “分析完成” *without* pausing chat | 省时、降低多人协作冲突 | 若监控不准确，回退至手动控制 | > **优先建议** > ① **模型切换，目标是将 90 % 的分析调用改为 `openrouter/epic` 或 `gpt-4o-mini`**（成本降 • 80 %） > ② **Heartbeat 设为 silent，结果仅在失败时推送**（减 30 % 运行时 token，保持 KP） > ③ **Cron failureAlert 报警开启**（故障及时可见） ## 3️⃣",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "gpt",
+        "router",
+        "openrouter/epic",
+        "gpt-4o-mini",
+        "message",
+        "分析",
+        "完成",
+        "without"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:25:25": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:25:25",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 25,
+      "endLine": 25,
+      "source": "memory",
+      "snippet": "User: 已经用了免费模型，为什么还要换其他模型",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "已经",
+        "免费",
+        "模型",
+        "为什么",
+        "其他"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:26:26": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:26:26",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 26,
+      "endLine": 26,
+      "source": "memory",
+      "snippet": "Assistant: We need to explain: the free model is openrouter/free, but that might be rate limited and expensive for many tokens. Suggest cheaper or more suitable. Also we can't change config without consent. Provide reasoning.**为什么网上说要换成别的模型？** | 可能的误解 | 真实情况 | |-----------|------",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "router",
+        "openrouter/free",
+        "need",
+        "explain",
+        "free",
+        "model",
+        "openrouter",
+        "but"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:27:27": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:27:27",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 27,
+      "endLine": 27,
+      "source": "memory",
+      "snippet": "Assistant: **长上下文**（上千 token）。`openrouter/free` 在可用 token 过低时会显著影响刷新速度：<br>1. 生成完整分析需要更多轮次，导致请求超时或中断。<br>2. 你收到的答案因“token 剩余不足”被截断，信息不完整。<br>使用更大容量、默认更高 token 限制的模型可以一次完成思考。 | | “不需要改模型，只改速率就行” | 可以先 *尝试* 降低聊量：<br>1. 设置 `sessions_spawn(..., thinking=\"low\")` 让子 agent 只算一句 “好的，我已开始",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "router",
+        "openrouter/free",
+        "sessions-spawn",
+        "上下文",
+        "上千",
+        "token",
+        "openrouter",
+        "free"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:28:28": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:28:28",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 28,
+      "endLine": 28,
+      "source": "memory",
+      "snippet": "Assistant: **批量分析**、**长文本推理**，使用更强大/更经济的模型更稳妥。 > 若你同意按上述方式微调模型，请回应 **YES**，我会帮你调整 `openclaw.json`（仅修改 `stock` agent 的默认模型）。若你想先查看 token 统计或做更细粒度的改动，也可以告诉我。",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "使用更强大/更经济的模型更稳妥",
+        "openclaw.json",
+        "批量",
+        "分析",
+        "文本",
+        "推理",
+        "使用",
+        "强大"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:29:29": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:29:29",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 29,
+      "endLine": 29,
+      "source": "memory",
+      "snippet": "Assistant: We need to respond that user says not to change model. So we must proceed with optimizing other aspects. Let's read any relevant config? Maybe read openclaw.json.",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "openclaw.json",
+        "need",
+        "respond",
+        "says",
+        "not",
+        "change",
+        "model",
+        "must"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:30:30": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:30:30",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 30,
+      "endLine": 30,
+      "source": "memory",
+      "snippet": "Assistant: We need to respond with optimization ideas but not change model. But we can still propose other optimizations: use subagents, reduce logs, compress. Provide plan.**关于 “不改模型” 的理解** > 我已记录：**保持使用 `openrouter/free`**。 > 于是其他优化维度将聚焦在“成本可控、上下文精简、可靠性提升” 三大方向，并且不改变模型本身。 --- #",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "router",
+        "openrouter/free",
+        "need",
+        "respond",
+        "optimization",
+        "ideas",
+        "but",
+        "not"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:31:31": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:31:31",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 31,
+      "endLine": 31,
+      "source": "memory",
+      "snippet": "Assistant: 直接发送非文本形式（如表格截图）而非完整文本。 | | **Cron/Heartbeat 日志** | 每次成功都会在 chat 做一个长段回传，如 “已完成 2026‑04‑27 23:12 行情刷新”。 | 成本 + 令牌占用。 | - 将 cron 里成功路径改为 **通知**：`payload.kind=\"systemEvent\", text=\"行情已刷新\"`, 只在失败时加入更详细信息。 | | **异常捕获** | 执行失败时，脚本往往输出错误日志长段。 | 触发阈值、token 消耗。 | - 在子脚本里捕获异常后只返",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "cron/heartbeat",
+        "payload.kind",
+        "直接",
+        "发送",
+        "文本",
+        "形式",
+        "表格",
+        "完整"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:32:32": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:32:32",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 32,
+      "endLine": 32,
+      "source": "memory",
+      "snippet": "Assistant: \"lightContext\":true, \"timeoutSeconds\": 300 } ``` 3. **Heartbeat 只在失败时输出详细** ```bash # heart.sh if success; then jsonPayload={\\\"payload\\\":{\\\"kind\\\":\\\"systemEvent\\\",\\\"text\\\":\\\"行情已刷新\\\"}} else jsonPayload={\\\"payload\\\":{\\\"kind\\\":\\\"systemEvent\\\",\\\"text\\\":\\\"行情刷新失败: 错误信息\\\"}} c",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "heart.sh",
+        "lightcontext",
+        "true",
+        "timeoutseconds",
+        "heartbeat",
+        "只在",
+        "失败",
+        "输出"
+      ]
+    },
+    "memory:memory/.dreams/session-corpus/2026-04-27.txt:33:33": {
+      "key": "memory:memory/.dreams/session-corpus/2026-04-27.txt:33:33",
+      "path": "memory/.dreams/session-corpus/2026-04-27.txt",
+      "startLine": 33,
+      "endLine": 33,
+      "source": "memory",
+      "snippet": "Assistant: `stock_system/heartbeat.sh`），我将直接为你写一个 **patch**，并给出 `gateway.config.patch`。 - **如果你想进一步简化**，可以把所有 cron 里 success 的回本改为 `message` 直接推送到专属频道，之后再创建“全量日志”按需查看。 > **你提出不改模型**，因此所有改动均保持使用 `openrouter/free`。 > 采用上述改动后，你将在保持同样模型的前提下，显著降低 token 消耗与日志噪声，并提升错误处理的可跟踪性。 请随时指示你想执行的",
+      "recallCount": 0,
+      "dailyCount": 1,
+      "groundedCount": 0,
+      "totalScore": 0.58,
+      "maxScore": 0.58,
+      "firstRecalledAt": "2026-04-27T19:00:44.463Z",
+      "lastRecalledAt": "2026-04-27T19:00:44.463Z",
+      "queryHashes": [
+        "e29ad1ab29b1"
+      ],
+      "recallDays": [
+        "2026-04-28",
+        "2026-04-27"
+      ],
+      "conceptTags": [
+        "gateway",
+        "router",
+        "stock-system/heartbeat.sh",
+        "gateway.config.patch",
+        "openrouter/free",
+        "stock-system",
+        "heartbeat.sh",
+        "直接"
       ]
     }
   }
