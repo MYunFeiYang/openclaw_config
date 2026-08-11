@@ -1,50 +1,87 @@
 #!/usr/bin/env python3
 """
-LLM 预测模块 — 通过 OpenRouter API 调用大模型进行股票预测。
+LLM 预测模块 — 通过 OpenClaw 的 openrouter 插件调用大模型进行股票预测。
+（行情抓取由 akshare/新浪直连，无需 LLM；仅预测环节的 LLM 走 OpenClaw。）
+
+机制：调用 `openclaw infer model run --model openrouter/<model> --prompt ... --json`，
+走 OpenClaw gateway 路由（gateway 进程已通过 `openclaw models auth paste-api-key` 注入 openrouter 凭据，
+模型路由由 OpenClaw 负责），脚本本身不持有 API Key。
+注意：不用 --local（内嵌进程读不到 gateway 凭据）；调用时强制把 openclaw 同目录的 Node 置顶 PATH，
+避免系统 Node 版本过低导致 openclaw CLI 拒绝启动。
 
 环境变量：
-  OPENROUTER_API_KEY    OpenRouter API Key（必需）
-  OPENROUTER_MODEL      模型名称（默认 deepseek/deepseek-chat）
-  OPENROUTER_BASE_URL   可选自定义 base URL（默认 https://openrouter.ai/api/v1）
-  OPENROUTER_TIMEOUT    请求超时秒数（默认 30）
+  OPENROUTER_MODEL      模型名称（缺省跟随 OpenClaw 默认模型 openclaw.json→agents.defaults.model.primary；可裸 slug 或 openrouter/ 前缀覆盖）
+  OPENROUTER_TIMEOUT    调用超时秒数（默认 30，gateway 路由调用已自动放宽）
   OPENROUTER_MAX_TOKENS 最大输出 token（默认 1024）
+  OPENCLAW_BIN          可选：openclaw 可执行文件路径（缺省自动探测 PATH / nvm）
 
-模型推荐（按性价比）：
-  deepseek/deepseek-chat        DeepSeek V3，便宜且中文好，$0.14/$0.28 per 1M tokens
-  qwen/qwen-3-32b               Qwen3，中文开源最强，免费
-  google/gemini-2.0-flash-001   Gemini 2.0 Flash，速度最快，免费额度大
-  anthropic/claude-3.5-haiku    Claude 3.5 Haiku，分析能力强，稍贵
-
-OpenRouter 兼容 OpenAI SDK 格式，本模块仅用 Python 标准库 urllib，
-不依赖任何第三方包。
+依赖：Python 标准库 + 本地 openclaw CLI。LLM 调用失败时自动降级为纯公式打分。
 """
 
 from __future__ import annotations
 
+import glob
 import json
 import os
-import urllib.request
-import urllib.error
+import shutil
+import subprocess
 from typing import Any, Dict, List, Optional, Tuple
 
 
 # ── 默认配置 ──────────────────────────────────────────
 _DEFAULT_MODEL = "deepseek/deepseek-chat"
-_DEFAULT_BASE_URL = "https://openrouter.ai/api/v1"
 _DEFAULT_TIMEOUT = 30
 _DEFAULT_MAX_TOKENS = 1024
 
+# openclaw CLI 候选路径（按优先级：PATH > 已知 nvm 安装）
+_OPENCLAW_CANDIDATES = [
+    "~/.nvm/versions/node/v24.19.0/bin/openclaw",
+    "~/.nvm/versions/node/*/bin/openclaw",
+]
 
-def _get_api_key() -> Optional[str]:
-    return os.environ.get("OPENROUTER_API_KEY") or None
+
+def _find_openclaw_bin() -> Optional[str]:
+    """定位 openclaw CLI。
+
+    优先使用已知 nvm 安装路径中的 Node>=24 版本（openclaw CLI 要求
+    Node>=22.22.3/<23 或 >=24.15，系统自带的低版本会直接拒绝启动），
+    其次回退 PATH。"""
+    for c in _OPENCLAW_CANDIDATES:
+        c = os.path.expanduser(c)
+        if "*" in c:
+            for g in sorted(glob.glob(c), reverse=True):
+                if os.path.exists(g):
+                    return g
+        elif os.path.exists(c):
+            return c
+    return shutil.which("openclaw") or None
+
+
+def _get_openclaw_default_model() -> str:
+    """读取 OpenClaw 全局默认模型（openclaw.json → agents.defaults.model.primary）。
+    这样股票系统自动跟随你在 OpenClaw 里切换的模型；找不到时回退内置默认。"""
+    cfg_path = os.environ.get("OPENCLAW_CONFIG") or os.path.expanduser("~/.openclaw/openclaw.json")
+    try:
+        with open(cfg_path, "r", encoding="utf-8") as f:
+            cfg = json.load(f)
+        primary = (
+            cfg.get("agents", {})
+            .get("defaults", {})
+            .get("model", {})
+            .get("primary")
+        )
+        if isinstance(primary, str) and primary.strip():
+            return primary.strip()
+    except Exception:
+        pass
+    return _DEFAULT_MODEL
 
 
 def _get_model() -> str:
-    return os.environ.get("OPENROUTER_MODEL") or _DEFAULT_MODEL
-
-
-def _get_base_url() -> str:
-    return os.environ.get("OPENROUTER_BASE_URL") or _DEFAULT_BASE_URL
+    """模型名解析优先级：OPENROUTER_MODEL 环境变量 > OpenClaw 默认模型 > 内置默认。
+    自动补 openrouter/ 前缀（兼容裸 slug 与 openrouter/ 前缀两种写法）。"""
+    m = os.environ.get("OPENROUTER_MODEL") or _get_openclaw_default_model()
+    return m if m.startswith("openrouter/") else f"openrouter/{m}"
 
 
 def _get_timeout() -> int:
@@ -174,56 +211,115 @@ def _parse_response(text: str) -> Optional[Dict[str, Any]]:
     return result
 
 
+def _extract_content_from_openclaw_output(text: str) -> Optional[str]:
+    """从 `openclaw infer model run --json` 的输出中抽出模型回复文本。
+
+    兼容两种 --json 结构：
+      - 官方封装：`{"ok": true, "outputs": [{"text": "..."}], ...}`
+      - 原生 OpenAI：`{"choices": [{"message": {"content": "..."}}]}`
+    非 JSON 时把整段 stdout 当作回复。
+    返回 None 表示调用失败（ok=false / 含 error / 无内容）。"""
+    text = (text or "").strip()
+    if not text:
+        return None
+    try:
+        obj = json.loads(text)
+    except json.JSONDecodeError:
+        return text  # CLI 直接输出纯文本（如我们的预测 JSON）
+    if not isinstance(obj, dict):
+        return text
+
+    # 失败信号：ok=false 或含 error 字段
+    if obj.get("ok") is False or obj.get("error") or obj.get("status") == "error":
+        return None
+
+    # 官方封装结构：outputs[].text
+    outputs = obj.get("outputs")
+    if isinstance(outputs, list) and outputs:
+        first = outputs[0]
+        if isinstance(first, dict):
+            t = first.get("text")
+            if isinstance(t, str) and t.strip():
+                return t
+        elif isinstance(first, str) and first.strip():
+            return first
+
+    # 通用顶层字段
+    for key in ("content", "text", "output", "response", "result"):
+        v = obj.get(key)
+        if isinstance(v, str) and v.strip():
+            return v
+
+    # 原生 OpenAI 结构：choices[0].message.content
+    choices = obj.get("choices")
+    if isinstance(choices, list) and choices:
+        msg = choices[0].get("message", {}) if isinstance(choices[0], dict) else {}
+        c = msg.get("content") if isinstance(msg, dict) else None
+        if isinstance(c, str) and c.strip():
+            return c
+    return None
+
+
 def call_openrouter(
     messages: List[Dict[str, str]],
     model: Optional[str] = None,
     max_tokens: int = _DEFAULT_MAX_TOKENS,
 ) -> Optional[Dict[str, Any]]:
-    """调用 OpenRouter Chat Completions API，返回完整响应 JSON 或 None"""
-    api_key = _get_api_key()
-    if not api_key:
+    """通过 OpenClaw 的 openrouter 插件调用 LLM，返回与 OpenRouter API 同构的
+    `{"choices":[{"message":{"content":...}}], "model":...}` 以便上层逻辑不变。
+    失败（CLI 缺失/超时/非零退出/输出无法解析）返回 None，触发公式降级。"""
+    bin_path = os.environ.get("OPENCLAW_BIN") or _find_openclaw_bin()
+    if not bin_path:
+        print("[LLM] 未找到 openclaw CLI，跳过 LLM 预测（仅用公式打分）")
         return None
 
-    url = f"{_get_base_url()}/chat/completions"
-    body = {
-        "model": model or _get_model(),
-        "messages": messages,
-        "max_tokens": max_tokens,
-        "temperature": 0.3,  # 低温度保证一致性
-    }
-    data = json.dumps(body).encode("utf-8")
-
-    req = urllib.request.Request(
-        url,
-        data=data,
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://github.com/stock-system",
-            "X-Title": "Stock Prediction System",
-        },
-        method="POST",
+    # CLI 以 --prompt 传单段文本：合并 system/user 角色
+    prompt_text = "\n\n".join(
+        m.get("content", "") for m in messages if m.get("content")
     )
+    model_ref = model or _get_model()  # 已是 openrouter/xxx 格式
+    if not model_ref.startswith("openrouter/"):
+        model_ref = f"openrouter/{model_ref}"
 
+    cmd = [
+        bin_path, "infer", "model", "run",
+        "--model", model_ref,
+        "--prompt", prompt_text,
+        "--json",
+    ]
+    # 走 gateway 路由（gateway 进程已注入 openrouter 凭据）；
+    # 内嵌 --local 模式读不到 gateway 的凭据，故不用 --local。
+    # 强制把 openclaw 同目录的 Node 置顶 PATH，避免 env node 解析到过低版本。
+    env = dict(os.environ)
+    node_bin_dir = os.path.dirname(bin_path)
+    env["PATH"] = node_bin_dir + os.pathsep + env.get("PATH", "")
+    timeout = _get_timeout() + 30
     try:
-        with urllib.request.urlopen(req, timeout=_get_timeout()) as resp:
-            return json.loads(resp.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        body = e.read().decode("utf-8", errors="replace")
-        print(f"[LLM] OpenRouter HTTP {e.code}: {body[:300]}")
+        proc = subprocess.run(
+            cmd, capture_output=True, text=True, timeout=timeout, env=env,
+        )
+    except subprocess.TimeoutExpired:
+        print(f"[LLM] openclaw infer 超时（{timeout}s）")
         return None
     except Exception as e:
-        print(f"[LLM] OpenRouter 请求失败: {e}")
+        print(f"[LLM] openclaw infer 调用失败: {e}")
         return None
+
+    if proc.returncode != 0:
+        err = (proc.stderr or proc.stdout).strip()
+        print(f"[LLM] openclaw infer 返回非零({proc.returncode}): {err[:300]}")
+        return None
+
+    content = _extract_content_from_openclaw_output(proc.stdout)
+    if not content:
+        print(f"[LLM] openclaw infer 输出为空: {proc.stdout[:300]}")
+        return None
+
+    return {"choices": [{"message": {"content": content}}], "model": model_ref}
 
 
 def predict_single(stock: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     """对单只股票调用 LLM 预测，失败返回 None"""
-    api_key = _get_api_key()
-    if not api_key:
-        print("[LLM] 未设置 OPENROUTER_API_KEY，跳过 LLM 预测")
-        return None
-
     user_prompt = _build_single_stock_prompt(stock)
     messages = [
         {"role": "system", "content": _SYSTEM_PROMPT},
@@ -253,11 +349,6 @@ def predict_single(stock: Dict[str, Any]) -> Optional[Dict[str, Any]]:
 def predict_batch(stocks: List[Dict[str, Any]]) -> Optional[List[Optional[Dict[str, Any]]]]:
     """批量预测多只股票（单次 API 调用），返回与输入等长的结果列表。
     某只股票解析失败则该位置为 None。整体调用失败返回 None。"""
-    api_key = _get_api_key()
-    if not api_key:
-        print("[LLM] 未设置 OPENROUTER_API_KEY，跳过 LLM 预测")
-        return None
-
     # 构建批量 prompt
     stock_blocks = []
     for i, s in enumerate(stocks):
@@ -363,5 +454,5 @@ def stock_to_llm_input(
 
 
 def is_llm_enabled() -> bool:
-    """检查 LLM 预测是否可用"""
-    return bool(_get_api_key())
+    """检查 LLM 预测是否可用：依赖 OpenClaw CLI（其 openrouter 插件提供 key 与路由）"""
+    return _find_openclaw_bin() is not None
