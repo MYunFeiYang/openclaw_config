@@ -27,7 +27,7 @@ def _expected_direction(signal: str) -> int:
 DEFAULT_AUTO_CALIBRATION: Dict[str, Any] = {
     "decay_per_session": 0.88,
     "last_sessions": 20,
-    "min_total_samples": 10,
+    "min_total_samples": 8,
     "min_bucket_samples": 3,
     "min_bucket_weight": 3.0,
     "max_thresh_drift": 0.35,
@@ -119,10 +119,10 @@ def _by_trade_date(records: List[Dict[str, Any]]) -> Dict[str, Dict[str, Any]]:
 
 
 DEFAULT_THRESHOLDS = {
-    "strong_buy": 8.5,
-    "buy": 7.0,
+    "strong_buy": 6.5,
+    "buy": 5.8,
     "hold": 5.0,
-    "sell": 3.5,
+    "sell": 4.3,
 }
 DEFAULT_WEIGHTS = {
     "technical": 0.40,
@@ -133,11 +133,12 @@ DEFAULT_WEIGHTS = {
 
 
 def _enforce_order(th: Dict[str, float]) -> Dict[str, float]:
-    """保证 strong_buy > buy > hold > sell，且各落在合理区间。"""
+    """保证 strong_buy > buy > hold > sell，且各落在合理区间。
+    档位间距放宽到 +0.5（原 +1.0 过宽，会把收窄后的持有带弹回，抑制方向性信号）。"""
     s = max(2.5, min(4.5, float(th.get("sell", 3.5))))
-    h = max(s + 1.0, min(6.2, float(th.get("hold", 5.0))))
-    b = max(h + 1.0, min(8.2, float(th.get("buy", 7.0))))
-    sb = max(b + 0.5, min(9.5, float(th.get("strong_buy", 8.5))))
+    h = max(s + 0.5, min(6.2, float(th.get("hold", 5.0))))
+    b = max(h + 0.5, min(8.2, float(th.get("buy", 5.8))))
+    sb = max(b + 0.5, min(9.5, float(th.get("strong_buy", 6.5))))
     return {
         "sell": round(s, 3),
         "hold": round(h, 3),
@@ -292,7 +293,9 @@ def run_auto_calibration(stock_system_root: Optional[Path] = None) -> Dict[str, 
         data_dir, int(tuning["max_history_lines"])
     )
     stats = _aggregate_stats(records, tuning)
-    total = stats["n_buy"] + stats["n_sell"] + stats["n_hold"]
+    # 校准门槛改用「方向性样本」（买入+卖出），持有信号不计入，
+    # 避免「持有天然判对」注水阻止真实校准触发。
+    directional_total = stats["n_buy"] + stats["n_sell"]
     min_total = int(tuning["min_total_samples"])
     step_th = float(tuning["step_th"])
     step_w = float(tuning["step_w"])
@@ -305,9 +308,9 @@ def run_auto_calibration(stock_system_root: Optional[Path] = None) -> Dict[str, 
     th, w = deepcopy(base_th), deepcopy(base_w)
     notes: List[str] = []
 
-    if total < min_total:
+    if directional_total < min_total:
         notes.append(
-            f"样本不足（有效方向样本 {total} < {min_total}），未调整阈值/权重。"
+            f"方向性样本不足（买入+卖出有效样本 {directional_total} < {min_total}），未调整阈值/权重。"
         )
     else:
         touched_buy = False

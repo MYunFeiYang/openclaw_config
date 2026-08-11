@@ -820,11 +820,13 @@ class ConfigManager:
     }
 
     # 信号阈值配置（默认值；运行时可由 config/calibration_overrides.json 覆盖）
+    # 2026-08-11 调窄：真实综合分分布约 4.58~6.54（中位 5.70），旧阈值 buy≥7.0 几乎永远触发不了买入。
+    # 新阈值让“略高于中位→买入、略低于 5.0→卖出”，使系统能产生方向性信号以积累校准样本。
     SIGNAL_THRESHOLDS = {
-        "strong_buy": 8.5,
-        "buy": 7.0,
+        "strong_buy": 6.5,
+        "buy": 5.8,
         "hold": 5.0,
-        "sell": 3.5,
+        "sell": 4.3,
     }
 
     _merged_signal_thresholds: Optional[Dict[str, float]] = None

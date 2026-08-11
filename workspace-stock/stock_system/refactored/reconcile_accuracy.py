@@ -11,7 +11,7 @@ from typing import Any, Dict, Optional, Tuple
 
 def default_accuracy_tuning() -> Dict[str, Any]:
     return {
-        "signal_margin": 0.12,
+        "signal_margin": 0.0,
         "reconcile_band_base": 0.55,
         "reconcile_band_vol_coef": 0.07,
         "reconcile_band_min": 0.35,

@@ -98,6 +98,11 @@ def _append_reconcile_history(data_dir: Path, out_json: Dict[str, Any], reconcil
             "direction_misses": st.get("direction_misses"),
             "fetch_errors": st.get("fetch_errors"),
             "rows": st.get("rows"),
+            # 拆表口径（供滚动趋势与校准使用）
+            "directional_samples": st.get("directional_samples"),
+            "directional_hit_rate": st.get("directional_hit_rate"),
+            "hold_hit_rate": st.get("hold_hit_rate"),
+            "buy_signal_mean_return_pct": st.get("buy_signal_mean_return_pct"),
         },
         "symbols": _compact_symbols_from_rows(out_json.get("rows") or []),
     }
@@ -150,13 +155,13 @@ def _records_by_trade_date(records: List[Dict[str, Any]]) -> Dict[str, Dict[str,
     return by_d
 
 
-def _rolling_hit_rates(by_date: Dict[str, Dict[str, Any]], last_n: int) -> Tuple[List[float], List[str]]:
+def _rolling_hit_rates(by_date: Dict[str, Dict[str, Any]], last_n: int, key: str = "hit_rate") -> Tuple[List[float], List[str]]:
     dates = sorted(by_date.keys())
     tail = dates[-last_n:] if len(dates) >= last_n else dates
     rates: List[float] = []
     for d in tail:
         st = (by_date[d].get("stats") or {})
-        hr = st.get("hit_rate")
+        hr = st.get(key)
         if hr is not None:
             try:
                 rates.append(float(hr))
@@ -191,6 +196,13 @@ def refresh_iteration_artifacts(data_dir: Path, trade_date_hint: str) -> Dict[st
     mean_20 = round(sum(last_20) / len(last_20), 4) if last_20 else None
     mean_5 = round(sum(last_5) / len(last_5), 4) if last_5 else None
     mean_prev_5 = round(sum(prev_5_rates) / len(prev_5_rates), 4) if prev_5_rates else None
+
+    # 方向性一致率滚动（剔除持有注水，才是真实预测能力）
+    last_20_dir, _ = _rolling_hit_rates(by_date, 20, "directional_hit_rate")
+    last_5_dir, _ = _rolling_hit_rates(by_date, 5, "directional_hit_rate")
+    mean_20_dir = round(sum(last_20_dir) / len(last_20_dir), 4) if last_20_dir else None
+    mean_5_dir = round(sum(last_5_dir) / len(last_5_dir), 4) if last_5_dir else None
+
     trend = "flat"
     trend_zh = "持平"
     if mean_5 is not None and mean_prev_5 is not None:
@@ -250,6 +262,23 @@ def refresh_iteration_artifacts(data_dir: Path, trade_date_hint: str) -> Dict[st
         )
     elif mean_5 is not None and len(last_5) > 1:
         narrative.append(f"最近 {len(last_5)} 次复盘平均一致率约 {mean_5:.0%}。")
+
+    # 方向性一致率（剔除持有注水）—— 真实预测能力口径
+    if mean_20_dir is not None:
+        if len(last_20_dir) == 1:
+            narrative.append(
+                f"当前仅 {len(last_20_dir)} 次含方向性信号（买卖）的复盘，方向性一致率约 {mean_20_dir:.0%}；"
+                "继续积累以评估真实预测能力。"
+            )
+        else:
+            narrative.append(
+                f"近 {len(last_20_dir)} 次含方向性信号的复盘，方向性一致率（剔除持有注水）算术平均约 {mean_20_dir:.0%}。"
+            )
+    elif mean_20 is not None:
+        narrative.append(
+            "尚无任何买入/卖出方向性信号样本（系统仍偏保守）；新阈值（2026-08-11）将逐步产生方向性样本。"
+        )
+
     if attention:
         top = attention[:5]
         narrative.append(
@@ -272,6 +301,8 @@ def refresh_iteration_artifacts(data_dir: Path, trade_date_hint: str) -> Dict[st
         "mean_hit_rate_recent": mean_20,
         "last_5_mean_hit_rate": mean_5,
         "prev_5_mean_hit_rate": mean_prev_5,
+        "mean_directional_hit_rate_recent": mean_20_dir,
+        "last_5_mean_directional_hit_rate": mean_5_dir,
         "hit_rate_trend": trend,
         "hit_rate_trend_zh": trend_zh,
         "symbol_attention": attention[:15],
@@ -415,6 +446,34 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
     miss = sum(1 for r in rows if r.get("direction_match") is False)
     err_n = sum(1 for r in rows if r.get("error"))
 
+    # ── 拆表：方向性信号（买入/卖出）vs 持有 ──
+    # 持有信号 expected_direction=0，与“当日波动落在中性带内”天然对齐，注水严重；
+    # 真正的预测能力只看方向性样本（买/卖）。
+    dir_hit = dir_miss = hold_hit = hold_miss = 0
+    buy_rets: List[float] = []  # 买入信号股的当日区间收益（真实收益口径）
+    for r in rows:
+        if r.get("session_return_pct") is None or r.get("direction_match") is None:
+            continue
+        exp = int(r.get("expected_direction", 0) or 0)
+        ok = bool(r.get("direction_match"))
+        if exp != 0:  # 方向性信号
+            if ok:
+                dir_hit += 1
+            else:
+                dir_miss += 1
+            if exp == 1:  # 买入信号
+                buy_rets.append(float(r["session_return_pct"]))
+        else:  # 持有信号
+            if ok:
+                hold_hit += 1
+            else:
+                hold_miss += 1
+    dir_samples = dir_hit + dir_miss
+    directional_hit_rate = round(dir_hit / dir_samples, 4) if dir_samples else None
+    hold_samples = hold_hit + hold_miss
+    hold_hit_rate = round(hold_hit / hold_samples, 4) if hold_samples else None
+    buy_mean_return = round(sum(buy_rets) / len(buy_rets), 4) if buy_rets else None
+
     ts = datetime.now().strftime("%H%M%S")
     out_json = {
         "kind": "reconcile",
@@ -434,6 +493,16 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
             "direction_misses": miss,
             "fetch_errors": err_n,
             "hit_rate": round(hit / with_result, 4) if with_result else None,
+            # 拆表口径
+            "directional_samples": dir_samples,
+            "directional_hits": dir_hit,
+            "directional_misses": dir_miss,
+            "directional_hit_rate": directional_hit_rate,
+            "hold_samples": hold_samples,
+            "hold_hits": hold_hit,
+            "hold_misses": hold_miss,
+            "hold_hit_rate": hold_hit_rate,
+            "buy_signal_mean_return_pct": buy_mean_return,
         },
         "rows": rows,
     }
@@ -456,8 +525,17 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
         "强烈买入/卖出要求超过「强档带」幅度；普通买/卖与持有为三向对照。"
         + bench_note,
         "",
-        f"统计: 共 {total} 条，有效比价 {with_result}，方向一致 {hit}，不一致 {miss}，拉价失败 {err_n}",
-        f"方向一致率: {out_json['stats']['hit_rate']!s}",
+        f"统计: 共 {total} 条，有效比价 {with_result}，拉价失败 {err_n}",
+        "",
+        "【全量一致率（含持有，注水口径，仅供参考）】",
+        f"  方向一致 {hit} / 有效 {with_result} = {out_json['stats']['hit_rate']!s}",
+        "",
+        "【方向性一致率（仅买入+卖出信号，真实预测能力口径）】",
+        f"  一致 {dir_hit} / 样本 {dir_samples} = {directional_hit_rate!s}",
+        f"  买入信号股当日平均区间收益: {buy_mean_return!s}%",
+        "",
+        "【持有命中率（非预测能力，多数交易日波动<中性带天然判对）】",
+        f"  一致 {hold_hit} / 样本 {hold_samples} = {hold_hit_rate!s}",
         "",
         "明细:",
     ]

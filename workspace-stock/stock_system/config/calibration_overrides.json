@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-08-11T18:10:02.479123",
+  "updated_at": "2026-08-11T19:50:26.788125",
   "source": "reconcile_history.jsonl",
   "stats": {
     "n_buy": 0,
@@ -36,20 +36,19 @@
     "last_sessions_cap": 20
   },
   "notes": [
-    "卖出误判（加权）更多，略降技术面、增行业权重。",
-    "持有向加权较准(4%)，略放宽持有带。"
+    "方向性样本不足（买入+卖出有效样本 1 < 10），未调整阈值/权重。"
   ],
   "signal_thresholds": {
-    "sell": 3.5,
-    "hold": 4.95,
-    "buy": 7.05,
-    "strong_buy": 8.5
+    "strong_buy": 6.5,
+    "buy": 5.8,
+    "hold": 5.0,
+    "sell": 4.3
   },
   "score_weights": {
-    "technical": 0.38,
+    "technical": 0.4,
     "fundamental": 0.35,
     "sentiment": 0.15,
-    "sector": 0.12
+    "sector": 0.1
   },
   "auto_calibration": {
     "decay_per_session": 0.88,
