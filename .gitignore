@@ -3,8 +3,9 @@
 .env.*
 !.env.example
 
-# Backup configs
+# Backup configs / runtime last-good copies
 openclaw.json.bak*
+openclaw.json.last-good
 
 # Secrets / device / TLS material
 identity/
@@ -32,6 +33,17 @@ cron/jobs.json.bak
 # WeChat Work runtime maps (regenerated)
 wecom/
 
+# Workspace attestation files (runtime generated, per-workspace)
+workspace-attestations/
+
+# Legacy workspace/stock_system runtime artifacts (old directory; keep source/config tracked)
+workspace/stock_system/data/
+workspace/stock_system/logs/
+workspace/stock_system/reports/
+workspace/stock_system/pids/
+workspace/stock_system/*.log
+workspace/stock_system/config/calibration_overrides.json
+
 # Dependencies and Python
 **/node_modules/
 __pycache__/
@@ -42,16 +54,33 @@ venv/
 # OS
 .DS_Store
 
-# Stock system generated artifacts
-workspace/stock_system/data/
-workspace/stock_system/logs/
-workspace/stock_system/reports/
-workspace/stock_system/pids/
-workspace/stock_system/*.txt
-!workspace/stock_system/requirements.txt
-workspace/stock_system/*.log
-workspace/stock_system/predictions.db
-workspace/stock_system/config/calibration_overrides.json
+# Stock system generated artifacts (path 修正: workspace-stock/stock_system)
+workspace-stock/stock_system/data/predictions_*.json
+workspace-stock/stock_system/data/summary_*.json
+workspace-stock/stock_system/data/day_review_*.json
+workspace-stock/stock_system/data/reconcile_*.json
+workspace-stock/stock_system/data/validation_metrics_*.json
+workspace-stock/stock_system/data/analysis_*.json
+workspace-stock/stock_system/data/a_stock_*.json
+workspace-stock/stock_system/data/accuracy_history.json
+workspace-stock/stock_system/data/clean_*.json
+workspace-stock/stock_system/data/consistent_*.json
+workspace-stock/stock_system/data/*_predictions.json
+workspace-stock/stock_system/data/*_report_*.json
+workspace-stock/stock_system/data/top5_*.json
+workspace-stock/stock_system/data/accuracy_*.json
+workspace-stock/stock_system/logs/
+workspace-stock/stock_system/reports/
+workspace-stock/stock_system/pids/
+workspace-stock/stock_system/*.txt
+!workspace-stock/stock_system/requirements.txt
+workspace-stock/stock_system/*.log
+workspace-stock/stock_system/predictions.db
+# 保留自校准闭环状态（跨克隆保留）
+!workspace-stock/stock_system/data/reconcile_history.jsonl
+!workspace-stock/stock_system/data/iteration_state.json
+!workspace-stock/stock_system/data/iteration_briefing.txt
+!workspace-stock/stock_system/config/calibration_overrides.json
 
 plugin-runtime-deps/
 
@@ -71,6 +100,8 @@ cache/
 npm/
 plugin-skills/
 skill-workshop/
+# 运行时临时目录（含 node-compile-cache / jiti / openclaw-* 临时工作区等）
+tmp/
 
 # 含密钥的插件目录（catalog.json 由运行时生成并嵌入 API Key，勿入库）
 agents/*/agent/plugins/*/catalog.json

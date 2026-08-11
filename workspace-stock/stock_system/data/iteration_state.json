@@ -1,15 +1,15 @@
 {
-  "updated_at": "2026-08-10T19:46:23.401489",
-  "as_of_trade_date": "20260810",
-  "window_effective_sessions": 4,
-  "mean_hit_rate_recent": 0.9,
-  "last_5_mean_hit_rate": 0.9,
+  "updated_at": "2026-08-11T18:10:02.477630",
+  "as_of_trade_date": "20260811",
+  "window_effective_sessions": 5,
+  "mean_hit_rate_recent": 0.92,
+  "last_5_mean_hit_rate": 0.92,
   "prev_5_mean_hit_rate": null,
   "hit_rate_trend": "flat",
   "hit_rate_trend_zh": "持平",
   "symbol_attention": [],
   "narrative_lines": [
-    "近 4 次复盘的方向一致率算术平均约 90%。",
-    "最近 4 次复盘平均一致率约 90%。"
+    "近 5 次复盘的方向一致率算术平均约 92%。",
+    "最近 5 次复盘平均一致率约 92%。"
   ]
 }

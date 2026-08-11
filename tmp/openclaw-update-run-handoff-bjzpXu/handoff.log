@@ -1,3 +1,0 @@
-[2026-08-05T06:50:35.904Z] starting managed update command: openclaw update --yes --channel stable
-[2026-08-05T06:50:35.907Z] managed update command pid=34938
-[restart] killing 1 stale gateway process(es) before restart: 34937
