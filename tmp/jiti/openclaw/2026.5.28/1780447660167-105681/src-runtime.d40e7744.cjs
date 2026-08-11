@@ -1,0 +1,2 @@
+"use strict";Object.defineProperty(exports, "__esModule", { value: true });exports.setWeComRuntime = exports.getWeComRuntime = void 0;var _runtimeStore = require("openclaw/plugin-sdk/runtime-store");
+const { setRuntime: setWeComRuntime, getRuntime: getWeComRuntime } = (0, _runtimeStore.createPluginRuntimeStore)("WeCom runtime not initialized");exports.getWeComRuntime = getWeComRuntime;exports.setWeComRuntime = setWeComRuntime; /* v9-01ce864ba967720f */

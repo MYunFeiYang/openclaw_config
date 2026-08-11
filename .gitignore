@@ -55,4 +55,24 @@ workspace/stock_system/config/calibration_overrides.json
 
 plugin-runtime-deps/
 
+# --- OpenClaw runtime state & secrets (补 2026-08-11，避免误提交密钥/大库) ---
+# 运行时数据库（含鉴权凭据与全量状态，运行时再生）
+*.sqlite*
+
+# 迁移 / 备份残留（DB 备份、pre-update 旧配置、带时间戳备份）
+*.pre-update
+*.bak
+*.backup.*
+
+# 运行时 / 缓存目录
+state/
+service-env/
+cache/
+npm/
+plugin-skills/
+skill-workshop/
+
+# 含密钥的插件目录（catalog.json 由运行时生成并嵌入 API Key，勿入库）
+agents/*/agent/plugins/*/catalog.json
+
 *.tmp

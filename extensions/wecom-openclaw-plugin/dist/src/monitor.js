@@ -17,21 +17,31 @@
  */
 import * as os from "os";
 import * as path from "path";
-import { WSClient, generateReqId, WSAuthFailureError, WSReconnectExhaustedError } from "@wecom/aibot-node-sdk";
-import { getWeComRuntime } from "./runtime.js";
-import { getDefaultMediaLocalRoots, resolveStateDir } from "./openclaw-compat.js";
+import { WSClient, generateReqId, WSAuthFailureError, WSReconnectExhaustedError, } from "@wecom/aibot-node-sdk";
 import { CHANNEL_ID, THINKING_MESSAGE, MEDIA_IMAGE_PLACEHOLDER, MEDIA_DOCUMENT_PLACEHOLDER, WS_HEARTBEAT_INTERVAL_MS, WS_MAX_RECONNECT_ATTEMPTS, WS_MAX_AUTH_FAILURE_ATTEMPTS, EVENT_ENTER_CHECK_UPDATE, CMD_ENTER_EVENT_REPLY, SCENE_WECOM_OPENCLAW, } from "./const.js";
+import { checkDmPolicy } from "./dm-policy.js";
+import { processDynamicRouting } from "./dynamic-routing.js";
+import { checkGroupPolicy } from "./group-policy.js";
+import { downloadAndSaveImages, downloadAndSaveFiles, MediaOversizeError, } from "./media-handler.js";
+import { uploadAndSendMedia } from "./media-uploader.js";
 import { parseMessageContent } from "./message-parser.js";
 import { sendWeComReply, StreamExpiredError } from "./message-sender.js";
-import { downloadAndSaveImages, downloadAndSaveFiles } from "./media-handler.js";
-import { uploadAndSendMedia } from "./media-uploader.js";
-import { maskTemplateCardBlocks } from "./template-card-parser.js";
-import { updateTemplateCardOnEvent, processTemplateCardsIfNeeded, } from "./template-card-manager.js";
-import { checkGroupPolicy } from "./group-policy.js";
-import { checkDmPolicy } from "./dm-policy.js";
+import { getDefaultMediaLocalRoots, resolveStateDir } from "./openclaw-compat.js";
+import { getWeComRuntime } from "./runtime.js";
 import { setWeComWebSocket, setMessageState, deleteMessageState, setReqIdForChat, setSessionChatInfo, warmupReqIdStore, startMessageStateCleanup, stopMessageStateCleanup, cleanupAccount, } from "./state-manager.js";
+import { updateTemplateCardOnEvent, processTemplateCardsIfNeeded, } from "./template-card-manager.js";
+import { maskTemplateCardBlocks } from "./template-card-parser.js";
 import { PLUGIN_VERSION } from "./version.js";
-import { processDynamicRouting } from "./dynamic-routing.js";
+// ============================================================================
+// 附件超限提示文案
+// ============================================================================
+/**
+ * 构造「附件超过 OpenClaw 大小限制」的中文提示文案。
+ */
+function buildMediaOversizeHintText(err) {
+    const maxMb = err.maxBytes / 1024 / 1024;
+    return `当前OpenClaw限制文件不超过${maxMb}MB，请修改OpenClaw配置。`;
+}
 // ============================================================================
 // 媒体本地路径白名单扩展
 // ============================================================================
@@ -135,7 +145,12 @@ function buildMessageContext(frame, account, config, text, mediaList, quoteConte
     const fromLabel = chatType === "group" ? `group:${chatId}` : `user:${body.from.userid}`;
     // 当只有媒体没有文本时，使用占位符标识媒体类型
     const hasImages = mediaList.some((m) => m.contentType?.startsWith("image/"));
-    const messageBody = text || (mediaList.length > 0 ? (hasImages ? MEDIA_IMAGE_PLACEHOLDER : MEDIA_DOCUMENT_PLACEHOLDER) : "");
+    const messageBody = text ||
+        (mediaList.length > 0
+            ? hasImages
+                ? MEDIA_IMAGE_PLACEHOLDER
+                : MEDIA_DOCUMENT_PLACEHOLDER
+            : "");
     // 构建多媒体数组
     const mediaPaths = mediaList.length > 0 ? mediaList.map((m) => m.path) : undefined;
     const mediaTypes = mediaList.length > 0
@@ -272,7 +287,9 @@ async function finishThinkingStream(ctx) {
     }
     else if (state.hasMedia) {
         if (state.hasMediaFailed && state.mediaErrorSummary) {
-            finishText = finishText ? `${finishText}\n\n${state.mediaErrorSummary}` : state.mediaErrorSummary;
+            finishText = finishText
+                ? `${finishText}\n\n${state.mediaErrorSummary}`
+                : state.mediaErrorSummary;
         }
         else if (!finishText) {
             finishText = "📎 文件已发送，请查收。";
@@ -283,7 +300,14 @@ async function finishThinkingStream(ctx) {
         let expired = state.streamExpired;
         if (!expired) {
             try {
-                await sendWeComReply({ wsClient, frame, text: finishText, runtime, finish: true, streamId: state.streamId });
+                await sendWeComReply({
+                    wsClient,
+                    frame,
+                    text: finishText,
+                    runtime,
+                    finish: true,
+                    streamId: state.streamId,
+                });
             }
             catch (err) {
                 if (err instanceof StreamExpiredError) {
@@ -307,7 +331,7 @@ async function finishThinkingStream(ctx) {
  * 路由消息到核心处理流程并处理回复
  */
 async function routeAndDispatchMessage(params) {
-    const { ctxPayload, route, storePath, chatId, chatType, config, account, wsClient, frame, state, runtime, onCleanup } = params;
+    const { ctxPayload, route, storePath, chatId, chatType, config, account, wsClient, frame, state, runtime, onCleanup, } = params;
     const core = getWeComRuntime();
     const ctx = { wsClient, frame, state, account, runtime };
     // 防止 onCleanup 被多次调用（onError 回调与 catch 块可能重复触发）
@@ -351,7 +375,13 @@ async function routeAndDispatchMessage(params) {
                 onReplyStart: async () => {
                     if (!isShowThink && state.streamId && !state.accumulatedText) {
                         try {
-                            await sendThinkingReply({ wsClient, frame, streamId: state.streamId, runtime, state });
+                            await sendThinkingReply({
+                                wsClient,
+                                frame,
+                                streamId: state.streamId,
+                                runtime,
+                                state,
+                            });
                         }
                         catch (e) {
                             runtime.error?.(`[wecom] sendThinkingReply threw err: ${String(e)}`);
@@ -363,10 +393,14 @@ async function routeAndDispatchMessage(params) {
                     runtime.log?.(`[openclaw -> plugin] kind=${info.kind}, payload=${JSON.stringify(payload)}, info=${JSON.stringify(info)}`);
                     // 累积文本
                     if (payload.text) {
-                        state.accumulatedText += `${payload.text || ''}`;
+                        state.accumulatedText += `${payload.text || ""}`;
                     }
                     // 发送媒体（统一走主动发送）
-                    const mediaUrls = payload.mediaUrls?.length ? payload.mediaUrls : payload.mediaUrl ? [payload.mediaUrl] : [];
+                    const mediaUrls = payload.mediaUrls?.length
+                        ? payload.mediaUrls
+                        : payload.mediaUrl
+                            ? [payload.mediaUrl]
+                            : [];
                     if (mediaUrls.length > 0) {
                         try {
                             await sendMediaBatch(ctx, mediaUrls);
@@ -392,7 +426,14 @@ async function routeAndDispatchMessage(params) {
                             // if (displayText !== state.accumulatedText) {
                             //   runtime.log?.(`[wecom][template-card] Mid-frame masked: original=${state.accumulatedText.length}chars, masked=${displayText.length}chars`);
                             // }
-                            await sendWeComReply({ wsClient, frame, text: displayText, runtime, finish: false, streamId: state.streamId });
+                            await sendWeComReply({
+                                wsClient,
+                                frame,
+                                text: displayText,
+                                runtime,
+                                finish: false,
+                                streamId: state.streamId,
+                            });
                         }
                         catch (err) {
                             if (err instanceof StreamExpiredError) {
@@ -411,7 +452,13 @@ async function routeAndDispatchMessage(params) {
             },
         });
         // 模板卡片检测与发送（在关闭 thinking 流之前独立处理）
-        const cardResult = await processTemplateCardsIfNeeded({ wsClient, frame, state, account, runtime });
+        const cardResult = await processTemplateCardsIfNeeded({
+            wsClient,
+            frame,
+            state,
+            account,
+            runtime,
+        });
         if (cardResult) {
             // 卡片已发送，用剩余文本替换累积文本
             state.accumulatedText = cardResult.remainingText;
@@ -424,7 +471,13 @@ async function routeAndDispatchMessage(params) {
         runtime.error?.(`[wecom][plugin] Failed to process message: ${String(err)}`);
         // 即使 dispatch 抛异常，也需要处理卡片和关闭 thinking 流
         try {
-            const cardResult = await processTemplateCardsIfNeeded({ wsClient, frame, state, account, runtime });
+            const cardResult = await processTemplateCardsIfNeeded({
+                wsClient,
+                frame,
+                state,
+                account,
+                runtime,
+            });
             if (cardResult) {
                 state.accumulatedText = cardResult.remainingText;
             }
@@ -492,24 +545,43 @@ async function prepareWeComMessage(params) {
         return null;
     }
     // Step 4: 下载并保存图片和文件
-    const [imageMediaList, fileMediaList] = await Promise.all([
-        downloadAndSaveImages({
-            imageUrls,
-            imageAesKeys,
-            account,
-            config,
-            runtime,
-            wsClient,
-        }),
-        downloadAndSaveFiles({
-            fileUrls,
-            fileAesKeys,
-            account,
-            config,
-            runtime,
-            wsClient,
-        }),
-    ]);
+    let imageMediaList;
+    let fileMediaList;
+    try {
+        [imageMediaList, fileMediaList] = await Promise.all([
+            downloadAndSaveImages({
+                imageUrls,
+                imageAesKeys,
+                account,
+                config,
+                runtime,
+                wsClient,
+            }),
+            downloadAndSaveFiles({
+                fileUrls,
+                fileAesKeys,
+                account,
+                config,
+                runtime,
+                wsClient,
+            }),
+        ]);
+    }
+    catch (err) {
+        if (err instanceof MediaOversizeError) {
+            // 附件超过 OpenClaw 配置的大小上限：向用户发送明确的中文提示并终止本次消息处理。
+            const hintText = buildMediaOversizeHintText(err);
+            runtime.error?.(`[wecom] Media oversize: kind=${err.kind}, size=${err.sizeBytes}, max=${err.maxBytes}, filename=${err.filename ?? "(none)"}`);
+            try {
+                await sendWeComReply({ wsClient, frame, text: hintText, runtime, finish: true });
+            }
+            catch (replyErr) {
+                runtime.error?.(`[wecom] Failed to send oversize hint: ${String(replyErr)}`);
+            }
+            return null;
+        }
+        throw err;
+    }
     const mediaList = [...imageMediaList, ...fileMediaList];
     return {
         frame,
@@ -532,7 +604,7 @@ async function prepareWeComMessage(params) {
  * 同一会话中的消息通过串行队列保证按序执行。
  */
 async function processWeComMessageNow(entry) {
-    const { frame, account, config, runtime, wsClient, text, mediaList, quoteContent, messageId, chatId, reqId } = entry;
+    const { frame, account, config, runtime, wsClient, text, mediaList, quoteContent, messageId, chatId, reqId, } = entry;
     // Step 5: 初始化消息状态
     setReqIdForChat(chatId, reqId, account.accountId);
     const streamId = generateReqId("stream");
@@ -547,7 +619,7 @@ async function processWeComMessageNow(entry) {
     //   await sendThinkingReply({ wsClient, frame, streamId, runtime });
     // }
     // Step 7: 构建上下文并路由到核心处理流程（带整体超时保护）
-    const { ctxPayload, route, storePath, chatId: resolvedChatId, chatType } = buildMessageContext(frame, account, config, text, mediaList, quoteContent, runtime);
+    const { ctxPayload, route, storePath, chatId: resolvedChatId, chatType, } = buildMessageContext(frame, account, config, text, mediaList, quoteContent, runtime);
     // 以 sessionKey 为键记录「原始大小写」的 chatId 与 chatType，
     // 供 MCP 工具工厂（index.ts:registerTool）在构造工具闭包时取回，
     // 进而传递给需要原始 chatId 的拦截器（如 doc-auth-error 发送 biz_msg）。

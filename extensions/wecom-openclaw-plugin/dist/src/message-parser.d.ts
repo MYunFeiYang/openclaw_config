@@ -42,6 +42,10 @@ export interface MessageBody {
         url?: string;
         aeskey?: string;
     };
+    video?: {
+        url?: string;
+        aeskey?: string;
+    };
     quote?: {
         msgtype: string;
         text?: {
@@ -55,6 +59,10 @@ export interface MessageBody {
             aeskey?: string;
         };
         file?: {
+            url?: string;
+            aeskey?: string;
+        };
+        video?: {
             url?: string;
             aeskey?: string;
         };

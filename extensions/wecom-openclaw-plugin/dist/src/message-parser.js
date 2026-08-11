@@ -175,6 +175,13 @@ export function parseMessageContent(body) {
                 fileAesKeys.set(body.file.url, body.file.aeskey);
             }
         }
+        // 处理视频消息（沿用 file 下载/解密通路，作为文件附件透传）
+        if (body.msgtype === "video" && body.video?.url) {
+            fileUrls.push(body.video.url);
+            if (body.video.aeskey) {
+                fileAesKeys.set(body.video.url, body.video.aeskey);
+            }
+        }
     }
     // 处理引用消息
     if (body.quote) {
@@ -196,6 +203,13 @@ export function parseMessageContent(body) {
             fileUrls.push(body.quote.file.url);
             if (body.quote.file.aeskey) {
                 fileAesKeys.set(body.quote.file.url, body.quote.file.aeskey);
+            }
+        }
+        else if (body.quote.msgtype === "video" && body.quote.video?.url) {
+            // 引用的视频消息：沿用文件下载通路
+            fileUrls.push(body.quote.video.url);
+            if (body.quote.video.aeskey) {
+                fileAesKeys.set(body.quote.video.url, body.quote.video.aeskey);
             }
         }
     }
