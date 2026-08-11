@@ -11,6 +11,7 @@ class EveningPredictionOptimizer:
     """收盘预测优化器（权重/阈值与早盘共用 calibration_overrides，另保留时间衰减）。"""
 
     def optimize_evening_prediction(
+        self,
         technical_score: float,
         fundamental_score: float,
         sentiment_score: float,

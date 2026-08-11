@@ -146,26 +146,61 @@ class PredictionEngine:
         self.signal_generator = SignalGenerator()
         self._use_llm = _use_llm()
     
-    def _build_llm_result(self, stock: StockConfig, inputs, llm_r: dict) -> PredictionResult:
-        """用 LLM 返回的 dict 构建 PredictionResult"""
+    def _blend_with_llm(self, stock: StockConfig, inputs, formula_result: PredictionResult, llm_r: dict) -> PredictionResult:
+        """
+        LLM 叠加层：将 LLM 判断与公式打分融合，取加权平均。
+        
+        融合策略：
+        - formula 提供一致性和纪律性
+        - LLM 提供模式识别和语义理解
+        - 两者差异过大时（>2.5分）降低信心度，提示不确定性
+        """
+        formula_score = formula_result.final_score
+        llm_score = float(llm_r["final_score"])
+
+        # 加权平均：公式 60% + LLM 40%
+        blended = formula_score * 0.6 + llm_score * 0.4
+        blended = max(1.0, min(10.0, blended))
+
+        # 判定信号
+        signal, conf, reasons = self.signal_generator.generate_signal(blended, stock, inputs.technical)
+
+        # 信心度：取两者中较低的，且差异大时进一步打折
+        diff = abs(formula_score - llm_score)
+        base_conf = min(formula_result.confidence, int(llm_r["confidence"]))
+        if diff > 2.5:
+            base_conf = int(base_conf * 0.8)  # 分歧大 → 降低信心
+        conf = base_conf
+
+        # 理由：合并公式 + LLM（去重，最多 4 条）
+        formula_reasons = list(formula_result.reasons or [])
+        llm_reasons = list(llm_r.get("reasons", []))
+        merged = []
+        seen = set()
+        for r in llm_reasons + formula_reasons:
+            if r and r not in seen:
+                seen.add(r)
+                merged.append(r)
+        merged = merged[:4]
+
         return PredictionResult(
             stock=stock,
             current_price=inputs.current_price,
             change_percent=inputs.change_percent,
-            technical_score=0.0,
-            fundamental_score=0.0,
-            sentiment_score=0.0,
-            sector_score=0.0,
-            final_score=llm_r["final_score"],
-            signal=llm_r["signal"],
-            confidence=llm_r["confidence"],
-            reasons=llm_r["reasons"],
+            technical_score=formula_result.technical_score,
+            fundamental_score=formula_result.fundamental_score,
+            sentiment_score=formula_result.sentiment_score,
+            sector_score=formula_result.sector_score,
+            final_score=round(blended, 2),
+            signal=signal,
+            confidence=conf,
+            reasons=merged,
             prediction_time=datetime.now(),
-            data_provenance=f"openrouter_llm:{llm_r.get('_model', 'unknown')}",
+            data_provenance=f"formula+llm:{llm_r.get('_model', 'unknown')}",
         )
 
-    def _try_llm_predict(self, stock: StockConfig, inputs) -> Optional[PredictionResult]:
-        """尝试用 LLM 预测单只股票，失败返回 None"""
+    def _try_llm_predict(self, stock: StockConfig, inputs) -> Optional[dict]:
+        """尝试用 LLM 预测单只股票，返回原始 dict 或 None"""
         llm_input = stock_to_llm_input(
             stock_name=stock.name,
             stock_symbol=stock.symbol,
@@ -177,25 +212,25 @@ class PredictionEngine:
             sentiment=inputs.sentiment,
             sector=inputs.sector,
         )
-        llm_result = predict_single(llm_input)
-        if not llm_result:
-            return None
-        return self._build_llm_result(stock, inputs, llm_result)
+        return predict_single(llm_input)
 
     def predict_stock(self, stock: StockConfig, analysis_type: str = "evening") -> PredictionResult:
-        """对单只股票进行预测"""
+        """对单只股票进行预测：先算公式，再叠加 LLM（若可用）"""
         
         inputs = self._provider.fetch(stock)
         
-        # ── LLM 预测路径（优先）──
-        if self._use_llm:
-            llm_result = self._try_llm_predict(stock, inputs)
-            if llm_result:
-                return llm_result
-            print(f"[LLM] {stock.name} 预测失败，降级到公式打分")
+        # ── 公式打分（始终计算）──
+        formula_result = self._formula_predict(stock, inputs, analysis_type)
         
-        # ── 公式打分路径（fallback）──
-        return self._formula_predict(stock, inputs, analysis_type)
+        # ── LLM 叠加（若启用且可用）──
+        if self._use_llm:
+            llm_r = self._try_llm_predict(stock, inputs)
+            if llm_r:
+                blended = self._blend_with_llm(stock, inputs, formula_result, llm_r)
+                return blended
+            print(f"[LLM] {stock.name} 预测失败，仅用公式打分")
+        
+        return formula_result
     
     def _formula_predict(self, stock: StockConfig, inputs, analysis_type: str) -> PredictionResult:
         """纯公式打分（LLM 失败时的 fallback）"""
@@ -241,14 +276,15 @@ class PredictionEngine:
         )
     
     def predict_portfolio(self, stocks: List[StockConfig], analysis_type: str = "evening") -> List[PredictionResult]:
-        """对股票组合进行预测（优先批量 LLM，失败降级逐只预测）"""
+        """对股票组合进行预测：先算公式，再叠加 LLM（若可用）"""
         
         # ── 批量 LLM 预测（单次 API 调用，效率最高）──
         if self._use_llm and len(stocks) > 1:
-            # 先获取所有股票的行情数据
-            stock_inputs: List[Tuple[StockConfig, Any, dict]] = []
+            # 先获取所有股票的行情数据 + 公式结果
+            stock_data: List[Tuple[StockConfig, Any, PredictionResult, dict]] = []
             for stock in stocks:
                 inputs = self._provider.fetch(stock)
+                formula_result = self._formula_predict(stock, inputs, analysis_type)
                 llm_input = stock_to_llm_input(
                     stock_name=stock.name,
                     stock_symbol=stock.symbol,
@@ -260,30 +296,30 @@ class PredictionEngine:
                     sentiment=inputs.sentiment,
                     sector=inputs.sector,
                 )
-                stock_inputs.append((stock, inputs, llm_input))
+                stock_data.append((stock, inputs, formula_result, llm_input))
             
-            batch_results = predict_batch([si[2] for si in stock_inputs])
+            batch_results = predict_batch([sd[3] for sd in stock_data])
             if batch_results:
                 results = []
                 all_success = True
-                for (stock, inputs, _), llm_r in zip(stock_inputs, batch_results):
+                for (stock, inputs, formula_result, _), llm_r in zip(stock_data, batch_results):
                     if llm_r:
-                        results.append(self._build_llm_result(stock, inputs, llm_r))
+                        results.append(self._blend_with_llm(stock, inputs, formula_result, llm_r))
                     else:
-                        # 某只股票 LLM 解析失败 → 该只回退公式
+                        # 某只股票 LLM 解析失败 → 该只用公式结果
                         all_success = False
-                        print(f"[LLM] {stock.name} 批量结果解析失败，该只降级公式")
-                        results.append(self._formula_predict(stock, inputs, analysis_type))
+                        print(f"[LLM] {stock.name} 批量结果解析失败，该只仅用公式")
+                        results.append(formula_result)
                 
                 if all_success:
-                    print(f"[LLM] 批量预测成功: {len(results)}/{len(stocks)} 只")
+                    print(f"[LLM] 批量叠加成功: {len(results)}/{len(stocks)} 只")
                 
                 results.sort(key=lambda x: x.final_score, reverse=True)
                 return results
             
             print("[LLM] 批量预测整体失败，降级到逐只预测")
         
-        # ── 逐只预测（每只独立尝试 LLM，失败则公式）──
+        # ── 逐只预测（每只独立尝试 LLM 叠加，失败则公式）──
         results = []
         for stock in stocks:
             result = self.predict_stock(stock, analysis_type)
@@ -313,7 +349,7 @@ class ScoringEngine:
         return float(k[-1][1])
     
     def calculate_technical_score(self, data: Dict) -> float:
-        """计算技术面评分"""
+        """计算技术面评分（基于真实 K 线多周期指标）"""
         rsi = float(data.get("rsi", 50))
         rsi_score = self._lin(
             rsi,
@@ -324,10 +360,9 @@ class ScoringEngine:
         mp = -1.0 if sig == "死叉" else (1.0 if sig == "金叉" else 0.0)
         macd_score = self._lin(mp, [(-1, 2.2), (0, 5.0), (1, 8.2)])
 
-        bollinger = float(data.get("bollinger_position", 0))
+        bollinger = float(data.get("bollinger_position", 0.5))
         bollinger_score = self._lin(
-            bollinger,
-            [(-2.5, 9), (-1.5, 7), (-0.5, 5.5), (0.5, 5), (1.5, 3), (2.5, 1)],
+            bollinger, [(0, 9), (0.2, 7.5), (0.4, 6), (0.5, 5), (0.6, 4), (0.8, 3), (1, 1)]
         )
 
         volume = float(data.get("volume_ratio", 1))
@@ -340,7 +375,20 @@ class ScoringEngine:
             momentum, [(-0.05, 2), (-0.02, 4), (0, 6), (0.02, 6.5), (0.05, 8)]
         )
 
-        return round((rsi_score + macd_score + bollinger_score + volume_score + momentum_score) / 5, 1)
+        # 多周期趋势强度（新增）：均线排列 + 20日动量
+        alignment = str(data.get("ma_alignment", "中性"))
+        align_score = {"多头排列": 8.5, "均线缠绕": 5.0, "空头排列": 2.0, "中性": 5.0}.get(alignment, 5.0)
+
+        mom20 = float(data.get("momentum_20d", 0))
+        trend_score = self._lin(
+            mom20, [(-0.15, 2), (-0.05, 4), (0, 5.5), (0.05, 7), (0.15, 8.5)]
+        )
+
+        # 加权：5 个核心指标 + 2 个趋势指标
+        core = (rsi_score + macd_score + bollinger_score + volume_score + momentum_score) / 5
+        trend = (align_score + trend_score) / 2
+        final = core * 0.7 + trend * 0.3
+        return round(final, 1)
     
     def calculate_fundamental_score(self, data: Dict, sector: str) -> float:
         """计算基本面评分"""

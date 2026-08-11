@@ -62,17 +62,215 @@ class StockInputs:
 
 
 def _neutral_technical() -> Dict:
+    """当 K 线数据不可用时的中性技术指标 fallback。"""
     return {
         "rsi": 50.0,
         "macd_signal": "中性",
-        "bollinger_position": 0.0,
+        "bollinger_position": 0.5,
         "volume_ratio": 1.0,
         "momentum_5d": 0.0,
+        "momentum_10d": 0.0,
+        "momentum_20d": 0.0,
+        "ma_alignment": "中性",
+        "ma5": None,
+        "ma10": None,
+        "ma20": None,
+        "ma60": None,
+    }
+
+
+# ── 真实技术指标计算（基于 K 线历史数据） ──────────────────────────
+
+
+def _ema(values: list, period: int) -> list:
+    """计算指数移动平均"""
+    if len(values) < period:
+        return [sum(values) / len(values)] * len(values)
+    result = [sum(values[:period]) / period]
+    multiplier = 2.0 / (period + 1)
+    for v in values[period:]:
+        result.append(v * multiplier + result[-1] * (1 - multiplier))
+    return [result[0]] * (period - 1) + result
+
+
+def _sma(values: list, period: int) -> list:
+    """简单移动平均"""
+    if len(values) < period:
+        return [sum(values) / len(values)] * len(values)
+    result = []
+    for i in range(len(values)):
+        if i < period - 1:
+            result.append(sum(values[: i + 1]) / (i + 1))
+        else:
+            result.append(sum(values[i - period + 1 : i + 1]) / period)
+    return result
+
+
+def compute_rsi(closes: list, period: int = 14) -> float:
+    """计算 RSI（Relative Strength Index）"""
+    if len(closes) < period + 1:
+        return 50.0
+    gains = []
+    losses = []
+    for i in range(1, len(closes)):
+        diff = closes[i] - closes[i - 1]
+        gains.append(diff if diff > 0 else 0.0)
+        losses.append(-diff if diff < 0 else 0.0)
+    avg_gain = sum(gains[:period]) / period
+    avg_loss = sum(losses[:period]) / period
+    for i in range(period, len(gains)):
+        avg_gain = (avg_gain * (period - 1) + gains[i]) / period
+        avg_loss = (avg_loss * (period - 1) + losses[i]) / period
+    if avg_loss == 0:
+        return 100.0
+    rs = avg_gain / avg_loss
+    return round(100.0 - 100.0 / (1.0 + rs), 1)
+
+
+def compute_macd(closes: list, fast: int = 12, slow: int = 26, signal: int = 9):
+    """返回 (DIF, DEA, MACD_bar, signal_text)"""
+    if len(closes) < slow + signal:
+        return 0.0, 0.0, 0.0, "中性"
+    ema_fast = _ema(closes, fast)
+    ema_slow = _ema(closes, slow)
+    dif = [f - s for f, s in zip(ema_fast, ema_slow)]
+    dea = _ema(dif, signal)
+    bar = 2.0 * (dif[-1] - dea[-1])
+
+    # 判断信号
+    if dif[-1] > dea[-1] and dif[-2] <= dea[-2]:
+        sig = "金叉"
+    elif dif[-1] < dea[-1] and dif[-2] >= dea[-2]:
+        sig = "死叉"
+    elif dif[-1] > dea[-1]:
+        sig = "多头"
+    else:
+        sig = "空头"
+    return round(dif[-1], 4), round(dea[-1], 4), round(bar, 4), sig
+
+
+def compute_bollinger(closes: list, period: int = 20, std_mult: float = 2.0):
+    """返回 (upper, middle, lower, position)，position 0=下轨 1=上轨"""
+    if len(closes) < period:
+        return None, None, None, 0.5
+    ma = _sma(closes, period)
+    middle = ma[-1]
+    # 计算标准差
+    recent = closes[-period:]
+    mean = sum(recent) / period
+    variance = sum((x - mean) ** 2 for x in recent) / period
+    std = variance ** 0.5
+    upper = middle + std_mult * std
+    lower = middle - std_mult * std
+    pos = (closes[-1] - lower) / (upper - lower) if upper != lower else 0.5
+    return round(upper, 2), round(middle, 2), round(lower, 2), round(max(0.0, min(1.0, pos)), 3)
+
+
+def compute_volume_ratio(volumes: list, period: int = 5) -> float:
+    """量比 = 今日成交量 / N日均量"""
+    if len(volumes) < period:
+        return 1.0
+    avg_vol = sum(volumes[-(period + 1) : -1]) / period
+    if avg_vol == 0:
+        return 1.0
+    return round(volumes[-1] / avg_vol, 2)
+
+
+def compute_ma_alignment(prices: list, periods: tuple = (5, 10, 20, 60)):
+    """判断均线排列：多头排列 / 空头排列 / 缠绕（中性）"""
+    mas = {}
+    for p in periods:
+        if len(prices) >= p:
+            mas[f"ma{p}"] = round(sum(prices[-p:]) / p, 2)
+        else:
+            mas[f"ma{p}"] = None
+
+    valid_mas = [mas[f"ma{p}"] for p in periods if mas[f"ma{p}"] is not None]
+    if len(valid_mas) >= 3:
+        # 多头排列：短期 > 中期 > 长期
+        if all(valid_mas[i] > valid_mas[i + 1] for i in range(len(valid_mas) - 1)):
+            alignment = "多头排列"
+        elif all(valid_mas[i] < valid_mas[i + 1] for i in range(len(valid_mas) - 1)):
+            alignment = "空头排列"
+        else:
+            alignment = "均线缠绕"
+    else:
+        alignment = "中性"
+
+    return mas, alignment
+
+
+def compute_real_technicals(klines: list) -> Dict:
+    """
+    基于真实 K 线数据计算全套技术指标。
+
+    klines: list of dict, each has keys: open, close, high, low, volume (all strings)
+    返回完整的 technical dict。
+    """
+    if not klines or len(klines) < 14:
+        return _neutral_technical()
+
+    closes = []
+    volumes = []
+    for k in klines:
+        try:
+            closes.append(float(k.get("close", 0)))
+            volumes.append(float(k.get("volume", 0)))
+        except (ValueError, TypeError):
+            continue
+
+    if len(closes) < 14:
+        return _neutral_technical()
+
+    # RSI (14)
+    rsi = compute_rsi(closes)
+
+    # MACD
+    dif, dea, macd_bar, macd_signal = compute_macd(closes)
+
+    # 布林带
+    bb_upper, bb_mid, bb_lower, bb_pos = compute_bollinger(closes)
+
+    # 量比
+    vol_ratio = compute_volume_ratio(volumes)
+
+    # 多周期动量
+    def momentum(cl, days):
+        if len(cl) > days and cl[-1 - days] > 0:
+            return round((cl[-1] - cl[-1 - days]) / cl[-1 - days], 4)
+        return 0.0
+
+    mom5 = momentum(closes, 5)
+    mom10 = momentum(closes, 10)
+    mom20 = momentum(closes, 20)
+
+    # 均线排列
+    mas, alignment = compute_ma_alignment(closes)
+
+    return {
+        "rsi": rsi,
+        "macd_signal": macd_signal,
+        "macd_dif": dif,
+        "macd_dea": dea,
+        "macd_bar": macd_bar,
+        "bollinger_position": bb_pos,
+        "bollinger_upper": bb_upper,
+        "bollinger_mid": bb_mid,
+        "bollinger_lower": bb_lower,
+        "volume_ratio": vol_ratio,
+        "momentum_5d": mom5,
+        "momentum_10d": mom10,
+        "momentum_20d": mom20,
+        "ma_alignment": alignment,
+        "ma5": mas.get("ma5"),
+        "ma10": mas.get("ma10"),
+        "ma20": mas.get("ma20"),
+        "ma60": mas.get("ma60"),
     }
 
 
 def technical_from_spot_change(change_percent: float) -> Dict:
-    """由涨跌幅构造技术面代理指标。"""
+    """由涨跌幅构造技术面代理指标（fallback，当 K 线不可用时）。"""
     t = _neutral_technical()
     t["momentum_5d"] = round(max(-0.05, min(0.05, change_percent / 500.0)), 4)
     if change_percent > 2:
