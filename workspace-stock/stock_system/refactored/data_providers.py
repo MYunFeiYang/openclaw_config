@@ -12,6 +12,7 @@
 """
 from __future__ import annotations
 
+import math
 import os
 from dataclasses import dataclass
 from typing import Any, Dict, Protocol
@@ -266,6 +267,101 @@ def compute_real_technicals(klines: list) -> Dict:
         "ma10": mas.get("ma10"),
         "ma20": mas.get("ma20"),
         "ma60": mas.get("ma60"),
+    }
+
+
+def _std(values: list) -> float:
+    """样本标准差。"""
+    n = len(values)
+    if n < 2:
+        return 0.0
+    mean = sum(values) / n
+    var = sum((x - mean) ** 2 for x in values) / (n - 1)
+    return math.sqrt(var)
+
+
+def detect_market_status(klines: list) -> Dict:
+    """
+    基于宽基指数 K 线判定市场状态（regime）。
+
+    返回 dict：
+      - status: trending_up | trending_down | ranging | volatile_up | volatile_down
+      - regime: trend | range | volatility （粗分三类，供权重调整用）
+      - volatility: 年化波动率估计（0.2 = 20%）
+      - trend_strength: 20日动量方向，约 -0.2..0.2
+      - bollinger_bandwidth: 布林带宽占中轨比，越小越震荡
+      - description: 中文说明
+
+    判定逻辑：
+      - 年化波动率 > 35% → volatility（高波动，风控优先）
+      - |20日动量| >= 4% 且 布林带宽 >= 4% → trend（有方向）
+      - 否则 → range（震荡，均值回归）
+    """
+    default = {
+        "status": "ranging",
+        "regime": "range",
+        "volatility": 0.0,
+        "trend_strength": 0.0,
+        "bollinger_bandwidth": 0.0,
+        "description": "数据不足，默认震荡市",
+    }
+    if not klines or len(klines) < 20:
+        return default
+
+    closes = []
+    for k in klines:
+        try:
+            closes.append(float(k.get("close", 0)))
+        except (ValueError, TypeError):
+            continue
+    if len(closes) < 20:
+        return default
+
+    # 年化波动率（日收益标准差 × √242 交易日）
+    rets = [closes[i] / closes[i - 1] - 1 for i in range(1, len(closes))]
+    vol_daily = _std(rets[-20:])
+    vol_annual = vol_daily * math.sqrt(242)
+
+    # 20 日动量（趋势方向与强度）
+    if len(closes) > 21 and closes[-22] > 0:
+        mom20 = (closes[-1] - closes[-22]) / closes[-22]
+    else:
+        mom20 = (closes[-1] - closes[-2]) / closes[-2] if closes[-2] else 0.0
+
+    # 布林带宽
+    bb_upper, bb_mid, bb_lower, _ = compute_bollinger(closes)
+    bbw = (bb_upper - bb_lower) / bb_mid if bb_mid else 0.0
+
+    # 判定 regime
+    if vol_annual > 0.35:
+        regime = "volatility"
+    elif abs(mom20) >= 0.04 and bbw >= 0.04:
+        regime = "trend"
+    else:
+        regime = "range"
+
+    if regime == "trend":
+        status = "trending_up" if mom20 > 0 else "trending_down"
+    elif regime == "volatility":
+        status = "volatile_up" if mom20 > 0 else "volatile_down"
+    else:
+        status = "ranging"
+
+    desc = {
+        "trending_up": "趋势上涨市：顺势而为，技术面占优",
+        "trending_down": "趋势下跌市：顺势防御，技术面占优",
+        "ranging": "震荡市：均值回归，基本面/估值占优",
+        "volatile_up": "高波动偏多：风控优先，关注情绪面",
+        "volatile_down": "高波动偏空：风控优先，关注情绪面",
+    }.get(status, status)
+
+    return {
+        "status": status,
+        "regime": regime,
+        "volatility": round(vol_annual, 3),
+        "trend_strength": round(mom20, 4),
+        "bollinger_bandwidth": round(bbw, 4),
+        "description": desc,
     }
 
 

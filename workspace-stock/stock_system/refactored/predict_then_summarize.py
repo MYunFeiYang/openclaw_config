@@ -145,6 +145,28 @@ class PredictionEngine:
         self.scoring_engine = ScoringEngine()
         self.signal_generator = SignalGenerator()
         self._use_llm = _use_llm()
+        self._market_status: Optional[Dict] = None
+        self._market_regime: str = "range"  # 默认震荡市（中性）
+
+    def _detect_market_status(self) -> Dict:
+        """检测当前市场状态（基于上证指数 K 线，缓存避免重复请求）。"""
+        if self._market_status is not None:
+            return self._market_status
+        default_status = {
+            "status": "ranging", "regime": "range", "volatility": 0.0,
+            "trend_strength": 0.0, "bollinger_bandwidth": 0.0,
+            "description": "市场状态检测失败，使用默认震荡市",
+        }
+        try:
+            from akshare_fallback import fetch_index_klines
+            from data_providers import detect_market_status
+            klines = fetch_index_klines("sh000001", 60)
+            status = detect_market_status(klines)
+        except Exception:
+            status = default_status
+        self._market_status = status
+        self._market_regime = status.get("regime", "range")
+        return status
     
     def _blend_with_llm(self, stock: StockConfig, inputs, formula_result: PredictionResult, llm_r: dict) -> PredictionResult:
         """
@@ -217,6 +239,7 @@ class PredictionEngine:
     def predict_stock(self, stock: StockConfig, analysis_type: str = "evening") -> PredictionResult:
         """对单只股票进行预测：先算公式，再叠加 LLM（若可用）"""
         
+        self._detect_market_status()
         inputs = self._provider.fetch(stock)
         
         # ── 公式打分（始终计算）──
@@ -240,20 +263,23 @@ class PredictionEngine:
         )
         sentiment_score = self.scoring_engine.calculate_sentiment_score(inputs.sentiment)
         sector_score = self.scoring_engine.calculate_sector_score(inputs.sector)
-        
+
+        # 市场状态感知的动态权重
+        weights = ConfigManager.get_market_adjusted_weights(self._market_regime)
+
         # 收盘预测特殊处理
         if analysis_type == 'evening':
             from evening_optimizer import EveningPredictionOptimizer
             evening_optimizer = EveningPredictionOptimizer()
             final_score, signal, reasons = evening_optimizer.optimize_evening_prediction(
                 technical_score, fundamental_score, sentiment_score, sector_score,
-                datetime.now()
+                datetime.now(), weights=weights
             )
             confidence = 65  # 收盘预测使用固定信心值
         else:
             # 其他时间段的正常预测
             final_score = self.scoring_engine.calculate_final_score(
-                technical_score, fundamental_score, sentiment_score, sector_score
+                technical_score, fundamental_score, sentiment_score, sector_score, weights=weights
             )
             signal, confidence, reasons = self.signal_generator.generate_signal(
                 final_score, stock, inputs.technical
@@ -278,6 +304,8 @@ class PredictionEngine:
     def predict_portfolio(self, stocks: List[StockConfig], analysis_type: str = "evening") -> List[PredictionResult]:
         """对股票组合进行预测：先算公式，再叠加 LLM（若可用）"""
         
+        self._detect_market_status()
+
         # ── 批量 LLM 预测（单次 API 调用，效率最高）──
         if self._use_llm and len(stocks) > 1:
             # 先获取所有股票的行情数据 + 公式结果
@@ -438,10 +466,11 @@ class ScoringEngine:
         
         return round((data['prosperity'] + data['policy_support'] + data['capital_flow'] + data['rotation_position']) / 4, 1)
     
-    def calculate_final_score(self, technical: float, fundamental: float, sentiment: float, sector: float) -> float:
-        """计算综合评分"""
+    def calculate_final_score(self, technical: float, fundamental: float, sentiment: float, sector: float, weights: Optional[Dict[str, float]] = None) -> float:
+        """计算综合评分（weights 为空时用基准权重）"""
         
-        weights = ConfigManager.get_score_weights()
+        if weights is None:
+            weights = ConfigManager.get_score_weights()
         final_score = (
             technical * weights['technical'] +
             fundamental * weights['fundamental'] +
@@ -541,7 +570,7 @@ class SignalGenerator:
 class SummaryEngine:
     """总结引擎 - 基于预测结果生成总结报告"""
     
-    def generate_summary(self, predictions: List[PredictionResult], analysis_type: str) -> SummaryReport:
+    def generate_summary(self, predictions: List[PredictionResult], analysis_type: str, market_status: Optional[Dict] = None) -> SummaryReport:
         """生成总结报告"""
         th = ConfigManager.get_signal_thresholds()
         b_line, h_line = th["buy"], th["hold"]
@@ -551,7 +580,7 @@ class SummaryEngine:
         hold_recommendations = [p for p in predictions if h_line <= p.final_score < b_line][:2]
         
         # 市场概况
-        market_overview = self._generate_market_overview(predictions, buy_recommendations, sell_recommendations, hold_recommendations)
+        market_overview = self._generate_market_overview(predictions, buy_recommendations, sell_recommendations, hold_recommendations, market_status)
         
         # 行业分析
         sector_analysis = self._generate_sector_analysis(predictions)
@@ -575,7 +604,8 @@ class SummaryEngine:
         )
     
     def _generate_market_overview(self, predictions: List[PredictionResult], buy: List[PredictionResult], 
-                                sell: List[PredictionResult], hold: List[PredictionResult]) -> Dict:
+                                sell: List[PredictionResult], hold: List[PredictionResult], 
+                                market_status: Optional[Dict] = None) -> Dict:
         """生成市场概况"""
         
         total_buy = len(buy)
@@ -590,7 +620,7 @@ class SummaryEngine:
         sell_sectors = list(set(p.stock.sector for p in sell))
         hold_sectors = list(set(p.stock.sector for p in hold))
         
-        return {
+        overview = {
             'total_stocks': len(predictions),
             'buy_count': total_buy,
             'sell_count': total_sell,
@@ -603,6 +633,14 @@ class SummaryEngine:
             'hold_sectors': hold_sectors,
             'market_sentiment': '乐观' if avg_buy_score > avg_sell_score else '谨慎' if avg_sell_score > avg_buy_score else '中性'
         }
+        # 叠加市场状态（regime 感知）
+        if market_status:
+            overview['market_status'] = market_status.get('status', 'ranging')
+            overview['market_regime'] = market_status.get('regime', 'range')
+            overview['market_volatility'] = market_status.get('volatility', 0.0)
+            overview['market_trend_strength'] = market_status.get('trend_strength', 0.0)
+            overview['market_status_desc'] = market_status.get('description', '')
+        return overview
     
     def _generate_sector_analysis(self, predictions: List[PredictionResult]) -> Dict:
         """生成行业分析"""
@@ -769,6 +807,16 @@ class ConfigManager:
         "sector": 0.10,
     }
 
+    # 市场状态 → 动态权重（乘性微调，量级 ±0.1，不颠覆基准）
+    #  trend      : 趋势市顺势而为，技术面占优
+    #  range      : 震荡市均值回归，基本面/估值占优
+    #  volatility : 高波动市风控优先，情绪面占优
+    MARKET_REGIME_WEIGHTS = {
+        "trend":      {"technical": 0.50, "fundamental": 0.28, "sentiment": 0.13, "sector": 0.09},
+        "range":      {"technical": 0.30, "fundamental": 0.45, "sentiment": 0.13, "sector": 0.12},
+        "volatility": {"technical": 0.28, "fundamental": 0.30, "sentiment": 0.30, "sector": 0.12},
+    }
+
     # 信号阈值配置（默认值；运行时可由 config/calibration_overrides.json 覆盖）
     SIGNAL_THRESHOLDS = {
         "strong_buy": 8.5,
@@ -842,6 +890,17 @@ class ConfigManager:
             "score_weights", dict(cls.SCORE_WEIGHTS), normalize=True
         )
         return cls._merged_score_weights
+
+    @classmethod
+    def get_market_adjusted_weights(cls, regime: str) -> Dict[str, float]:
+        """根据市场状态返回动态权重（可被 calibration_overrides.json 覆盖）。
+
+        regime ∈ {trend, range, volatility}；未知值回落到基准 SCORE_WEIGHTS。
+        """
+        base = dict(cls.MARKET_REGIME_WEIGHTS.get(regime, cls.SCORE_WEIGHTS))
+        return cls._merge_from_calibration(
+            f"regime_weights_{regime}", base, normalize=True
+        )
     
     @classmethod
     def get_sector_benchmark(cls, sector: str) -> Dict[str, float]:
@@ -1086,6 +1145,12 @@ class ReportGenerator:
         report_lines.append(f"卖出推荐: {market_overview['sell_count']}只 | 平均评分: {market_overview['avg_sell_score']}")
         report_lines.append(f"持有推荐: {market_overview['hold_count']}只 | 平均评分: {market_overview['avg_hold_score']}")
         report_lines.append(f"市场情绪: {market_overview['market_sentiment']}")
+        if market_overview.get("market_status"):
+            report_lines.append(
+                f"市场状态: {market_overview['market_status_desc']} "
+                f"(vol≈{market_overview['market_volatility']*100:.0f}%, "
+                f"20日动量≈{market_overview['market_trend_strength']*100:+.1f}%)"
+            )
     
     def _add_sector_analysis_summary(self, sector_analysis: Dict, report_lines: List[str]):
         """添加行业分析总结"""
@@ -1132,7 +1197,9 @@ class StockAnalyzer:
         print("📋 第二步: 生成总结报告...")
         
         # 第二步: 总结阶段 - 基于所有预测结果生成总结
-        summary = self.summary_engine.generate_summary(predictions, analysis_type)
+        summary = self.summary_engine.generate_summary(
+            predictions, analysis_type, market_status=self.prediction_engine._market_status
+        )
         
         print("✅ 总结报告生成完成")
         print("📝 第三步: 生成文本报告...")

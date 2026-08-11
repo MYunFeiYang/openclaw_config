@@ -3,7 +3,7 @@
 收盘预测优化器 - 专门解决收盘预测准确率偏低问题
 """
 
-from typing import Dict, List, Tuple
+from typing import Dict, List, Optional, Tuple
 from datetime import datetime
 
 
@@ -18,6 +18,7 @@ class EveningPredictionOptimizer:
         sector_score: float,
         prediction_time: datetime,
         market_close_time: datetime = None,
+        weights: Optional[Dict[str, float]] = None,
     ) -> Tuple[float, str, List[str]]:
         from predict_then_summarize import ConfigManager, apply_signal_margin
 
@@ -32,7 +33,8 @@ class EveningPredictionOptimizer:
         adjusted_technical = technical_score * time_decay
         adjusted_sentiment = sentiment_score * time_decay
         
-        weights = ConfigManager.get_score_weights()
+        if weights is None:
+            weights = ConfigManager.get_score_weights()
         final_score = (
             adjusted_technical * weights['technical'] +
             fundamental_score * weights['fundamental'] +

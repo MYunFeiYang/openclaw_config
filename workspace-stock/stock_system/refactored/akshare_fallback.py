@@ -55,6 +55,40 @@ def _fetch_sina_kline(symbol: str, days: int = 60) -> list:
     return []
 
 
+def fetch_index_klines(symbol: str, days: int = 60) -> list:
+    """
+    拉取宽基指数日线 K 线，用于市场状态判定。
+
+    symbol 用新浪格式（如 sh000001 上证指数、sz399006 创业板指、
+    sh000300 沪深300）。优先 akshare，降级新浪 HTTP（零依赖）。
+    """
+    if _akshare_available():
+        try:
+            import akshare as ak
+            df = ak.index_zh_a_hist(
+                symbol=symbol.lstrip("shsz"),
+                period="daily",
+                start_date="20240101",
+                end_date="20261231",
+            )
+            if df is not None and not df.empty:
+                out = []
+                for _, row in df.iterrows():
+                    out.append({
+                        "day": str(row.get("日期", "")),
+                        "open": str(row.get("开盘", 0)),
+                        "close": str(row.get("收盘", 0)),
+                        "high": str(row.get("最高", 0)),
+                        "low": str(row.get("最低", 0)),
+                        "volume": str(row.get("成交量", 0)),
+                    })
+                return out[-days:]
+        except Exception:
+            pass
+    # 新浪指数 K 线：代码需带交易所前缀
+    return _fetch_sina_kline(symbol, days)
+
+
 def _code_to_sina_symbol(code: str) -> str:
     """600519 → sh600519, 000858 → sz000858"""
     code = code.strip().zfill(6)
