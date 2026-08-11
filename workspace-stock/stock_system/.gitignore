@@ -1,0 +1,15 @@
+# 运行时产物（预测 / 复盘 / 报告，每次运行自动再生，不入库）
+data/predictions_*.json
+data/summary_*.json
+data/day_review_*.json
+data/reconcile_*.json
+data/validation_metrics_*.json
+reports/
+logs/
+*.log
+
+# 保留（状态/配置，需入库）：
+#   data/iteration_state.json
+#   data/iteration_briefing.txt
+#   data/reconcile_history.jsonl
+#   config/calibration_overrides.json

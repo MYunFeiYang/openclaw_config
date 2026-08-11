@@ -1,7 +1,7 @@
 {
-  "updated_at": "2026-04-27T18:12:17.597528",
-  "as_of_trade_date": "20260427",
-  "window_effective_sessions": 2,
+  "updated_at": "2026-08-10T19:46:23.401489",
+  "as_of_trade_date": "20260810",
+  "window_effective_sessions": 4,
   "mean_hit_rate_recent": 0.9,
   "last_5_mean_hit_rate": 0.9,
   "prev_5_mean_hit_rate": null,
@@ -9,7 +9,7 @@
   "hit_rate_trend_zh": "持平",
   "symbol_attention": [],
   "narrative_lines": [
-    "近 2 次复盘的方向一致率算术平均约 90%。",
-    "最近 2 次复盘平均一致率约 90%。"
+    "近 4 次复盘的方向一致率算术平均约 90%。",
+    "最近 4 次复盘平均一致率约 90%。"
   ]
 }

@@ -31,6 +31,35 @@ python3 refactored/openclaw_cron_analyzer.py morning
 
 环境变量：`STOCK_SYSTEM_ROOT`、`OPENCLAW_BIN`、`OPENCLAW_AGENT_TIMEOUT`、`STOCK_OPENCLAW_CACHE_SEC`（见仓库根目录 `SETUP.md`）。
 
+## LLM 预测（OpenRouter）
+
+设置以下环境变量可将预测引擎从公式打分切换为 LLM 预测：
+
+```bash
+export STOCK_USE_LLM=1                          # 启用 LLM 预测
+export OPENROUTER_API_KEY="sk-or-v1-xxxx"        # OpenRouter API Key
+export OPENROUTER_MODEL="deepseek/deepseek-chat"  # 模型（可选，默认 deepseek）
+```
+
+不设置 `STOCK_USE_LLM` 或未提供 API Key 时，系统**自动回退**到公式打分，行为与之前完全一致。
+
+**LLM 预测流程**：
+1. 批量模式（推荐）：一次 API 调用预测组合内所有股票，LLM 可做相对比较
+2. 单只模式：批量失败时降级到逐只 LLM 预测
+3. 公式 fallback：LLM 全部失败时自动回退到分段线性公式打分
+
+**推荐模型**（按性价比排序）：
+
+| 模型 | 成本 (per 1M tokens) | 特点 |
+|------|---------------------|------|
+| `deepseek/deepseek-chat` | $0.14 / $0.28 | 中文最佳，最便宜 |
+| `qwen/qwen-3-32b` | 免费 | 开源中文强，零成本 |
+| `google/gemini-2.0-flash-001` | 免费额度大 | 速度最快 |
+| `anthropic/claude-3.5-haiku` | $1.0 / $5.0 | 分析能力最强 |
+
+- 取数仍走 akshare（新浪 HTTP），LLM **只做预测**，不做数据抓取
+- LLM 模块 `refactored/llm_predictor.py` 纯标准库，零第三方依赖
+
 **免费强化 OpenClaw 搜索（仍为 DuckDuckGo）**：在 `openclaw.json` 为 `duckduckgo` 配 `region: cn-zh`，并视需要调 `tools.web.search` 的 `maxResults` / `cacheTtlMinutes`。片段见根目录 `SETUP.md`（含敏感项的配置请勿提交到公开仓库）。
 
 落盘目录：`data/`、`reports/`、`logs/`。
