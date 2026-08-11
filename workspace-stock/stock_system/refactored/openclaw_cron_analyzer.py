@@ -14,6 +14,7 @@ from pathlib import Path
 # 导入预测和总结引擎
 sys.path.append(os.path.dirname(__file__))
 from predict_then_summarize import StockAnalyzer
+from data_providers import get_analysis_type_name
 
 def main():
     """主函数 - 支持命令行参数指定分析类型"""
@@ -67,7 +68,9 @@ def main():
             print(f"\n⚠️ 复盘阶段退出码 {rc_r}（可能无早盘文件或拉价失败），仍已执行汇总。")
         if rc_d != 0:
             print(f"\n❌ 汇总阶段退出码 {rc_d}")
-        return rc_r if rc_r != 0 else rc_d
+        # post_close 的核心产出是 day_review（汇总 + 自校准）。
+        # reconcile 需要早盘文件，缺失属于警告场景，不应让定时任务失败。
+        return rc_d
 
     if analysis_type == "day_review":
         from daily_cycle_review import run_day_review
@@ -117,19 +120,6 @@ def main():
     except Exception as e:
         print(f"❌ 分析失败: {e}")
         return 1
-
-def get_analysis_type_name(analysis_type: str) -> str:
-    """获取分析类型中文名称"""
-    names = {
-        'morning': '早盘',
-        'afternoon': '午盘',
-        'evening': '收盘',
-        'weekly': '周度',
-        'reconcile': '收盘复盘（对照早盘预测）',
-        'day_review': '全日预测汇总',
-        'post_close': '收盘复盘 + 全日汇总（含自校准）',
-    }
-    return names.get(analysis_type, analysis_type)
 
 if __name__ == "__main__":
     exit_code = main()

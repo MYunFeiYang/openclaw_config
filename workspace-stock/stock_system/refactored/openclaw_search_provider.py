@@ -26,20 +26,10 @@ from typing import Any, Dict, List, Optional, Tuple
 from data_providers import (
     StockInputs,
     _neutral_fundamental,
-    _neutral_technical,
     sector_from_price_action,
     sentiment_from_price_action,
+    technical_from_spot_change,
 )
-
-
-def _technical_from_spot_change(change_percent: float) -> Dict:
-    t = _neutral_technical()
-    t["momentum_5d"] = round(max(-0.05, min(0.05, change_percent / 500.0)), 4)
-    if change_percent > 2:
-        t["macd_signal"] = "金叉"
-    elif change_percent < -2:
-        t["macd_signal"] = "死叉"
-    return t
 
 
 def _strip_json_from_text(text: str) -> str:
@@ -124,14 +114,47 @@ def _parse_agent_stdout(stdout: str) -> Tuple[Optional[str], str]:
     return None, raw
 
 
+def _find_openclaw_bin() -> str:
+    """查找 openclaw 二进制路径，覆盖 nvm 等常见安装位置。"""
+    # 1) 环境变量显式指定
+    env_bin = os.environ.get("OPENCLAW_BIN")
+    if env_bin and os.path.isfile(env_bin):
+        return env_bin
+    # 2) PATH 内查找
+    found = shutil.which("openclaw")
+    if found:
+        return found
+    # 3) 搜索 nvm 安装目录
+    nvm_dir = os.environ.get(
+        "NVM_DIR",
+        os.path.join(os.path.expanduser("~"), ".nvm"),
+    )
+    for versions_dir in [os.path.join(nvm_dir, "versions", "node")]:
+        if os.path.isdir(versions_dir):
+            for ver in sorted(os.listdir(versions_dir), reverse=True):
+                candidate = os.path.join(versions_dir, ver, "bin", "openclaw")
+                if os.path.isfile(candidate):
+                    # 同时把同级 node 加入 PATH 避免 shebang 解析失败
+                    node_dir = os.path.join(versions_dir, ver, "bin")
+                    existing = os.environ.get("PATH", "")
+                    if node_dir not in existing:
+                        os.environ["PATH"] = node_dir + os.pathsep + existing
+                    return candidate
+    # 4) 兜底
+    return "openclaw"
+
+
 class OpenclawAgentWebProvider:
     """
     调用 `openclaw agent`，由 Agent 使用 OpenClaw 配置的浏览/搜索类工具查询公开行情。
     技术面以涨跌幅粗估为主；基本面用板块中性基准（避免二次搜索爆炸）。
+
+    当 openclaw agent 不可用时（gateway 挂了、超时等），自动降级到 akshare 直接拉取
+    东方财富实时行情（环境变量 STOCK_USE_AKSHARE_FALLBACK 控制，默认开启）。
     """
 
     def __init__(self) -> None:
-        self._bin = os.environ.get("OPENCLAW_BIN") or shutil.which("openclaw") or "openclaw"
+        self._bin = _find_openclaw_bin()
         self._agent_id = (os.environ.get("OPENCLAW_STOCK_AGENT_ID") or "main").strip()
         self._timeout = int(os.environ.get("OPENCLAW_AGENT_TIMEOUT") or "600")
         self._use_local = os.environ.get("OPENCLAW_AGENT_LOCAL", "1").lower() not in (
@@ -144,6 +167,35 @@ class OpenclawAgentWebProvider:
         self._max_attempts = max(
             1, min(5, int(os.environ.get("STOCK_OPENCLAW_MAX_ATTEMPTS") or "2"))
         )
+        self._use_fallback = os.environ.get("STOCK_USE_AKSHARE_FALLBACK", "1").lower() not in (
+            "0", "false", "no",
+        )
+        self._fallback_available: Optional[bool] = None  # None=未检测, True/False
+
+    def _check_gateway_health(self) -> bool:
+        """快速检查 OpenClaw Gateway 是否可达（超时 3 秒）。"""
+        if os.environ.get("STOCK_SKIP_AGENT", "").lower() in ("1", "true", "yes"):
+            return False
+        import urllib.request
+        try:
+            req = urllib.request.Request("http://127.0.0.1:18789/health")
+            with urllib.request.urlopen(req, timeout=3) as resp:
+                return resp.status == 200
+        except Exception:
+            return False
+
+    def _ensure_fallback(self) -> Optional[Any]:
+        """延迟加载 akshare fallback provider（成功返回实例，失败返回 None）。"""
+        if self._fallback_available is False:
+            return None
+        try:
+            from akshare_fallback import get_akshare_provider
+            p = get_akshare_provider()
+            self._fallback_available = True
+            return p
+        except Exception:
+            self._fallback_available = False
+            return None
 
     def _invoke_agent(self, stock: Any, *, is_retry: bool = False) -> Dict[str, Any]:
         code = str(getattr(stock, "symbol", "")).strip().zfill(6)
@@ -244,43 +296,62 @@ class OpenclawAgentWebProvider:
                 price, pct = pair
                 return self._build_inputs(stock, price, pct)
 
-        last_err: Optional[Exception] = None
-        data: Optional[Dict[str, Any]] = None
-        for att in range(self._max_attempts):
-            try:
-                data = self._invoke_agent(stock, is_retry=(att > 0))
+        # ── 主路径：OpenClaw Agent ──
+        gateway_ok = self._check_gateway_health()
+        if gateway_ok:
+            last_err: Optional[Exception] = None
+            data: Optional[Dict[str, Any]] = None
+            for att in range(self._max_attempts):
+                try:
+                    data = self._invoke_agent(stock, is_retry=(att > 0))
+                    price_v = data.get("current_price")
+                    if price_v is None:
+                        raise RuntimeError(f"OpenClaw 未返回有效现价: {data!r}")
+                    price = float(price_v)
+                    if price <= 0:
+                        raise RuntimeError(f"现价无效: {price}")
+                    break
+                except (RuntimeError, TypeError, ValueError) as e:
+                    last_err = e
+                    if att >= self._max_attempts - 1:
+                        break  # 跌出循环走 fallback
+                    time.sleep(1.5 + att * 1.5 + random.uniform(0, 0.6))
+
+            if data is not None:
                 price_v = data.get("current_price")
-                if price_v is None:
-                    raise RuntimeError(f"OpenClaw 未返回有效现价: {data!r}")
-                price = float(price_v)
-                if price <= 0:
-                    raise RuntimeError(f"现价无效: {price}")
-                break
-            except (RuntimeError, TypeError, ValueError) as e:
-                last_err = e
-                if att >= self._max_attempts - 1:
-                    raise RuntimeError(
-                        f"单股拉价失败（已试 {self._max_attempts} 次）: {e}"
-                    ) from last_err
-                time.sleep(1.5 + att * 1.5 + random.uniform(0, 0.6))
+                chg_v = data.get("change_percent")
+                try:
+                    price = float(price_v)
+                except (TypeError, ValueError):
+                    price = 0.0
+                try:
+                    pct = float(chg_v) if chg_v is not None else 0.0
+                except (TypeError, ValueError):
+                    pct = 0.0
+                if price > 0:
+                    self._cache[code] = (now, (price, pct))
+                    return self._build_inputs(stock, price, pct)
 
-        assert data is not None
-        price_v = data.get("current_price")
-        chg_v = data.get("change_percent")
-        try:
-            price = float(price_v)
-        except (TypeError, ValueError) as e:
-            raise RuntimeError(f"现价格式无效: {price_v!r}") from e
-        try:
-            pct = float(chg_v) if chg_v is not None else 0.0
-        except (TypeError, ValueError):
-            pct = 0.0
+        # ── Fallback：akshare 直取 ──
+        if self._use_fallback:
+            fb = self._ensure_fallback()
+            if fb is not None:
+                print(f"  ⚠️ OpenClaw Agent 不可用，降级到 akshare 直取 {stock.name}({code})")
+                return fb.fetch(stock)
 
-        self._cache[code] = (now, (price, pct))
-        return self._build_inputs(stock, price, pct)
+        # ── 彻底失败 ──
+        if gateway_ok and last_err:
+            raise RuntimeError(
+                f"单股拉价失败（OpenClaw 已试 {self._max_attempts} 次，"
+                f"akshare fallback 不可用）: {last_err}"
+            ) from last_err
+        raise RuntimeError(
+            "单股拉价失败：OpenClaw Gateway 不可达且 akshare fallback 不可用。"
+            "请确认 gateway 已启动或安装 akshare。"
+        )
 
     def _build_inputs(self, stock: Any, price: float, pct: float) -> StockInputs:
-        technical = _technical_from_spot_change(pct)
+        technical = technical_from_spot_change(pct)
         fundamental = _neutral_fundamental(stock)
         sentiment = sentiment_from_price_action(pct, 1.0)
         sector = sector_from_price_action(pct)

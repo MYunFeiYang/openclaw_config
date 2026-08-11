@@ -3,25 +3,21 @@
 收盘预测优化器 - 专门解决收盘预测准确率偏低问题
 """
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 from datetime import datetime
-import statistics
 
 
 class EveningPredictionOptimizer:
     """收盘预测优化器（权重/阈值与早盘共用 calibration_overrides，另保留时间衰减）。"""
-    
-    def __init__(self):
-        self.time_decay_factor = 0.95
-    
-    def optimize_evening_prediction(self, 
-                                  technical_score: float,
-                                  fundamental_score: float, 
-                                  sentiment_score: float,
-                                  sector_score: float,
-                                  prediction_time: datetime,
-                                  market_close_time: datetime = None) -> Tuple[float, str, List[str]]:
-        """优化收盘预测"""
+
+    def optimize_evening_prediction(
+        technical_score: float,
+        fundamental_score: float,
+        sentiment_score: float,
+        sector_score: float,
+        prediction_time: datetime,
+        market_close_time: datetime = None,
+    ) -> Tuple[float, str, List[str]]:
         from predict_then_summarize import ConfigManager, apply_signal_margin
 
         if market_close_time is None:
@@ -133,61 +129,3 @@ class EveningPredictionOptimizer:
             reasons.append("收盘阶段交易平稳，观望情绪较浓")
         
         return reasons[:3]  # 限制为3个理由
-    
-    def should_adjust_weights(self, recent_accuracy: float, prediction_count: int) -> bool:
-        """判断是否需要调整权重"""
-        
-        # 如果收盘预测准确率低于60%，建议调整
-        if recent_accuracy < 0.6 and prediction_count >= 5:
-            return True
-        
-        return False
-    
-    def get_optimization_suggestions(self, validation_results: List[Dict]) -> List[str]:
-        """基于验证结果提供优化建议"""
-        
-        suggestions = []
-        
-        if not validation_results:
-            return ["暂无验证数据，建议收集更多收盘预测结果"]
-        
-        # 分析收盘预测的特点
-        evening_results = [r for r in validation_results if r.get('analysis_type') == 'evening']
-        
-        if not evening_results:
-            return ["暂无收盘预测验证数据"]
-        
-        # 计算收盘预测准确率
-        total_evening = len(evening_results)
-        correct_evening = len([r for r in evening_results if r.get('direction_match', False)])
-        evening_accuracy = correct_evening / total_evening if total_evening > 0 else 0
-        
-        # 基于准确率提供建议
-        if evening_accuracy < 0.5:
-            suggestions.append("📉 收盘预测准确率偏低，建议降低技术面权重，提高基本面权重")
-            suggestions.append("🔧 考虑增加时间衰减因子，减少临近收盘的噪音影响")
-            suggestions.append("📊 建议引入更多长期趋势指标，减少短期波动干扰")
-        elif evening_accuracy > 0.8:
-            suggestions.append("🎉 收盘预测表现优秀，保持当前优化策略")
-            suggestions.append("📈 可考虑将部分优化逻辑应用到其他时间段")
-        else:
-            suggestions.append("📊 收盘预测表现中等，建议微调权重配比")
-            suggestions.append("🔄 建议增加更多验证样本，持续优化算法")
-        
-        # 分析具体错误模式
-        false_buys = len([r for r in evening_results if r.get('expected_direction') == 1 and not r.get('direction_match', False)])
-        false_sells = len([r for r in evening_results if r.get('expected_direction') == -1 and not r.get('direction_match', False)])
-        
-        if false_buys > false_sells:
-            suggestions.append("⚠️  买入信号误判较多，建议提高买入阈值")
-        elif false_sells > false_buys:
-            suggestions.append("⚠️  卖出信号误判较多，建议重新评估卖出逻辑")
-        
-        # 通用建议
-        suggestions.extend([
-            "🕐 建议分析不同时间段（早盘vs收盘）的预测差异",
-            "📈 考虑引入盘后信息（如美股走势、政策消息）",
-            "🔄 建议定期回测优化效果，动态调整参数"
-        ])
-        
-        return suggestions

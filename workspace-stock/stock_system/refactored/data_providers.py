@@ -14,7 +14,23 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
-from typing import Any, Dict, Protocol, runtime_checkable
+from typing import Any, Dict, Protocol
+
+ANALYSIS_TYPE_NAMES = {
+    "morning": "早盘",
+    "afternoon": "午盘",
+    "evening": "收盘",
+    "weekly": "周度",
+    "reconcile": "收盘复盘（对照早盘预测）",
+    "day_review": "全日预测汇总",
+    "post_close": "收盘复盘 + 全日汇总（含自校准）",
+}
+
+
+def get_analysis_type_name(analysis_type: str) -> str:
+    """获取分析类型中文名称（统一入口）。"""
+    return ANALYSIS_TYPE_NAMES.get(analysis_type, analysis_type)
+
 
 SECTOR_BENCHMARKS = {
     "白酒": {"pe_avg": 28, "pb_avg": 7, "roe_avg": 22, "growth_avg": 15},
@@ -53,6 +69,17 @@ def _neutral_technical() -> Dict:
         "volume_ratio": 1.0,
         "momentum_5d": 0.0,
     }
+
+
+def technical_from_spot_change(change_percent: float) -> Dict:
+    """由涨跌幅构造技术面代理指标。"""
+    t = _neutral_technical()
+    t["momentum_5d"] = round(max(-0.05, min(0.05, change_percent / 500.0)), 4)
+    if change_percent > 2:
+        t["macd_signal"] = "金叉"
+    elif change_percent < -2:
+        t["macd_signal"] = "死叉"
+    return t
 
 
 def _neutral_sentiment() -> Dict:
@@ -121,12 +148,20 @@ def sector_from_price_action(change_percent: float) -> Dict:
     }
 
 
-@runtime_checkable
 class StockDataProvider(Protocol):
     def fetch(self, stock: Any) -> StockInputs: ...
 
 
 def get_default_provider() -> StockDataProvider:
-    from openclaw_search_provider import OpenclawAgentWebProvider
+    """返回默认数据提供者。
 
+    生产环境（STOCK_SKIP_AGENT=1）直接使用 akshare/sina HTTP fallback，
+    不启动 OpenClaw Agent 以节省时间和资源。
+    """
+    skip_agent = os.environ.get("STOCK_SKIP_AGENT", "").lower() in ("1", "true", "yes")
+    if skip_agent:
+        from akshare_fallback import get_akshare_provider
+        return get_akshare_provider()
+
+    from openclaw_search_provider import OpenclawAgentWebProvider
     return OpenclawAgentWebProvider()

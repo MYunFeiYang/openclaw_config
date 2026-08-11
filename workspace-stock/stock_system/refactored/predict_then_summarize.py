@@ -12,9 +12,12 @@ from typing import List, Dict, Optional, Tuple, Any
 from enum import Enum
 from pathlib import Path
 
-from data_providers import StockDataProvider, get_default_provider
+from data_providers import StockDataProvider, get_analysis_type_name, get_default_provider, SECTOR_BENCHMARKS
 from evening_optimizer import EveningPredictionOptimizer
 from reconcile_accuracy import default_accuracy_tuning, merge_accuracy_tuning
+from llm_predictor import (
+    predict_single, predict_batch, stock_to_llm_input, is_llm_enabled,
+)
 
 
 def _default_stock_system_root() -> str:
@@ -127,6 +130,11 @@ class SummaryReport:
         }
 
 
+def _use_llm() -> bool:
+    """是否启用 LLM 预测（环境变量 STOCK_USE_LLM=1）"""
+    return os.environ.get("STOCK_USE_LLM") == "1" and is_llm_enabled()
+
+
 # ==================== 预测引擎 ====================
 
 class PredictionEngine:
@@ -136,12 +144,61 @@ class PredictionEngine:
         self._provider = data_provider or get_default_provider()
         self.scoring_engine = ScoringEngine()
         self.signal_generator = SignalGenerator()
+        self._use_llm = _use_llm()
     
+    def _build_llm_result(self, stock: StockConfig, inputs, llm_r: dict) -> PredictionResult:
+        """用 LLM 返回的 dict 构建 PredictionResult"""
+        return PredictionResult(
+            stock=stock,
+            current_price=inputs.current_price,
+            change_percent=inputs.change_percent,
+            technical_score=0.0,
+            fundamental_score=0.0,
+            sentiment_score=0.0,
+            sector_score=0.0,
+            final_score=llm_r["final_score"],
+            signal=llm_r["signal"],
+            confidence=llm_r["confidence"],
+            reasons=llm_r["reasons"],
+            prediction_time=datetime.now(),
+            data_provenance=f"openrouter_llm:{llm_r.get('_model', 'unknown')}",
+        )
+
+    def _try_llm_predict(self, stock: StockConfig, inputs) -> Optional[PredictionResult]:
+        """尝试用 LLM 预测单只股票，失败返回 None"""
+        llm_input = stock_to_llm_input(
+            stock_name=stock.name,
+            stock_symbol=stock.symbol,
+            stock_sector=stock.sector,
+            current_price=inputs.current_price,
+            change_percent=inputs.change_percent,
+            technical=inputs.technical,
+            fundamental=inputs.fundamental,
+            sentiment=inputs.sentiment,
+            sector=inputs.sector,
+        )
+        llm_result = predict_single(llm_input)
+        if not llm_result:
+            return None
+        return self._build_llm_result(stock, inputs, llm_result)
+
     def predict_stock(self, stock: StockConfig, analysis_type: str = "evening") -> PredictionResult:
         """对单只股票进行预测"""
         
         inputs = self._provider.fetch(stock)
         
+        # ── LLM 预测路径（优先）──
+        if self._use_llm:
+            llm_result = self._try_llm_predict(stock, inputs)
+            if llm_result:
+                return llm_result
+            print(f"[LLM] {stock.name} 预测失败，降级到公式打分")
+        
+        # ── 公式打分路径（fallback）──
+        return self._formula_predict(stock, inputs, analysis_type)
+    
+    def _formula_predict(self, stock: StockConfig, inputs, analysis_type: str) -> PredictionResult:
+        """纯公式打分（LLM 失败时的 fallback）"""
         technical_score = self.scoring_engine.calculate_technical_score(inputs.technical)
         fundamental_score = self.scoring_engine.calculate_fundamental_score(
             inputs.fundamental, stock.sector
@@ -184,14 +241,54 @@ class PredictionEngine:
         )
     
     def predict_portfolio(self, stocks: List[StockConfig], analysis_type: str = "evening") -> List[PredictionResult]:
-        """对股票组合进行预测"""
+        """对股票组合进行预测（优先批量 LLM，失败降级逐只预测）"""
         
+        # ── 批量 LLM 预测（单次 API 调用，效率最高）──
+        if self._use_llm and len(stocks) > 1:
+            # 先获取所有股票的行情数据
+            stock_inputs: List[Tuple[StockConfig, Any, dict]] = []
+            for stock in stocks:
+                inputs = self._provider.fetch(stock)
+                llm_input = stock_to_llm_input(
+                    stock_name=stock.name,
+                    stock_symbol=stock.symbol,
+                    stock_sector=stock.sector,
+                    current_price=inputs.current_price,
+                    change_percent=inputs.change_percent,
+                    technical=inputs.technical,
+                    fundamental=inputs.fundamental,
+                    sentiment=inputs.sentiment,
+                    sector=inputs.sector,
+                )
+                stock_inputs.append((stock, inputs, llm_input))
+            
+            batch_results = predict_batch([si[2] for si in stock_inputs])
+            if batch_results:
+                results = []
+                all_success = True
+                for (stock, inputs, _), llm_r in zip(stock_inputs, batch_results):
+                    if llm_r:
+                        results.append(self._build_llm_result(stock, inputs, llm_r))
+                    else:
+                        # 某只股票 LLM 解析失败 → 该只回退公式
+                        all_success = False
+                        print(f"[LLM] {stock.name} 批量结果解析失败，该只降级公式")
+                        results.append(self._formula_predict(stock, inputs, analysis_type))
+                
+                if all_success:
+                    print(f"[LLM] 批量预测成功: {len(results)}/{len(stocks)} 只")
+                
+                results.sort(key=lambda x: x.final_score, reverse=True)
+                return results
+            
+            print("[LLM] 批量预测整体失败，降级到逐只预测")
+        
+        # ── 逐只预测（每只独立尝试 LLM，失败则公式）──
         results = []
         for stock in stocks:
             result = self.predict_stock(stock, analysis_type)
             results.append(result)
         
-        # 按综合评分排序
         results.sort(key=lambda x: x.final_score, reverse=True)
         return results
 
@@ -606,34 +703,30 @@ class ConfigManager:
         lims = cls._analysis_limits_cache or {"morning": 5, "default": 10}
         n = lims.get(analysis_type, lims.get("default", len(stocks)))
         n = max(1, min(n, len(stocks)))
+
+        # 早盘轮换：按交易日偏移，确保低权重股也能获得早盘覆盖
+        if analysis_type == "morning" and n < len(stocks):
+            from datetime import date
+            day_hash = hash(date.today().isoformat()) % len(stocks)
+            rotated = stocks[day_hash:] + stocks[:day_hash]
+            return rotated[:n]
+
         return stocks[:n]
-    
-    # 行业基准配置
-    SECTOR_BENCHMARKS = {
-        '白酒': {'pe_avg': 28, 'pb_avg': 7, 'roe_avg': 22, 'growth_avg': 15},
-        '新能源': {'pe_avg': 35, 'pb_avg': 4, 'roe_avg': 16, 'growth_avg': 25},
-        '银行': {'pe_avg': 6, 'pb_avg': 0.9, 'roe_avg': 12, 'growth_avg': 8},
-        '医药': {'pe_avg': 32, 'pb_avg': 4, 'roe_avg': 15, 'growth_avg': 18},
-        '科技': {'pe_avg': 38, 'pb_avg': 5, 'roe_avg': 18, 'growth_avg': 20},
-        '消费': {'pe_avg': 26, 'pb_avg': 4, 'roe_avg': 16, 'growth_avg': 12},
-        '地产': {'pe_avg': 8, 'pb_avg': 1.2, 'roe_avg': 10, 'growth_avg': 5},
-        '面板': {'pe_avg': 15, 'pb_avg': 2, 'roe_avg': 12, 'growth_avg': 10}
-    }
-    
+
     # 评分权重配置
     SCORE_WEIGHTS = {
-        'technical': 0.40,
-        'fundamental': 0.35,
-        'sentiment': 0.15,
-        'sector': 0.10
+        "technical": 0.40,
+        "fundamental": 0.35,
+        "sentiment": 0.15,
+        "sector": 0.10,
     }
-    
+
     # 信号阈值配置（默认值；运行时可由 config/calibration_overrides.json 覆盖）
     SIGNAL_THRESHOLDS = {
-        'strong_buy': 8.5,
-        'buy': 7.0,
-        'hold': 5.0,
-        'sell': 3.5
+        "strong_buy": 8.5,
+        "buy": 7.0,
+        "hold": 5.0,
+        "sell": 3.5,
     }
 
     _merged_signal_thresholds: Optional[Dict[str, float]] = None
@@ -646,6 +739,26 @@ class ConfigManager:
         cls._merged_signal_thresholds = None
         cls._merged_score_weights = None
         cls._merged_accuracy_tuning = None
+
+    @classmethod
+    def _merge_from_calibration(cls, key: str, base: Dict, *, normalize: bool = False) -> Dict:
+        """通用合并：从 calibration_overrides.json 覆盖 base 中同名键。"""
+        path = Path(_default_stock_system_root()) / "config" / "calibration_overrides.json"
+        if path.is_file():
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                ov = data.get(key) or {}
+                for k in base:
+                    if k in ov:
+                        base[k] = float(ov[k])
+                if normalize:
+                    s = sum(base.values())
+                    if s > 0:
+                        base = {k: round(base[k] / s, 4) for k in base}
+            except (OSError, ValueError, TypeError, KeyError):
+                pass
+        return base
 
     @classmethod
     def get_accuracy_tuning(cls) -> Dict[str, Any]:
@@ -668,47 +781,24 @@ class ConfigManager:
     def get_signal_thresholds(cls) -> Dict[str, float]:
         if cls._merged_signal_thresholds is not None:
             return cls._merged_signal_thresholds
-        base = dict(cls.SIGNAL_THRESHOLDS)
-        path = Path(_default_stock_system_root()) / "config" / "calibration_overrides.json"
-        if path.is_file():
-            try:
-                with open(path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                ov = data.get("signal_thresholds") or {}
-                for k in base:
-                    if k in ov:
-                        base[k] = float(ov[k])
-            except (OSError, ValueError, TypeError, KeyError):
-                pass
-        cls._merged_signal_thresholds = base
-        return base
+        cls._merged_signal_thresholds = cls._merge_from_calibration(
+            "signal_thresholds", dict(cls.SIGNAL_THRESHOLDS)
+        )
+        return cls._merged_signal_thresholds
 
     @classmethod
     def get_score_weights(cls) -> Dict[str, float]:
         if cls._merged_score_weights is not None:
             return cls._merged_score_weights
-        base = dict(cls.SCORE_WEIGHTS)
-        path = Path(_default_stock_system_root()) / "config" / "calibration_overrides.json"
-        if path.is_file():
-            try:
-                with open(path, "r", encoding="utf-8") as f:
-                    data = json.load(f)
-                ov = data.get("score_weights") or {}
-                for k in base:
-                    if k in ov:
-                        base[k] = float(ov[k])
-                s = sum(base.values())
-                if s > 0:
-                    base = {k: round(base[k] / s, 4) for k in base}
-            except (OSError, ValueError, TypeError, KeyError):
-                pass
-        cls._merged_score_weights = base
-        return base
+        cls._merged_score_weights = cls._merge_from_calibration(
+            "score_weights", dict(cls.SCORE_WEIGHTS), normalize=True
+        )
+        return cls._merged_score_weights
     
     @classmethod
     def get_sector_benchmark(cls, sector: str) -> Dict[str, float]:
         """获取行业基准"""
-        return cls.SECTOR_BENCHMARKS.get(sector, {
+        return SECTOR_BENCHMARKS.get(sector, {
             'pe_avg': 20, 'pb_avg': 3, 'roe_avg': 15, 'growth_avg': 15
         })
 
@@ -751,10 +841,10 @@ class ReportGenerator:
         """生成预测报告"""
         
         report_lines = []
-        report_lines.append(f"【A股{self._get_analysis_type_name(analysis_type)}预测报告】")
+        report_lines.append(f"【A股{get_analysis_type_name(analysis_type)}预测报告】")
         report_lines.append("=" * 60)
         report_lines.append(f"预测时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        report_lines.append(f"分析类型: {self._get_analysis_type_name(analysis_type)}")
+        report_lines.append(f"分析类型: {get_analysis_type_name(analysis_type)}")
         report_lines.append("=" * 60)
         report_lines.extend(self._morning_iteration_briefing_lines(analysis_type))
         
@@ -792,10 +882,10 @@ class ReportGenerator:
         """生成总结报告"""
         
         report_lines = []
-        report_lines.append(f"【A股{self._get_analysis_type_name(summary.analysis_type)}总结报告】")
+        report_lines.append(f"【A股{get_analysis_type_name(summary.analysis_type)}总结报告】")
         report_lines.append("=" * 60)
         report_lines.append(f"总结时间: {summary.report_time.strftime('%Y-%m-%d %H:%M:%S')}")
-        report_lines.append(f"分析类型: {self._get_analysis_type_name(summary.analysis_type)}")
+        report_lines.append(f"分析类型: {get_analysis_type_name(summary.analysis_type)}")
         report_lines.append("=" * 60)
         report_lines.extend(self._morning_iteration_briefing_lines(summary.analysis_type))
         
@@ -874,16 +964,6 @@ class ReportGenerator:
             'prediction_report': str(prediction_report_file),
             'summary_report': str(summary_report_file)
         }
-    
-    def _get_analysis_type_name(self, analysis_type: str) -> str:
-        """获取分析类型中文名称"""
-        names = {
-            'morning': '早盘',
-            'afternoon': '午盘',
-            'evening': '收盘',
-            'weekly': '周度'
-        }
-        return names.get(analysis_type, analysis_type)
     
     def _add_prediction_detail(self, index: int, pred: PredictionResult, report_lines: List[str]):
         """添加预测详情"""
@@ -989,7 +1069,11 @@ class StockAnalyzer:
     def analyze(self, analysis_type: str = "evening") -> Dict[str, any]:
         """执行完整分析流程 - 先预测再总结"""
         ConfigManager.reload_calibration()
-        print(f"🚀 开始{self._get_analysis_type_name(analysis_type)}分析...")
+        print(f"🚀 开始{get_analysis_type_name(analysis_type)}分析...")
+
+        # ── 前置：检查 OpenClaw Gateway 健康状态 ──
+        self._print_gateway_status()
+
         print("📊 第一步: 生成个股预测...")
         
         # 第一步: 预测阶段 - 对每只股票进行独立预测（股票池见 config/stock_pool.json）
@@ -1028,15 +1112,24 @@ class StockAnalyzer:
             'analysis_type': analysis_type
         }
     
-    def _get_analysis_type_name(self, analysis_type: str) -> str:
-        """获取分析类型中文名称"""
-        names = {
-            'morning': '早盘',
-            'afternoon': '午盘',
-            'evening': '收盘',
-            'weekly': '周度'
-        }
-        return names.get(analysis_type, analysis_type)
+    @staticmethod
+    def _print_gateway_status() -> None:
+        """启动前检测 OpenClaw Gateway 是否可达，提前给出提示。"""
+        import os as _os
+        if _os.environ.get("STOCK_SKIP_AGENT", "").lower() in ("1", "true", "yes"):
+            print("⚡ STOCK_SKIP_AGENT=1，跳过 Agent，直接使用 akshare 拉取行情。")
+            return
+        import urllib.request
+        try:
+            req = urllib.request.Request("http://127.0.0.1:18789/health")
+            with urllib.request.urlopen(req, timeout=3) as resp:
+                if resp.status == 200:
+                    print("🟢 OpenClaw Gateway 正常，将使用 Agent 拉取行情。")
+                    return
+        except Exception:
+            pass
+        print("🔴 OpenClaw Gateway 不可达！将自动降级到 akshare 直取行情。")
+        print("   如需恢复 Agent 拉取，请确认 openclaw gateway 已启动。")
 
 
 # ==================== 主函数 ====================

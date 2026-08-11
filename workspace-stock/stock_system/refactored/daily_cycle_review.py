@@ -327,9 +327,9 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
 
     morning_path = _latest_prediction_for_day(data_dir, "morning", day)
     if not morning_path:
-        print(f"❌ 未找到当日早盘预测文件 predictions_morning_*_{day}_*.json，跳过复盘。")
+        print(f"⚠️ 未找到当日早盘预测文件 predictions_morning_*_{day}_*.json，跳过复盘。")
         print("   请先成功跑过一次早盘分析，或将系统日期与文件内日期对齐。")
-        return 1
+        return 2
 
     with open(morning_path, "r", encoding="utf-8") as f:
         bundle = json.load(f)
@@ -339,13 +339,13 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
         return 1
 
     # 延迟导入，避免无 OpenClaw 时影响其它子命令
-    from openclaw_search_provider import OpenclawAgentWebProvider
+    from data_providers import get_default_provider
     from predict_then_summarize import ConfigManager
 
     tuning = ConfigManager.get_accuracy_tuning()
     benchmark_ret = benchmark_return_pct_for_reconcile()
 
-    provider = OpenclawAgentWebProvider()
+    provider = get_default_provider()
     rows: List[Dict[str, Any]] = []
     ok = 0
     for p in preds:
@@ -643,5 +643,6 @@ if __name__ == "__main__":
     if a.command == "post_close":
         r1 = run_reconcile(a.root, a.date)
         r2 = run_day_review(a.root, a.date)
-        raise SystemExit(r1 if r1 != 0 else r2)
+        # post_close 的核心产出是 day_review；reconcile 缺失早盘文件属于警告场景。
+        raise SystemExit(r2)
     raise SystemExit(run_day_review(a.root, a.date))

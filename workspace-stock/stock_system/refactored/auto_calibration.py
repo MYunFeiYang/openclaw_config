@@ -25,11 +25,11 @@ def _expected_direction(signal: str) -> int:
 
 
 DEFAULT_AUTO_CALIBRATION: Dict[str, Any] = {
-    "decay_per_session": 0.92,
+    "decay_per_session": 0.88,
     "last_sessions": 20,
-    "min_total_samples": 24,
-    "min_bucket_samples": 6,
-    "min_bucket_weight": 5.5,
+    "min_total_samples": 10,
+    "min_bucket_samples": 3,
+    "min_bucket_weight": 3.0,
     "max_thresh_drift": 0.35,
     "max_weight_drift": 0.06,
     "step_th": 0.05,
@@ -52,7 +52,7 @@ def _sanitize_auto_tuning(raw: Dict[str, Any]) -> Dict[str, Any]:
             t[k] = float(v)
     t["decay_per_session"] = max(0.5, min(0.9999, float(t["decay_per_session"])))
     t["last_sessions"] = max(5, min(200, int(t["last_sessions"])))
-    t["min_total_samples"] = max(8, min(500, int(t["min_total_samples"])))
+    t["min_total_samples"] = max(5, min(500, int(t["min_total_samples"])))
     t["min_bucket_samples"] = max(2, min(50, int(t["min_bucket_samples"])))
     t["min_bucket_weight"] = max(1.0, min(50.0, float(t["min_bucket_weight"])))
     t["max_thresh_drift"] = max(0.05, min(1.0, float(t["max_thresh_drift"])))
