@@ -1,7 +1,7 @@
 {
   "meta": {
-    "lastTouchedVersion": "2026.4.25",
-    "lastTouchedAt": "2026-04-28T01:39:20.491Z"
+    "lastTouchedVersion": "2026.7.1",
+    "lastTouchedAt": "2026-08-05T06:25:04.137Z"
   },
   "env": {
     "shellEnv": {
@@ -9,9 +9,9 @@
     }
   },
   "wizard": {
-    "lastRunAt": "2026-04-28T01:38:27.612Z",
-    "lastRunVersion": "2026.4.25",
-    "lastRunCommand": "onboard",
+    "lastRunAt": "2026-08-05T06:25:04.036Z",
+    "lastRunVersion": "2026.7.1",
+    "lastRunCommand": "doctor",
     "lastRunMode": "local"
   },
   "update": {
@@ -22,16 +22,8 @@
   },
   "auth": {
     "profiles": {
-      "ollama:default": {
-        "provider": "ollama",
-        "mode": "api_key"
-      },
       "openrouter:default": {
         "provider": "openrouter",
-        "mode": "api_key"
-      },
-      "nvidia:default": {
-        "provider": "nvidia",
         "mode": "api_key"
       }
     }
@@ -47,334 +39,28 @@
       "claude",
       "codex",
       "pi",
-      "opencode",
-      "gemini"
+      "opencode"
     ],
     "maxConcurrentSessions": 8
   },
   "models": {
     "mode": "merge",
     "providers": {
-      "oneapi": {
-        "baseUrl": "https://zhuge-oneapi.sangfor.com/v1",
-        "apiKey": {
-          "source": "env",
-          "provider": "default",
-          "id": "ONEAPI_API_KEY"
-        },
-        "api": "openai-completions",
-        "models": [
-          {
-            "id": "doubao-seed-1-6-250615",
-            "name": "豆包Seed 1.6",
-            "api": "openai-completions",
-            "reasoning": false,
-            "input": [
-              "text"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 256000,
-            "maxTokens": 32000
-          },
-          {
-            "id": "doubao-seed-1-6-vision-250815",
-            "name": "doubao-seed-1-6-vision-250815",
-            "api": "openai-completions",
-            "reasoning": false,
-            "input": [
-              "text",
-              "image"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 200000,
-            "maxTokens": 8192
-          },
-          {
-            "id": "doubao-seed-1-6-flash-250828",
-            "name": "doubao-seed-1-6-flash-250828",
-            "api": "openai-completions",
-            "reasoning": false,
-            "input": [
-              "text"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 200000,
-            "maxTokens": 8192
-          },
-          {
-            "id": "doubao-seed-1-6-thinking-250715",
-            "name": "doubao-seed-1-6-thinking-250715",
-            "api": "openai-completions",
-            "reasoning": false,
-            "input": [
-              "text"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 200000,
-            "maxTokens": 8192
-          },
-          {
-            "id": "deepseek-r1-250528",
-            "name": "deepseek-r1-250528",
-            "api": "openai-completions",
-            "reasoning": false,
-            "input": [
-              "text"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 200000,
-            "maxTokens": 8192
-          },
-          {
-            "id": "kimi-k2-250905",
-            "name": "kimi-k2-250905",
-            "api": "openai-completions",
-            "reasoning": true,
-            "input": [
-              "text"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 262144,
-            "maxTokens": 32768
-          },
-          {
-            "id": "ep-20260109114743-pzmrw",
-            "name": "ep-20260109114743-pzmrw",
-            "api": "openai-completions",
-            "reasoning": false,
-            "input": [
-              "text"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 200000,
-            "maxTokens": 8192
-          },
-          {
-            "id": "ep-20260126102354-h52jt",
-            "name": "ep-20260126102354-h52jt",
-            "api": "openai-completions",
-            "reasoning": false,
-            "input": [
-              "text"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 200000,
-            "maxTokens": 8192
-          },
-          {
-            "id": "ep-20260129171630-rb6hw",
-            "name": "ep-20260129171630-rb6hw",
-            "api": "openai-completions",
-            "reasoning": false,
-            "input": [
-              "text"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 200000,
-            "maxTokens": 8192
-          },
-          {
-            "id": "ep-20251225100448-xgxcf",
-            "name": "ep-20251225100448-xgxcf",
-            "api": "openai-completions",
-            "reasoning": false,
-            "input": [
-              "text"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 200000,
-            "maxTokens": 8192
-          },
-          {
-            "id": "ep-20260226191313-wmp8x",
-            "name": "ep-20260226191313-wmp8x",
-            "api": "openai-completions",
-            "reasoning": false,
-            "input": [
-              "text"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 200000,
-            "maxTokens": 8192
-          },
-          {
-            "id": "deepseek3",
-            "name": "deepseek3",
-            "api": "openai-completions",
-            "reasoning": false,
-            "input": [
-              "text"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 128000,
-            "maxTokens": 8192
-          },
-          {
-            "id": "sf-gpt5",
-            "name": "sf-gpt5",
-            "api": "openai-completions",
-            "reasoning": false,
-            "input": [
-              "text"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 200000,
-            "maxTokens": 8192
-          },
-          {
-            "id": "QwQ-32B",
-            "name": "QwQ-32B",
-            "api": "openai-completions",
-            "reasoning": false,
-            "input": [
-              "text"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 200000,
-            "maxTokens": 8192
-          }
-        ]
-      },
-      "ollama": {
-        "baseUrl": "http://127.0.0.1:11434",
-        "apiKey": "OLLAMA_API_KEY",
-        "api": "ollama",
-        "models": [
-          {
-            "id": "glm-4.7-flash",
-            "name": "glm-4.7-flash",
-            "reasoning": false,
-            "input": [
-              "text"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 128000,
-            "maxTokens": 8192
-          },
-          {
-            "id": "qwen2.5:7b",
-            "name": "qwen2.5:7b",
-            "reasoning": false,
-            "input": [
-              "text"
-            ],
-            "cost": {
-              "input": 0,
-              "output": 0,
-              "cacheRead": 0,
-              "cacheWrite": 0
-            },
-            "contextWindow": 32768,
-            "maxTokens": 8192
-          }
-        ]
-      }
     }
   },
   "agents": {
     "defaults": {
       "model": {
-        "primary": "deepseek/deepseek-v4-pro"
+        "primary": "openrouter/free"
       },
       "imageGenerationModel": {
-        "primary": "google/gemini-3-pro-image-preview"
+        "primary": "openrouter/free"
       },
       "models": {
-        "oneapi/doubao-seed-1-6-vision-250815": {},
-        "oneapi/doubao-seed-1-6-flash-250828": {},
-        "oneapi/doubao-seed-1-6-thinking-250715": {},
-        "oneapi/deepseek-r1-250528": {},
-        "oneapi/kimi-k2-250905": {},
-        "oneapi/ep-20260109114743-pzmrw": {},
-        "oneapi/ep-20260126102354-h52jt": {},
-        "oneapi/ep-20260129171630-rb6hw": {},
-        "oneapi/ep-20251225100448-xgxcf": {},
-        "oneapi/ep-20260226191313-wmp8x": {},
-        "oneapi/deepseek3": {},
-        "oneapi/sf-gpt5": {},
-        "oneapi/QwQ-32B": {},
-        "oneapi/doubao-seed-1-6-250615": {},
-        "ollama/qwen2.5:7b": {},
-        "openrouter/auto": {
-          "alias": "OpenRouter"
-        },
-        "openrouter/free": {},
-        "deepseek/deepseek-v4-pro": {}
+
+        "openrouter/free": {
+          "alias": "OpenRouter 免费"
+        }
       },
       "workspace": "~/.openclaw/workspace",
       "userTimezone": "Asia/Shanghai",
@@ -392,7 +78,7 @@
         "id": "main",
         "default": true,
         "workspace": "/Users/thinkway/.openclaw/workspace",
-        "model": "openrouter/openrouter/free",
+        "model": "openrouter/free",
         "identity": {
           "name": "通用助手",
           "emoji": "🦞"
@@ -436,7 +122,7 @@
       {
         "id": "stock",
         "workspace": "/Users/thinkway/.openclaw/workspace-stock",
-        "model": "openrouter/openrouter/free",
+        "model": "openrouter/free",
         "identity": {
           "name": "股票分析",
           "emoji": "📈"
@@ -515,7 +201,7 @@
   "gateway": {
     "port": 18789,
     "mode": "local",
-    "bind": "lan",
+    "bind": "loopback",
     "controlUi": {
       "allowedOrigins": [
         "http://localhost:18789",
@@ -525,11 +211,7 @@
     },
     "auth": {
       "mode": "token",
-      "token": {
-        "source": "env",
-        "provider": "default",
-        "id": "GATEWAY_AUTH_TOKEN"
-      }
+      "token": "0192fcc267007b1002525973afc71dce8006c729b95b9d28"
     },
     "tailscale": {
       "mode": "off",
@@ -655,7 +337,7 @@
         "enabled": true
       },
       "research-analyzer": {
-        "enabled": true
+        "enabled": false
       },
       "skill-creator": {
         "enabled": true
@@ -668,18 +350,79 @@
       },
       "web-search-preferences": {
         "enabled": true
+      },
+      "blogwatcher": {
+        "enabled": false
+      },
+      "blucli": {
+        "enabled": false
+      },
+      "camsnap": {
+        "enabled": false
+      },
+      "coding-agent": {
+        "enabled": false
+      },
+      "eightctl": {
+        "enabled": false
+      },
+      "gemini": {
+        "enabled": false
+      },
+      "gh-issues": {
+        "enabled": false
+      },
+      "gifgrep": {
+        "enabled": false
+      },
+      "github": {
+        "enabled": false
+      },
+      "gog": {
+        "enabled": false
+      },
+      "goplaces": {
+        "enabled": false
+      },
+      "himalaya": {
+        "enabled": false
+      },
+      "model-usage": {
+        "enabled": false
+      },
+      "openhue": {
+        "enabled": false
+      },
+      "slack": {
+        "enabled": false
+      },
+      "songsee": {
+        "enabled": false
+      },
+      "sonoscli": {
+        "enabled": false
+      },
+      "spotify-player": {
+        "enabled": false
+      },
+      "summarize": {
+        "enabled": false
+      },
+      "things-mac": {
+        "enabled": false
+      },
+      "mcporter": {
+        "enabled": false
       }
     }
   },
   "plugins": {
     "allow": [
       "wecom-openclaw-plugin",
-      "acpx",
       "duckduckgo",
-      "ollama",
       "memory-core",
       "openrouter",
-      "deepseek"
+      "duckduckgo"
     ],
     "load": {
       "paths": [
@@ -688,7 +431,7 @@
     },
     "entries": {
       "acpx": {
-        "enabled": true,
+        "enabled": false,
         "config": {}
       },
       "wecom-openclaw-plugin": {
@@ -705,21 +448,34 @@
         }
       },
       "ollama": {
-        "enabled": true
+        "enabled": false
       },
       "memory-core": {
         "config": {
           "dreaming": {
             "enabled": true
           }
-        }
+        },
+        "enabled": true
       },
       "openrouter": {
         "enabled": true
       },
       "deepseek": {
-        "enabled": true
+        "enabled": false
+      },
+      "google": {
+        "enabled": false
+      },
+      "tavily": {
+        "enabled": false
       }
+    },
+    "bundledDiscovery": "compat"
+  },
+  "messages": {
+    "groupChat": {
+      "visibleReplies": "message_tool"
     }
   }
 }
