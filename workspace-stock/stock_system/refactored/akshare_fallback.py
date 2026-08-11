@@ -24,7 +24,7 @@ from data_providers import (
     _neutral_fundamental,
     compute_real_technicals,
     sector_from_price_action,
-    sentiment_from_price_action,
+    sentiment_from_technical,
     technical_from_spot_change,
 )
 
@@ -271,7 +271,10 @@ class AkshareFallbackProvider:
             provenance_suffix = "spot_proxy"
 
         fundamental = _neutral_fundamental(stock)
-        sentiment = sentiment_from_price_action(pct, technical.get("volume_ratio", 1.0))
+        # 情绪面：由真实技术指标构造（放量/缩量 + 均线排列 + 中期动量）
+        sentiment = sentiment_from_technical(technical)
+        # 板块/相对强度：fetch 时仅用当日涨跌幅作占位，
+        # 真正的相对强度在引擎层用指数动量计算（见 predict_then_summarize._formula_predict）
         sector = sector_from_price_action(pct)
         return StockInputs(
             current_price=round(price, 2),

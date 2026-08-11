@@ -431,7 +431,7 @@ def sentiment_from_price_action(change_percent: float, turnover: float) -> Dict:
 
 
 def sector_from_price_action(change_percent: float) -> Dict:
-    """由涨跌幅构造行业轮动代理维度。"""
+    """由涨跌幅构造行业轮动代理维度（fallback，当相对强度不可用时）。"""
     base = 5.0 + min(3.0, max(-3.0, change_percent / 2))
     p = int(min(9, max(3, round(base + 1))))
     return {
@@ -440,6 +440,69 @@ def sector_from_price_action(change_percent: float) -> Dict:
         "capital_flow": int(min(9, max(2, round(5 + change_percent / 3)))),
         "rotation_position": int(min(9, max(3, round(5 + abs(change_percent) / 5)))),
     }
+
+
+def _lin(x: float, points: list) -> float:
+    """分段线性插值。points: [(x0,y0),(x1,y1),...]（按 x 升序）。"""
+    if not points:
+        return 0.0
+    if x <= points[0][0]:
+        return float(points[0][1])
+    if x >= points[-1][0]:
+        return float(points[-1][1])
+    for i in range(1, len(points)):
+        x0, y0 = points[i - 1]
+        x1, y1 = points[i]
+        if x0 <= x <= x1:
+            t = (x - x0) / (x1 - x0) if x1 != x0 else 0.0
+            return y0 + t * (y1 - y0)
+    return float(points[-1][1])
+
+
+def sentiment_from_technical(technical: Dict) -> Dict:
+    """由真实技术指标构造情绪面（放量/缩量 + 均线排列 + 中期动量）。
+
+    相比 sentiment_from_price_action 直接用单日涨跌幅「造假」，这里用
+    K 线衍生的 volume_ratio / ma_alignment / momentum_20d（均为真实信号）。
+    返回字段与 calculate_sentiment_score 期望一致。
+    """
+    vr = float(technical.get("volume_ratio", 1.0))
+    align = str(technical.get("ma_alignment", "中性"))
+    mom20 = float(technical.get("momentum_20d", 0))
+
+    # 放量上涨偏乐观，放量下跌偏恐慌，缩量观望
+    if vr > 1.5 and mom20 > 0:
+        base = 7.0
+    elif vr > 1.5 and mom20 < 0:
+        base = 3.5
+    elif vr < 0.7:
+        base = 4.5
+    else:
+        base = 5.0
+
+    # 均线排列修正
+    if align == "多头排列":
+        base = min(9.0, base + 1.0)
+    elif align == "空头排列":
+        base = max(2.0, base - 1.0)
+
+    base = round(base, 1)
+    return {
+        "market_heat": base,
+        "institution_attention": base,
+        "retail_sentiment": "乐观" if base >= 7 else "谨慎" if base <= 4 else "中性",
+        "news_sentiment": "正面" if base >= 7 else "负面" if base <= 4 else "中性",
+    }
+
+
+def relative_strength_score(stock_mom20: float, index_mom20: float) -> float:
+    """个股 20 日动量相对宽基指数的强弱（真实相对强度 / RS 信号）。
+
+    返回 1-10：个股显著跑赢指数为高，跑输为低。
+    指数动量来自 detect_market_status（P2，真实 K 线）。
+    """
+    rs = float(stock_mom20) - float(index_mom20)
+    return round(_lin(rs, [(-0.10, 2), (-0.03, 4), (0, 5), (0.03, 6.5), (0.10, 8.5)]), 1)
 
 
 class StockDataProvider(Protocol):

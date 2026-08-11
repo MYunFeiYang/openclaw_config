@@ -262,7 +262,14 @@ class PredictionEngine:
             inputs.fundamental, stock.sector
         )
         sentiment_score = self.scoring_engine.calculate_sentiment_score(inputs.sentiment)
-        sector_score = self.scoring_engine.calculate_sector_score(inputs.sector)
+
+        # 板块/相对强度：用个股 20 日动量相对宽基指数动量的真实相对强度（RS）。
+        # 指数动量来自 _detect_market_status（P2，真实 K 线）。
+        from data_providers import relative_strength_score
+        index_mom20 = self._market_status.get("trend_strength", 0.0) if self._market_status else 0.0
+        sector_score = relative_strength_score(
+            float(inputs.technical.get("momentum_20d", 0)), index_mom20
+        )
 
         # 市场状态感知的动态权重
         weights = ConfigManager.get_market_adjusted_weights(self._market_regime)
@@ -460,11 +467,6 @@ class ScoringEngine:
         news_score = news_map.get(str(data.get("news_sentiment", "中性")), 6.0)
         
         return round((heat_score + attention_score + retail_score + news_score) / 4, 1)
-    
-    def calculate_sector_score(self, data: Dict) -> float:
-        """计算行业评分"""
-        
-        return round((data['prosperity'] + data['policy_support'] + data['capital_flow'] + data['rotation_position']) / 4, 1)
     
     def calculate_final_score(self, technical: float, fundamental: float, sentiment: float, sector: float, weights: Optional[Dict[str, float]] = None) -> float:
         """计算综合评分（weights 为空时用基准权重）"""
