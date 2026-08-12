@@ -226,8 +226,11 @@ class AkshareFallbackProvider:
         self._cache: Dict[str, Tuple[float, Tuple[float, float]]] = {}
         self._ttl = float(os.environ.get("STOCK_FALLBACK_CACHE_SEC") or "60")
 
-    def fetch_one(self, code: str) -> Optional[Tuple[float, float]]:
-        """返回 (现价, 涨跌幅%)，失败返回 None。"""
+    def fetch_one(self, code: str, retries: int | None = None) -> Optional[Tuple[float, float]]:
+        """返回 (现价, 涨跌幅%)，失败返回 None。
+
+        对底层 HTTP/akshare 拉取做指数退避重试，减少偶发网络抖动导致整批中断。
+        """
         code = code.strip().zfill(6)
         now = time.time()
         if code in self._cache:
@@ -235,15 +238,23 @@ class AkshareFallbackProvider:
             if now - ts < self._ttl:
                 return pair
 
-        if _akshare_available():
-            data = _fetch_akshare_batch([code])
-        else:
-            data = _fetch_sina_batch([code])
+        if retries is None:
+            retries = int(os.environ.get("STOCK_FETCH_RETRIES") or "3")
+        retries = max(1, retries)
 
-        pair = data.get(code)
-        if pair is not None:
-            self._cache[code] = (now, pair)
-        return pair
+        via_akshare = _akshare_available()
+        for attempt in range(retries):
+            try:
+                data = _fetch_akshare_batch([code]) if via_akshare else _fetch_sina_batch([code])
+            except Exception:
+                data = {}
+            if data.get(code) is not None:
+                pair = data[code]
+                self._cache[code] = (now, pair)
+                return pair
+            if attempt < retries - 1:
+                time.sleep(min(4.0, 0.5 * (2 ** attempt)))  # 0.5s, 1s, 2s ...
+        return None
 
     def fetch(self, stock: Any) -> StockInputs:
         code = str(getattr(stock, "symbol", "")).strip().zfill(6)
@@ -285,12 +296,6 @@ class AkshareFallbackProvider:
             sector=sector,
             provenance=f"{'akshare_direct' if _akshare_available() else 'sina_http'}_{provenance_suffix}",
         )
-
-    def is_available(self) -> bool:
-        """快速检查 fallback 是否可用。"""
-        data = _fetch_sina_batch(["600519"])
-        return len(data) > 0
-
 
 # 全局单例
 _global_akshare: Optional[AkshareFallbackProvider] = None

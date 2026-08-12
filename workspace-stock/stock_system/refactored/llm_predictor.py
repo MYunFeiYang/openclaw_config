@@ -25,7 +25,7 @@ import json
 import os
 import shutil
 import subprocess
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 
 # ── 默认配置 ──────────────────────────────────────────

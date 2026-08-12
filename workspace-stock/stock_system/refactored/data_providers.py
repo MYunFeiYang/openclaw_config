@@ -376,24 +376,6 @@ def technical_from_spot_change(change_percent: float) -> Dict:
     return t
 
 
-def _neutral_sentiment() -> Dict:
-    return {
-        "market_heat": 5,
-        "institution_attention": 5,
-        "retail_sentiment": "中性",
-        "news_sentiment": "中性",
-    }
-
-
-def _neutral_sector() -> Dict:
-    return {
-        "prosperity": 5,
-        "policy_support": 5,
-        "capital_flow": 5,
-        "rotation_position": 5,
-    }
-
-
 def _neutral_fundamental(stock: Any) -> Dict:
     b = _sector_bm(getattr(stock, "sector", "") or "")
     return {

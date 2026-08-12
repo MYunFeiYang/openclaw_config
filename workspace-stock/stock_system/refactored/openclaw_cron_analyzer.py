@@ -7,7 +7,6 @@ OpenClaw定时任务专用的股票分析系统
 
 import os
 import sys
-import json
 from datetime import datetime
 from pathlib import Path
 
@@ -108,12 +107,18 @@ def main():
         buy_count = len(summary.buy_recommendations)
         sell_count = len(summary.sell_recommendations)
         hold_count = len(summary.hold_recommendations)
+        analyzed = len(result['predictions'])
         
         print(f"\n📈 结果摘要:")
         print(f"  买入推荐: {buy_count}只")
         print(f"  卖出推荐: {sell_count}只") 
         print(f"  持有推荐: {hold_count}只")
-        print(f"  分析股票: {len(result['predictions'])}只")
+        print(f"  分析股票: {analyzed}只")
+        
+        # 全部个股行情拉取/分析均失败 → 视为本次分析失败（exit 1）
+        if analyzed == 0:
+            print("❌ 无可用预测（全部股票数据缺失），本次分析失败")
+            return 1
         
         return 0
         

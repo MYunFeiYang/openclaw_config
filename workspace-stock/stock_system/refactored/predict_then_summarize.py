@@ -6,7 +6,7 @@ A股分析系统 - 符合"先预测再总结"理念的重构版本
 
 import json
 import os
-from datetime import datetime, timedelta
+from datetime import datetime
 from dataclasses import dataclass, asdict
 from typing import List, Dict, Optional, Tuple, Any
 from enum import Enum
@@ -318,7 +318,11 @@ class PredictionEngine:
             # 先获取所有股票的行情数据 + 公式结果
             stock_data: List[Tuple[StockConfig, Any, PredictionResult, dict]] = []
             for stock in stocks:
-                inputs = self._provider.fetch(stock)
+                try:
+                    inputs = self._provider.fetch(stock)
+                except Exception as e:
+                    print(f"[WARN] 跳过 {stock.name}（行情拉取失败: {e}），不参与本次分析")
+                    continue
                 formula_result = self._formula_predict(stock, inputs, analysis_type)
                 llm_input = stock_to_llm_input(
                     stock_name=stock.name,
@@ -332,6 +336,10 @@ class PredictionEngine:
                     sector=inputs.sector,
                 )
                 stock_data.append((stock, inputs, formula_result, llm_input))
+
+            if not stock_data:
+                print("[WARN] 全部股票行情拉取失败，无可用预测")
+                return []
             
             batch_results = predict_batch([sd[3] for sd in stock_data])
             if batch_results:
@@ -357,9 +365,17 @@ class PredictionEngine:
         # ── 逐只预测（每只独立尝试 LLM 叠加，失败则公式）──
         results = []
         for stock in stocks:
-            result = self.predict_stock(stock, analysis_type)
+            try:
+                result = self.predict_stock(stock, analysis_type)
+            except Exception as e:
+                print(f"[WARN] 跳过 {stock.name}（分析失败: {e}），不参与本次分析")
+                continue
             results.append(result)
-        
+
+        if not results:
+            print("[WARN] 全部股票分析失败，无可用预测")
+            return []
+
         results.sort(key=lambda x: x.final_score, reverse=True)
         return results
 
