@@ -1244,7 +1244,8 @@ class StockAnalyzer:
             'prediction_report': prediction_report,
             'summary_report': summary_report,
             'saved_files': saved_files,
-            'analysis_type': analysis_type
+            'analysis_type': analysis_type,
+            'total_stocks': len(universe),
         }
     
     @staticmethod

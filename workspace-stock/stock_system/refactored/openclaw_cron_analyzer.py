@@ -115,11 +115,17 @@ def main():
         print(f"  持有推荐: {hold_count}只")
         print(f"  分析股票: {analyzed}只")
         
-        # 全部个股行情拉取/分析均失败 → 视为本次分析失败（exit 1）
+        # 全部个股行情拉取/分析均失败 → 本次分析失败（exit 1）
         if analyzed == 0:
             print("❌ 无可用预测（全部股票数据缺失），本次分析失败")
             return 1
-        
+
+        # 部分股票缺失 → 不视为成功，避免企微误报"成功"（exit 2）
+        total = result.get('total_stocks', analyzed)
+        if analyzed < total:
+            print(f"⚠️ 部分股票数据缺失（{total - analyzed}/{total} 只未分析），本次视为部分失败")
+            return 2
+
         return 0
         
     except Exception as e:
