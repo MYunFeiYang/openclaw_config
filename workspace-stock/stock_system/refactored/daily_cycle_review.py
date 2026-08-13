@@ -413,14 +413,18 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
                 }
             )
             continue
-        open_px, close_px = ohlc
-        morning_px = open_px
+        open_px, close_px, _ = ohlc
         evening_px = close_px
+        # morning_px 沿用早盘预测文件存的基线（昨收 prev_close，见第391行），
+        # 与早盘「锚定上一交易日收盘」的预测口径一致；不再用当日开盘价覆盖，
+        # 否则预测(相对昨收)与复盘(相对今开)口径错位，系统性污染方向一致率。
+        if morning_px <= 0:
+            morning_px = open_px  # 早盘文件缺基线时兜底用今开
 
-        if open_px <= 0:
+        if morning_px <= 0:
             session_ret = 0.0
         else:
-            session_ret = (close_px - open_px) / open_px * 100.0
+            session_ret = (close_px - morning_px) / morning_px * 100.0
         ret_for_match = session_return_for_direction(session_ret, benchmark_ret)
         matched, act, strong_band = direction_match_with_tuning(
             signal, ret_for_match, band, tuning

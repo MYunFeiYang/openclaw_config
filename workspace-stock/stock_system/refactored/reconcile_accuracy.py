@@ -73,7 +73,9 @@ def benchmark_return_pct_for_reconcile(ymd: Optional[str] = None) -> Optional[fl
         # 它走个股/ETF 接口必有数据，紧贴沪深300 走势。
         ohlc = fetch_daily_ohlc("510300", ymd or "")
         if ohlc and ohlc[0] and ohlc[1]:
-            open_px, close_px = ohlc
+            open_px, close_px, prev_close = ohlc
+            if prev_close and prev_close > 0:
+                return round((close_px - prev_close) / prev_close * 100.0, 4)
             if open_px > 0:
                 return round((close_px - open_px) / open_px * 100.0, 4)
     except Exception:

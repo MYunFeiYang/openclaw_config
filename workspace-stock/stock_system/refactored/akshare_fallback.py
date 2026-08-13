@@ -212,8 +212,8 @@ def _fetch_akshare_kline(code: str, days: int = 60) -> list:
         return []
 
 
-def fetch_daily_ohlc(symbol: str, ymd: str, retries: int | None = None) -> Optional[Tuple[float, float]]:
-    """返回交易日 ymd 的 (开盘价, 收盘价)，用于收盘复盘计算真实区间涨跌。
+def fetch_daily_ohlc(symbol: str, ymd: str, retries: int | None = None) -> Optional[Tuple[float, float, float]]:
+    """返回交易日 ymd 的 (开盘价, 收盘价, 昨收价)，用于收盘复盘计算真实区间涨跌（相对昨收口径）。
 
     与实时快照不同，交易日的开/收是收盘后即固定的历史值，任何时刻（含 cron 因
     睡眠延迟到收盘后运行）都能取到，因此复盘不再受运行时刻影响而恒为 0。
@@ -242,7 +242,8 @@ def fetch_daily_ohlc(symbol: str, ymd: str, retries: int | None = None) -> Optio
                     o = float(row.get("开盘", 0) or 0)
                     c = float(row.get("收盘", 0) or 0)
                     if o > 0 and c > 0:
-                        return (o, c)
+                        prev_close = c - float(row.get("涨跌额", 0) or 0)
+                        return (o, c, prev_close)
             except Exception:
                 pass
             if attempt < retries - 1:
@@ -260,7 +261,8 @@ def fetch_daily_ohlc(symbol: str, ymd: str, retries: int | None = None) -> Optio
                         o = float(row.get("开盘", 0) or 0)
                         c = float(row.get("收盘", 0) or 0)
                         if o > 0 and c > 0:
-                            return (o, c)
+                            prev_close = c - float(row.get("涨跌额", 0) or 0)
+                            return (o, c, prev_close)
         except Exception:
             pass
 
@@ -275,7 +277,8 @@ def fetch_daily_ohlc(symbol: str, ymd: str, retries: int | None = None) -> Optio
                 except (ValueError, TypeError):
                     o = c = 0
                 if o > 0 and c > 0:
-                    return (o, c)
+                    prev_close = float(k.get("preClose", 0) or 0)
+                    return (o, c, prev_close)
         if attempt < retries - 1:
             time.sleep(min(4.0, 0.5 * (2 ** attempt)))
     return None
