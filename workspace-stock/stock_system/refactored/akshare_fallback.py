@@ -212,6 +212,75 @@ def _fetch_akshare_kline(code: str, days: int = 60) -> list:
         return []
 
 
+def fetch_daily_ohlc(symbol: str, ymd: str, retries: int | None = None) -> Optional[Tuple[float, float]]:
+    """返回交易日 ymd 的 (开盘价, 收盘价)，用于收盘复盘计算真实区间涨跌。
+
+    与实时快照不同，交易日的开/收是收盘后即固定的历史值，任何时刻（含 cron 因
+    睡眠延迟到收盘后运行）都能取到，因此复盘不再受运行时刻影响而恒为 0。
+
+    优先 akshare stock_zh_a_hist（按日期过滤，失败再全量扫描兜底），
+    降级新浪日线 K 线取当日；均失败返回 None。带指数退避重试。
+    """
+    code = symbol.strip().zfill(6)
+    if retries is None:
+        retries = int(os.environ.get("STOCK_FETCH_RETRIES") or "3")
+    retries = max(1, retries)
+    ymd = str(ymd).replace("-", "")
+
+    # ── 优先 akshare ──
+    if _akshare_available():
+        # 1) 按日期精确过滤（最快）
+        for attempt in range(retries):
+            try:
+                import akshare as ak
+                df = ak.stock_zh_a_hist(
+                    symbol=code, period="daily", adjust="qfq",
+                    start_date=ymd, end_date=ymd,
+                )
+                if df is not None and not df.empty:
+                    row = df.iloc[0]
+                    o = float(row.get("开盘", 0) or 0)
+                    c = float(row.get("收盘", 0) or 0)
+                    if o > 0 and c > 0:
+                        return (o, c)
+            except Exception:
+                pass
+            if attempt < retries - 1:
+                time.sleep(min(4.0, 0.5 * (2 ** attempt)))
+        # 2) 全量扫描兜底（akshare 单日过滤偶发不稳）
+        try:
+            import akshare as ak
+            df = ak.stock_zh_a_hist(
+                symbol=code, period="daily", adjust="qfq",
+                start_date="20240101", end_date="20261231",
+            )
+            if df is not None and not df.empty:
+                for _, row in df.iterrows():
+                    if str(row.get("日期", "")).replace("-", "") == ymd:
+                        o = float(row.get("开盘", 0) or 0)
+                        c = float(row.get("收盘", 0) or 0)
+                        if o > 0 and c > 0:
+                            return (o, c)
+        except Exception:
+            pass
+
+    # ── 降级新浪日线 K 线 ──
+    sina_sym = _code_to_sina_symbol(code)
+    for attempt in range(retries):
+        for k in _fetch_sina_kline(sina_sym, 90):
+            if str(k.get("day", "")).replace("-", "") == ymd:
+                try:
+                    o = float(k.get("open", 0) or 0)
+                    c = float(k.get("close", 0) or 0)
+                except (ValueError, TypeError):
+                    o = c = 0
+                if o > 0 and c > 0:
+                    return (o, c)
+        if attempt < retries - 1:
+            time.sleep(min(4.0, 0.5 * (2 ** attempt)))
+    return None
+
+
 # ── 统一接口 ─────────────────────────────────────────────────────────
 
 class AkshareFallbackProvider:

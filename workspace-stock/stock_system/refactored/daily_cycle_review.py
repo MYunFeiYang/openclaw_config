@@ -346,8 +346,10 @@ class _StockLite:
 
 def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> int:
     """
-    读取当日早盘 predictions 文件，对每只股票再 fetch 一次现价，计算相对早盘价的区间涨跌，
+    读取当日早盘 predictions 文件，对每只股票取交易日历史 OHLC（开盘→收盘）计算真实区间涨跌，
     与早盘信号方向对照，写入 data/reconcile_{ymd}_*.json 与 reports。
+    采用交易日开/收（收盘后即固定的历史值），不受 cron 运行时刻影响，避免收盘后
+    两次实时快照相等导致涨跌幅恒为 0 的虚假高一致率。
     """
     root = _root(base_dir)
     data_dir = root / "data"
@@ -370,13 +372,12 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
         return 1
 
     # 延迟导入，避免无 OpenClaw 时影响其它子命令
-    from data_providers import get_default_provider
+    from akshare_fallback import fetch_daily_ohlc
     from predict_then_summarize import ConfigManager
 
     tuning = ConfigManager.get_accuracy_tuning()
     benchmark_ret = benchmark_return_pct_for_reconcile()
 
-    provider = get_default_provider()
     rows: List[Dict[str, Any]] = []
     ok = 0
     for p in preds:
@@ -393,29 +394,33 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
         morning_vol = abs(float(p.get("change_percent") or 0))
         band = adaptive_neutral_band_pct(morning_vol, tuning)
 
-        try:
-            inputs = provider.fetch(stock)
-            evening_px = float(inputs.current_price)
-        except Exception as e:
+        # 用交易日历史 OHLC 计算真实区间涨跌（开盘→收盘），不依赖 cron 运行时刻。
+        # 收盘后两次实时快照相等会让涨跌幅恒为 0（导致持有注水的虚假高分），
+        # 而交易日的开/收是收盘后即固定的历史值，任何时刻都能取到。
+        ohlc = fetch_daily_ohlc(stock.symbol, day)
+        if ohlc is None:
             rows.append(
                 {
                     "symbol": stock.symbol,
                     "name": stock.name,
-                    "morning_price": morning_px,
+                    "morning_price": None,
                     "evening_price": None,
                     "session_return_pct": None,
                     "morning_signal": signal,
                     "expected_direction": exp,
                     "direction_match": None,
-                    "error": str(e)[:500],
+                    "error": f"未取到 {stock.symbol} 交易日 {day} 的 OHLC 历史",
                 }
             )
             continue
+        open_px, close_px = ohlc
+        morning_px = open_px
+        evening_px = close_px
 
-        if morning_px <= 0:
+        if open_px <= 0:
             session_ret = 0.0
         else:
-            session_ret = (evening_px - morning_px) / morning_px * 100.0
+            session_ret = (close_px - open_px) / open_px * 100.0
         ret_for_match = session_return_for_direction(session_ret, benchmark_ret)
         matched, act, strong_band = direction_match_with_tuning(
             signal, ret_for_match, band, tuning
@@ -483,6 +488,7 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
         "reconcile_logic": {
             "adaptive_neutral_band": True,
             "strong_signal_stricter": True,
+            "price_source": "trade_date_ohlc(open->close)",
             "benchmark_return_pct": benchmark_ret,
             "accuracy_tuning": tuning,
         },
