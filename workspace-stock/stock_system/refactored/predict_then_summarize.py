@@ -84,6 +84,7 @@ class PredictionResult:
     reasons: List[str]
     prediction_time: datetime
     data_provenance: str = "openclaw_agent_web"
+    formula_signal: str = None  # A/B 对照：纯公式信号（LLM 开启时与 signal 区分）
     
     def to_dict(self) -> Dict:
         return {
@@ -96,6 +97,7 @@ class PredictionResult:
             'sector_score': self.sector_score,
             'final_score': self.final_score,
             'signal': self.signal,
+            'formula_signal': self.formula_signal,
             'confidence': self.confidence,
             'reasons': self.reasons,
             'prediction_time': self.prediction_time.isoformat(),
@@ -284,17 +286,18 @@ class PredictionEngine:
                     inputs.sentiment = sentiment_from_technical(inputs.technical)
                 inputs.provenance = inputs.provenance + "_prevclose_anchor"
 
-        # ── 公式打分（始终计算）──
+        # ── 公式打分（始终计算，A/B 对照的纯公式基线）──
         formula_result = self._formula_predict(stock, inputs, analysis_type)
-        
+
         # ── LLM 叠加（若启用且可用）──
         if self._use_llm:
             llm_r = self._try_llm_predict(stock, inputs)
             if llm_r:
                 blended = self._blend_with_llm(stock, inputs, formula_result, llm_r)
+                blended.formula_signal = formula_result.signal  # A/B：记录纯公式信号
                 return blended
             print(f"[LLM] {stock.name} 预测失败，仅用公式打分")
-        
+        formula_result.formula_signal = formula_result.signal  # 公式路径同样记录纯公式信号
         return formula_result
     
     def _formula_predict(self, stock: StockConfig, inputs, analysis_type: str) -> PredictionResult:

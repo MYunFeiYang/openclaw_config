@@ -35,6 +35,24 @@ def _is_trading_day(dt: datetime) -> bool:
     return True
 
 
+def _maybe_warn_strategy_degraded(base_dir: str) -> None:
+    """若策略处于 degraded，早盘打印醒目警告（不篡改保存信号，供复盘继续统计校准）。"""
+    import json
+    from pathlib import Path
+    status_path = Path(base_dir) / "data" / "strategy_status.json"
+    if not status_path.exists():
+        return
+    try:
+        st = json.loads(status_path.read_text(encoding="utf-8"))
+    except Exception:
+        return
+    if st.get("status") == "degraded":
+        rates = st.get("recent_directional_hit_rates", [])
+        print(f"\n⚠️⚠️ 策略失效预警 ⚠️⚠️")
+        print(f"   连续 {st.get('window')} 个交易日方向性一致率 {rates} < {st.get('threshold')}")
+        print(f"   近期策略疑似失效，早报信号参考价值低，建议观望/减仓。")
+
+
 def main():
     """主函数 - 支持命令行参数指定分析类型"""
     
@@ -117,7 +135,10 @@ def main():
     # 执行分析
     try:
         result = analyzer.analyze(analysis_type)
-        
+
+        # 策略失效预警：早盘给醒目警告（不篡改保存信号，供复盘继续统计）
+        _maybe_warn_strategy_degraded(str(base_dir))
+
         print("\n📊 分析结果:")
         print("=" * 70)
         print(result['summary_report'])

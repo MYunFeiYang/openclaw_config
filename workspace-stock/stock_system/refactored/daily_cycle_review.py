@@ -103,11 +103,67 @@ def _append_reconcile_history(data_dir: Path, out_json: Dict[str, Any], reconcil
             "directional_hit_rate": st.get("directional_hit_rate"),
             "hold_hit_rate": st.get("hold_hit_rate"),
             "buy_signal_mean_return_pct": st.get("buy_signal_mean_return_pct"),
+            "formula_directional_hit_rate": st.get("formula_directional_hit_rate"),
         },
         "symbols": _compact_symbols_from_rows(out_json.get("rows") or []),
     }
     with open(path, "a", encoding="utf-8") as f:
         f.write(json.dumps(line, ensure_ascii=False) + "\n")
+
+
+def _check_strategy_health(data_dir: Path, window: int = 5, threshold: float = 0.5) -> Dict[str, Any]:
+    """策略失效预警：连续 window 个交易日方向性一致率 < threshold 则标记 degraded 并企微告警。
+
+    今天仅 1 天数据不会触发，需累积 window 天才有意义。返回当前状态 dict。
+    新进入 degraded（上次非 degraded）才发企微，避免每次复盘重跑都推送。"""
+    import os
+    import subprocess
+    path = data_dir / "strategy_status.json"
+    records = _load_reconcile_history_records(data_dir, max_lines=200)
+    recent = [r for r in records if (r.get("stats") or {}).get("directional_hit_rate") is not None]
+    recent = recent[-window:]
+    rates = [round(float(r["stats"]["directional_hit_rate"]), 4) for r in recent]
+    status = "normal"
+    since = None
+    if len(recent) >= window and all(rt < threshold for rt in rates):
+        status = "degraded"
+        since = recent[0].get("trade_date")
+    prev = {}
+    if path.exists():
+        try:
+            prev = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            prev = {}
+    payload = {
+        "status": status,
+        "checked_at": datetime.now().isoformat(),
+        "window": window,
+        "threshold": threshold,
+        "recent_directional_hit_rates": rates,
+        "since": since,
+    }
+    try:
+        path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception as e:
+        print(f"[WARN] 写 strategy_status.json 失败: {e}")
+    if status == "degraded" and prev.get("status") != "degraded":
+        try:
+            env = dict(os.environ)
+            npm_bin = os.path.expanduser("~/.nvm/versions/node/v24.19.0/bin")
+            if npm_bin not in env.get("PATH", ""):
+                env["PATH"] = npm_bin + ":" + env.get("PATH", "")
+            msg = (
+                f"⚠️ 股票策略失效预警：连续 {window} 个交易日方向性一致率 < {threshold} "
+                f"（最近 {len(rates)} 天: {rates}），策略疑似失效，已自动暂停买卖建议，建议观望。"
+            )
+            subprocess.run(
+                ["openclaw", "message", "send", "--channel", "wecom", "--target", "thinkway", "--message", msg],
+                env=env, capture_output=True, timeout=60,
+            )
+            print("📨 已发送策略失效企微告警")
+        except Exception as e:
+            print(f"[WARN] 策略失效企微告警发送失败: {e}")
+    return payload
 
 
 def _ensure_reconcile_history_seeded_from_disk(data_dir: Path) -> None:
@@ -391,6 +447,8 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
         morning_px = float(p.get("current_price") or 0)
         signal = str(p.get("signal") or "")
         exp = expected_direction_from_signal(signal)
+        formula_signal = str(p.get("formula_signal") or "")
+        fexp = expected_direction_from_signal(formula_signal) if formula_signal else 0
         morning_vol = abs(float(p.get("change_percent") or 0))
         band = adaptive_neutral_band_pct(morning_vol, tuning)
 
@@ -429,6 +487,11 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
         matched, act, strong_band = direction_match_with_tuning(
             signal, ret_for_match, band, tuning
         )
+        fmatched = None
+        if formula_signal:
+            fmatched, _, _ = direction_match_with_tuning(
+                formula_signal, ret_for_match, band, tuning
+            )
         if matched:
             ok += 1
         rows.append(
@@ -446,6 +509,9 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
                 "expected_direction": exp,
                 "inferred_direction_from_session_return": act,
                 "direction_match": matched,
+                "formula_signal": formula_signal,
+                "formula_expected_direction": fexp,
+                "formula_direction_match": fmatched,
             }
         )
 
@@ -459,6 +525,7 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
     # 持有信号 expected_direction=0，与“当日波动落在中性带内”天然对齐，注水严重；
     # 真正的预测能力只看方向性样本（买/卖）。
     dir_hit = dir_miss = hold_hit = hold_miss = 0
+    fdir_hit = fdir_miss = 0  # A/B：纯公式路径方向性计数
     buy_rets: List[float] = []  # 买入信号股的当日区间收益（真实收益口径）
     for r in rows:
         if r.get("session_return_pct") is None or r.get("direction_match") is None:
@@ -477,11 +544,21 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
                 hold_hit += 1
             else:
                 hold_miss += 1
+        # A/B 公式路径（纯公式信号的方向性对照）
+        fexp = int(r.get("formula_expected_direction", 0) or 0)
+        fok = r.get("formula_direction_match")
+        if fexp != 0 and fok is not None:
+            if fok:
+                fdir_hit += 1
+            else:
+                fdir_miss += 1
     dir_samples = dir_hit + dir_miss
     directional_hit_rate = round(dir_hit / dir_samples, 4) if dir_samples else None
     hold_samples = hold_hit + hold_miss
     hold_hit_rate = round(hold_hit / hold_samples, 4) if hold_samples else None
     buy_mean_return = round(sum(buy_rets) / len(buy_rets), 4) if buy_rets else None
+    fdir_samples = fdir_hit + fdir_miss
+    formula_directional_hit_rate = round(fdir_hit / fdir_samples, 4) if fdir_samples else None
 
     ts = datetime.now().strftime("%H%M%S")
     out_json = {
@@ -513,6 +590,8 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
             "hold_misses": hold_miss,
             "hold_hit_rate": hold_hit_rate,
             "buy_signal_mean_return_pct": buy_mean_return,
+            "formula_directional_samples": fdir_samples,
+            "formula_directional_hit_rate": formula_directional_hit_rate,
         },
         "rows": rows,
     }
@@ -521,6 +600,12 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
         json.dump(out_json, f, ensure_ascii=False, indent=2)
 
     _append_reconcile_history(data_dir, out_json, jpath.name)
+
+    # ── 策略失效预警：连续 window 天方向性一致率 <0.5 标记 degraded + 企微告警 ──
+    health = _check_strategy_health(data_dir)
+    if health["status"] == "degraded":
+        print(f"\n⚠️ 策略失效预警：连续 {health['window']} 日方向性一致率 {health['recent_directional_hit_rates']} "
+              f"< {health['threshold']}，已自动暂停买卖建议，建议观望。")
 
     bench_note = (
         f"；大盘涨跌基准={benchmark_ret}%（用于超额收益判定，环境变量 RECONCILE_BENCHMARK_RETURN_PCT）"
@@ -546,6 +631,10 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
         "",
         "【持有命中率（非预测能力，多数交易日波动<中性带天然判对）】",
         f"  一致 {hold_hit} / 样本 {hold_samples} = {hold_hit_rate!s}",
+        "",
+        "【LLM A/B 对照（纯公式 vs 公式+LLM 方向一致率）】",
+        f"  纯公式: 一致 {fdir_hit} / 样本 {fdir_samples} = {formula_directional_hit_rate!s}",
+        f"  公式+LLM: 一致 {dir_hit} / 样本 {dir_samples} = {directional_hit_rate!s}",
         "",
         "明细:",
     ]

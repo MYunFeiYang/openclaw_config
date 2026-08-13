@@ -83,6 +83,8 @@ workspace-stock/stock_system/data/iteration_state.json
 # iteration_briefing.txt 已被上方 *.txt 规则忽略
 # 保留：reconcile_history.jsonl 是准确率记分牌（append-only 小文件，跨克隆需保留，证明 loop 是否变准）
 !workspace-stock/stock_system/data/reconcile_history.jsonl
+# 忽略：策略失效预警运行时状态（可由 reconcile_history 重算，非调优参数）
+workspace-stock/stock_system/data/strategy_status.json
 
 plugin-runtime-deps/
 
