@@ -130,6 +130,26 @@ class SummaryReport:
         }
 
 
+def _prev_close_anchor(symbol: str):
+    """取早盘预测的锚定基准：(上一交易日收盘, 上一交易日相对前一交易日的真实涨跌幅%)。
+
+    返回 None 表示取不到历史（非交易日/无数据），调用方应回退到实时价。
+    """
+    from akshare_fallback import fetch_recent_ohlc
+    rec = fetch_recent_ohlc(symbol, n=2)
+    if not rec or len(rec) < 1:
+        return None
+    last_open, last_close = rec[-1]
+    prev_close = last_close
+    if len(rec) >= 2:
+        _po, prev_prev_close = rec[-2]
+        chg = (last_close - prev_prev_close) / prev_prev_close * 100.0 if prev_prev_close > 0 else 0.0
+    else:
+        # 仅 1 天可用：用当日日内涨跌近似
+        chg = (last_close - last_open) / last_open * 100.0 if last_open > 0 else 0.0
+    return (prev_close, round(chg, 2))
+
+
 def _use_llm() -> bool:
     """是否启用 LLM 预测（环境变量 STOCK_USE_LLM=1）"""
     return os.environ.get("STOCK_USE_LLM") == "1" and is_llm_enabled()
@@ -241,7 +261,29 @@ class PredictionEngine:
         
         self._detect_market_status()
         inputs = self._provider.fetch(stock)
-        
+
+        # ── 早盘锚定上一交易日收盘：让预测与 cron 实际运行时刻解耦 ──
+        # 否则机器睡眠导致早盘 cron 延后到盘中跑时，会用盘中实时价做基线，
+        # "早报"名不副实。改用已收盘的历史值后，08:00 或盘中补跑结果完全一致。
+        if analysis_type == "morning":
+            anchor = _prev_close_anchor(stock.symbol)
+            if anchor:
+                prev_close, prev_change = anchor
+                inputs.current_price = round(prev_close, 2)
+                inputs.change_percent = prev_change
+                from data_providers import (
+                    sector_from_price_action,
+                    technical_from_spot_change,
+                    sentiment_from_technical,
+                )
+                inputs.sector = sector_from_price_action(prev_change)
+                if inputs.provenance.endswith("spot_proxy"):
+                    # K 线不可用、technical 由实时涨跌幅派生时才需重算；
+                    # 真实 K 线算出的 technical/sentiment 本身是历史值、已与时刻无关，保留。
+                    inputs.technical = technical_from_spot_change(prev_change)
+                    inputs.sentiment = sentiment_from_technical(inputs.technical)
+                inputs.provenance = inputs.provenance + "_prevclose_anchor"
+
         # ── 公式打分（始终计算）──
         formula_result = self._formula_predict(stock, inputs, analysis_type)
         

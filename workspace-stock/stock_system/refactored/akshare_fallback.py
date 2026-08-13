@@ -281,6 +281,69 @@ def fetch_daily_ohlc(symbol: str, ymd: str, retries: int | None = None) -> Optio
     return None
 
 
+def fetch_recent_ohlc(symbol: str, n: int = 2, retries: int | None = None) -> Optional[list[Tuple[float, float]]]:
+    """返回最近 n 个【已收盘】交易日的 [(开盘, 收盘), ...]（升序，末位为最近一个交易日）。
+
+    用于早盘预测锚定"上一交易日收盘"：交易日的开/收是收盘后即固定的历史值，任何时刻
+    （含 cron 因睡眠延迟到盘中才跑）取到都一样，预测因此与运行时刻解耦。
+    自动跳过今天（可能未收盘，避免取到盘中临时值）。
+    akshare 全量历史优先，降级新浪日线 K 线；不足 n 天或失败返回 None。带指数退避重试。
+    """
+    code = symbol.strip().zfill(6)
+    if retries is None:
+        retries = int(os.environ.get("STOCK_FETCH_RETRIES") or "3")
+    retries = max(1, retries)
+    today_ymd = time.strftime("%Y%m%d", time.localtime())
+
+    # ── 优先 akshare 全量历史 ──
+    if _akshare_available():
+        for attempt in range(retries):
+            try:
+                import akshare as ak
+                df = ak.stock_zh_a_hist(
+                    symbol=code, period="daily", adjust="qfq",
+                    start_date="20240101", end_date="20261231",
+                )
+                if df is not None and not df.empty:
+                    pairs = []
+                    for _, row in df.iterrows():
+                        d = str(row.get("日期", "")).replace("-", "")
+                        if d >= today_ymd:
+                            continue
+                        o = float(row.get("开盘", 0) or 0)
+                        c = float(row.get("收盘", 0) or 0)
+                        if o > 0 and c > 0:
+                            pairs.append((o, c))
+                    if len(pairs) >= n:
+                        return pairs[-n:]
+            except Exception:
+                pass
+            if attempt < retries - 1:
+                time.sleep(min(4.0, 0.5 * (2 ** attempt)))
+
+    # ── 降级新浪日线 K 线 ──
+    sina_sym = _code_to_sina_symbol(code)
+    for attempt in range(retries):
+        kl = list(_fetch_sina_kline(sina_sym, 120))
+        pairs = []
+        for k in kl:
+            d = str(k.get("day", "")).replace("-", "")[:8]
+            if d >= today_ymd:
+                continue
+            try:
+                o = float(k.get("open", 0) or 0)
+                c = float(k.get("close", 0) or 0)
+            except (ValueError, TypeError):
+                o = c = 0
+            if o > 0 and c > 0:
+                pairs.append((o, c))
+        if len(pairs) >= n:
+            return pairs[-n:]
+        if attempt < retries - 1:
+            time.sleep(min(4.0, 0.5 * (2 ** attempt)))
+    return None
+
+
 # ── 统一接口 ─────────────────────────────────────────────────────────
 
 class AkshareFallbackProvider:
