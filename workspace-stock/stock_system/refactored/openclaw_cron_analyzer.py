@@ -15,6 +15,26 @@ sys.path.append(os.path.dirname(__file__))
 from predict_then_summarize import StockAnalyzer
 from data_providers import get_analysis_type_name
 
+
+def _is_trading_day(dt: datetime) -> bool:
+    """A 股交易日判断。
+
+    周末直接返回 False；工作日用 akshare 交易日历校验（含节假日）。
+    交易日历拉取失败时回退为 True（假定交易日），避免网络抖动阻塞运行。
+    """
+    if dt.weekday() >= 5:  # 5=周六, 6=周日
+        return False
+    try:
+        import akshare as ak
+        cal = ak.tool_trade_date_hist_sina()
+        if cal is not None and "trade_date" in cal.columns:
+            trade_dates = {str(d)[:10] for d in cal["trade_date"].tolist()}
+            return dt.strftime("%Y-%m-%d") in trade_dates
+    except Exception:
+        pass
+    return True
+
+
 def main():
     """主函数 - 支持命令行参数指定分析类型"""
     
@@ -35,7 +55,13 @@ def main():
         print(f"❌ 无效的分析类型: {analysis_type}")
         print(f"✅ 有效的类型: {', '.join(valid_types)}")
         return 1
-    
+
+    # 非交易日跳过：避免周末/节假日无效运行 + 噪音（reconcile 无早盘文件也会告警）
+    now = datetime.now()
+    if not _is_trading_day(now):
+        print(f"📅 今日 {now.strftime('%Y-%m-%d')} 非交易日，跳过「{analysis_type}」分析。")
+        return 0
+
     # 基础目录：环境变量优先，否则为本仓库内 stock_system 根目录
     base_dir = Path(
         os.environ.get(

@@ -52,14 +52,33 @@ def strong_direction_band_pct(base_band: float, tuning: Dict[str, Any]) -> float
     return round(max(base_band * f, base_band + extra), 4)
 
 
-def benchmark_return_pct_for_reconcile() -> Optional[float]:
+def benchmark_return_pct_for_reconcile(ymd: Optional[str] = None) -> Optional[float]:
+    """方向性匹配的大盘基准（个股超额收益方向）。
+
+    优先级：
+      1. 显式环境变量 RECONCILE_BENCHMARK_RETURN_PCT（手工覆盖）
+      2. 默认拉沪深300(000300) 同日 open->close 区间涨跌作为大盘基准，
+         使方向性命中更公平（大盘涨 3% 个股仅涨 1% 实际偏弱）。
+    网络/拉取失败时返回 None（退化为二元方向判断，不阻塞复盘）。
+    """
     raw = os.environ.get("RECONCILE_BENCHMARK_RETURN_PCT", "").strip()
-    if not raw:
-        return None
+    if raw:
+        try:
+            return float(raw)
+        except ValueError:
+            pass
     try:
-        return float(raw)
-    except ValueError:
+        from akshare_fallback import fetch_daily_ohlc
+        # 000300 是指数，stock_zh_a_hist 不返回；改用沪深300ETF(510300)作大盘代理，
+        # 它走个股/ETF 接口必有数据，紧贴沪深300 走势。
+        ohlc = fetch_daily_ohlc("510300", ymd or "")
+        if ohlc and ohlc[0] and ohlc[1]:
+            open_px, close_px = ohlc
+            if open_px > 0:
+                return round((close_px - open_px) / open_px * 100.0, 4)
+    except Exception:
         return None
+    return None
 
 
 def session_return_for_direction(session_return_pct: float, benchmark_pct: Optional[float]) -> float:

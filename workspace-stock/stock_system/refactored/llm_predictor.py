@@ -22,6 +22,7 @@ from __future__ import annotations
 import glob
 import json
 import os
+import re
 import shutil
 import subprocess
 from typing import Any, Dict, List, Optional
@@ -159,6 +160,16 @@ def _build_single_stock_prompt(stock: Dict[str, Any]) -> str:
 def _parse_response(text: str) -> Optional[Dict[str, Any]]:
     """从 LLM 响应中解析 JSON"""
     text = text.strip()
+    # 免费模型(openrouter/free)偶发返回安全包装前缀（如 "User Safety: safe"、
+    # "Assistant:"）而非纯 JSON。剥离这些前缀后再解析；若剥离后仍无 JSON，
+    # 则视为拒绝/无法解析，上层会降级为公式打分。
+    _safety_prefix = re.compile(
+        r"^\s*(user\s*safety\s*:\s*safe|safety\s*:\s*safe|assistant\s*:)\s*",
+        re.IGNORECASE,
+    )
+    m = _safety_prefix.match(text)
+    if m:
+        text = text[m.end():].strip()
     # 尝试提取 JSON 块
     if "```json" in text:
         start = text.index("```json") + 7
@@ -339,7 +350,9 @@ def predict_single(stock: Dict[str, Any]) -> Optional[Dict[str, Any]]:
         print(f"[LLM] {stock.get('name', '?')} → {result['signal']}({result['final_score']}) "
               f"信心{result['confidence']} [{result['_model']}]")
     else:
-        print(f"[LLM] {stock.get('name', '?')} 响应解析失败: {content[:200]}")
+        # 常见原因：免费模型返回 "User Safety: safe" 安全包装且无 JSON 内容
+        hint = "（安全包装/无JSON，降级公式）" if re.search(r"user\s*safety", content, re.I) else ""
+        print(f"[LLM] {stock.get('name', '?')} 响应解析失败{hint}: {content[:200]}")
     return result
 
 

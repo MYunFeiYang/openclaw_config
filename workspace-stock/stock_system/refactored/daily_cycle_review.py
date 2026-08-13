@@ -376,7 +376,7 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
     from predict_then_summarize import ConfigManager
 
     tuning = ConfigManager.get_accuracy_tuning()
-    benchmark_ret = benchmark_return_pct_for_reconcile()
+    benchmark_ret = benchmark_return_pct_for_reconcile(day)
 
     rows: List[Dict[str, Any]] = []
     ok = 0

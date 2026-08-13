@@ -590,9 +590,11 @@ class SummaryEngine:
         th = ConfigManager.get_signal_thresholds()
         b_line, h_line = th["buy"], th["hold"]
         # 分类推荐（与 SignalGenerator 档位一致）
-        buy_recommendations = [p for p in predictions if p.final_score >= b_line][:3]
-        sell_recommendations = [p for p in predictions if p.final_score < h_line][:2]
-        hold_recommendations = [p for p in predictions if h_line <= p.final_score < b_line][:2]
+        # 买卖信号（方向性）全部展示——它们是自校准的方向性样本来源，不能截断；
+        # 持有信号数量多，封顶展示 8 只保持报告可读。
+        buy_recommendations = [p for p in predictions if p.final_score >= b_line]
+        sell_recommendations = [p for p in predictions if p.final_score < h_line]
+        hold_recommendations = [p for p in predictions if h_line <= p.final_score < b_line][:8]
         
         # 市场概况
         market_overview = self._generate_market_overview(predictions, buy_recommendations, sell_recommendations, hold_recommendations, market_status)
