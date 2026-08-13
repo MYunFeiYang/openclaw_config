@@ -726,7 +726,7 @@ class ConfigManager:
         path = cls._stock_pool_path()
         if not path.is_file():
             cls._core_stocks_cache = list(cls._DEFAULT_CORE_STOCKS)
-            cls._analysis_limits_cache = {"morning": 5, "default": 10}
+            cls._analysis_limits_cache = {"morning": 20, "default": 20}
             return cls._core_stocks_cache
         try:
             with open(path, "r", encoding="utf-8") as f:
@@ -753,23 +753,18 @@ class ConfigManager:
             }
         except (OSError, ValueError, KeyError, TypeError):
             cls._core_stocks_cache = list(cls._DEFAULT_CORE_STOCKS)
-            cls._analysis_limits_cache = {"morning": 5, "default": 10}
+            cls._analysis_limits_cache = {"morning": 20, "default": 20}
         return cls._core_stocks_cache
     
     @classmethod
     def get_analysis_stock_slice(cls, analysis_type: str) -> List[StockConfig]:
         stocks = cls.get_core_stocks()
-        lims = cls._analysis_limits_cache or {"morning": 5, "default": 10}
+        lims = cls._analysis_limits_cache or {"morning": 20, "default": 20}
         n = lims.get(analysis_type, lims.get("default", len(stocks)))
         n = max(1, min(n, len(stocks)))
-
-        # 早盘轮换：按交易日偏移，确保低权重股也能获得早盘覆盖
-        if analysis_type == "morning" and n < len(stocks):
-            from datetime import date
-            day_hash = hash(date.today().isoformat()) % len(stocks)
-            rotated = stocks[day_hash:] + stocks[:day_hash]
-            return rotated[:n]
-
+        # 固定自选股池：每天跑同一批（由 config/stock_pool.json 的 stocks 决定），
+        # 不再按交易日轮换抽样。这样能持续跟踪同一批个股、稳定积累方向性样本，
+        # 供 auto_calibration 跨日学习（否则买卖信号样本长期稀缺、校准空转）。
         return stocks[:n]
 
     # 评分权重配置
