@@ -42,7 +42,7 @@ workspace/stock_system/logs/
 workspace/stock_system/reports/
 workspace/stock_system/pids/
 workspace/stock_system/*.log
-workspace/stock_system/config/calibration_overrides.json
+workspace/stock_system/config/
 
 # Dependencies and Python
 **/node_modules/
@@ -76,11 +76,12 @@ workspace-stock/stock_system/*.txt
 !workspace-stock/stock_system/requirements.txt
 workspace-stock/stock_system/*.log
 workspace-stock/stock_system/predictions.db
-# 保留自校准闭环状态（跨克隆保留）
-!workspace-stock/stock_system/data/reconcile_history.jsonl
-!workspace-stock/stock_system/data/iteration_state.json
-!workspace-stock/stock_system/data/iteration_briefing.txt
+# 保留：仅调优参数入库（calibration_overrides.json 供 auto_calibration 读取，需跨克隆保留）
 !workspace-stock/stock_system/config/calibration_overrides.json
+# 忽略：loop 中间过程（每次运行自动再生，非调优参数，无需入库）
+workspace-stock/stock_system/data/reconcile_history.jsonl
+workspace-stock/stock_system/data/iteration_state.json
+# iteration_briefing.txt 已被上方 *.txt 规则忽略
 
 plugin-runtime-deps/
 
@@ -107,3 +108,9 @@ tmp/
 agents/*/agent/plugins/*/catalog.json
 
 *.tmp
+
+# OpenClaw 自动记忆 / 梦境产物（后台进程每日再生，纯噪声，不入库）
+**/.dreams/
+**/DREAMS.md
+**/MEMORY.md
+**/memory/dreaming/
