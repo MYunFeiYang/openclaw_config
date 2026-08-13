@@ -167,6 +167,7 @@ class PredictionEngine:
         self.scoring_engine = ScoringEngine()
         self.signal_generator = SignalGenerator()
         self._use_llm = _use_llm()
+        self._llm_consec_fail = 0  # LLM 连续失败计数：达阈值整批降级纯公式
         self._market_status: Optional[Dict] = None
         self._market_regime: str = "range"  # 默认震荡市（中性）
 
@@ -293,10 +294,17 @@ class PredictionEngine:
         if self._use_llm:
             llm_r = self._try_llm_predict(stock, inputs)
             if llm_r:
+                self._llm_consec_fail = 0
                 blended = self._blend_with_llm(stock, inputs, formula_result, llm_r)
                 blended.formula_signal = formula_result.signal  # A/B：记录纯公式信号
                 return blended
-            print(f"[LLM] {stock.name} 预测失败，仅用公式打分")
+            # 单只失败：计数 + 连续失败达阈值则整批降级，避免 20 只全卡/主进程 OOM
+            self._llm_consec_fail += 1
+            if self._llm_consec_fail >= 3:
+                self._use_llm = False
+                print("[LLM] 连续失败 3 次，后续整批降级为纯公式打分（避免拖死/OOM）")
+            else:
+                print(f"[LLM] {stock.name} 预测失败，仅用公式打分")
         formula_result.formula_signal = formula_result.signal  # 公式路径同样记录纯公式信号
         return formula_result
     
