@@ -22,9 +22,10 @@ predictions.db
 # 保留：仅调优参数入库（calibration_overrides.json 供 auto_calibration 读取，需跨克隆保留）
 !config/calibration_overrides.json
 # 忽略：loop 中间过程（每次运行自动再生，非调优参数，无需入库）
-data/reconcile_history.jsonl
 data/iteration_state.json
 # iteration_briefing.txt 已被上方 *.txt 规则忽略
+# 保留：reconcile_history.jsonl 是准确率记分牌（append-only 小文件，跨克隆需保留）
+!data/reconcile_history.jsonl
 
 # 根目录 txt（保留 requirements.txt）
 *.txt
