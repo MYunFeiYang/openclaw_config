@@ -12,7 +12,6 @@ LLM 预测模块 — 通过 OpenClaw 的 openrouter 插件调用大模型进行�
 环境变量：
   OPENROUTER_MODEL      模型名称（缺省跟随 OpenClaw 默认模型 openclaw.json→agents.defaults.model.primary；可裸 slug 或 openrouter/ 前缀覆盖）
   OPENROUTER_TIMEOUT    调用超时秒数（默认 30，gateway 路由调用已自动放宽）
-  OPENROUTER_MAX_TOKENS 最大输出 token（默认 1024）
   OPENCLAW_BIN          可选：openclaw 可执行文件路径（缺省自动探测 PATH / nvm）
 
 依赖：Python 标准库 + 本地 openclaw CLI。LLM 调用失败时自动降级为纯公式打分。
@@ -31,7 +30,6 @@ from typing import Any, Dict, List, Optional
 # ── 默认配置 ──────────────────────────────────────────
 _DEFAULT_MODEL = "deepseek/deepseek-chat"
 _DEFAULT_TIMEOUT = 30
-_DEFAULT_MAX_TOKENS = 1024
 
 # openclaw CLI 候选路径（按优先级：PATH > 已知 nvm 安装）
 _OPENCLAW_CANDIDATES = [
@@ -263,7 +261,6 @@ def _extract_content_from_openclaw_output(text: str) -> Optional[str]:
 def call_openrouter(
     messages: List[Dict[str, str]],
     model: Optional[str] = None,
-    max_tokens: int = _DEFAULT_MAX_TOKENS,
 ) -> Optional[Dict[str, Any]]:
     """通过 OpenClaw 的 openrouter 插件调用 LLM，返回与 OpenRouter API 同构的
     `{"choices":[{"message":{"content":...}}], "model":...}` 以便上层逻辑不变。
@@ -344,86 +341,6 @@ def predict_single(stock: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     else:
         print(f"[LLM] {stock.get('name', '?')} 响应解析失败: {content[:200]}")
     return result
-
-
-def predict_batch(stocks: List[Dict[str, Any]]) -> Optional[List[Optional[Dict[str, Any]]]]:
-    """批量预测多只股票（单次 API 调用），返回与输入等长的结果列表。
-    某只股票解析失败则该位置为 None。整体调用失败返回 None。"""
-    # 构建批量 prompt
-    stock_blocks = []
-    for i, s in enumerate(stocks):
-        block = _build_single_stock_prompt(s)
-        stock_blocks.append(f"--- 股票 #{i+1} ---\n{block}")
-
-    user_prompt = (
-        "请逐一预测以下 {} 只A股未来1-5个交易日的走势。\n"
-        "对每只股票分别给出评分和信号。\n\n"
-        "{}\n\n"
-        "请返回一个 JSON 数组，每个元素对应一只股票：\n"
-        '[{{"final_score": 7.5, "signal": "买入", "confidence": 72, "reasons": ["理由1","理由2"]}},...]\n'
-        "不要输出其他内容。"
-    ).format(len(stocks), "\n\n".join(stock_blocks))
-
-    messages = [
-        {"role": "system", "content": _SYSTEM_PROMPT},
-        {"role": "user", "content": user_prompt},
-    ]
-
-    resp = call_openrouter(messages, max_tokens=2048)
-    if not resp:
-        return None
-
-    try:
-        content = resp["choices"][0]["message"]["content"]
-    except (KeyError, IndexError, TypeError):
-        print("[LLM] 响应格式异常")
-        return None
-
-    # 解析 JSON 数组
-    content = content.strip()
-    if "```json" in content:
-        content = content[content.index("```json") + 7 :]
-        if "```" in content:
-            content = content[: content.index("```")].strip()
-    elif "```" in content:
-        content = content[content.index("```") + 3 :]
-        if "```" in content:
-            content = content[: content.index("```")].strip()
-
-    try:
-        arr = json.loads(content)
-    except json.JSONDecodeError:
-        # 尝试提取数组部分
-        try:
-            s = content.index("[")
-            e = content.rindex("]") + 1
-            arr = json.loads(content[s:e])
-        except (ValueError, json.JSONDecodeError):
-            print(f"[LLM] 批量响应解析失败: {content[:300]}")
-            return None
-
-    if not isinstance(arr, list):
-        return None
-
-    # 逐项解析
-    model_used = resp.get("model", "unknown")
-    results: List[Optional[Dict[str, Any]]] = []
-    for i, item in enumerate(arr):
-        name = stocks[i].get("name", "?") if i < len(stocks) else "?"
-        if not isinstance(item, dict):
-            results.append(None)
-            print(f"[LLM] {name} 结果格式异常，跳过")
-            continue
-        parsed = _parse_response(json.dumps(item))
-        if parsed:
-            parsed["_model"] = model_used
-            print(f"[LLM] {name} → {parsed['signal']}({parsed['final_score']}) "
-                  f"信心{parsed['confidence']}")
-        else:
-            print(f"[LLM] {name} 解析失败: {item}")
-        results.append(parsed)
-
-    return results
 
 
 # ── 便捷入口：与现有 PredictionEngine 对接 ──

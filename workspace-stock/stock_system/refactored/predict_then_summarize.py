@@ -16,7 +16,7 @@ from data_providers import StockDataProvider, get_analysis_type_name, get_defaul
 from evening_optimizer import EveningPredictionOptimizer
 from reconcile_accuracy import default_accuracy_tuning, merge_accuracy_tuning
 from llm_predictor import (
-    predict_single, predict_batch, stock_to_llm_input, is_llm_enabled,
+    predict_single, stock_to_llm_input, is_llm_enabled,
 )
 
 
@@ -309,59 +309,14 @@ class PredictionEngine:
         )
     
     def predict_portfolio(self, stocks: List[StockConfig], analysis_type: str = "evening") -> List[PredictionResult]:
-        """对股票组合进行预测：先算公式，再叠加 LLM（若可用）"""
+        """对股票组合进行预测：逐只先算公式，再叠加 LLM（若可用）。
+
+        逐只调用而非批量：免费模型下批量请求必然在 60s 超时并退化成逐只，
+        既没省调用还白等 60s；逐只路径已验证稳定（5/5），且能天然隔离
+        单只行情/解析失败（单股异常被 try/except 跳过，不影响其余）。"""
         
         self._detect_market_status()
 
-        # ── 批量 LLM 预测（单次 API 调用，效率最高）──
-        if self._use_llm and len(stocks) > 1:
-            # 先获取所有股票的行情数据 + 公式结果
-            stock_data: List[Tuple[StockConfig, Any, PredictionResult, dict]] = []
-            for stock in stocks:
-                try:
-                    inputs = self._provider.fetch(stock)
-                except Exception as e:
-                    print(f"[WARN] 跳过 {stock.name}（行情拉取失败: {e}），不参与本次分析")
-                    continue
-                formula_result = self._formula_predict(stock, inputs, analysis_type)
-                llm_input = stock_to_llm_input(
-                    stock_name=stock.name,
-                    stock_symbol=stock.symbol,
-                    stock_sector=stock.sector,
-                    current_price=inputs.current_price,
-                    change_percent=inputs.change_percent,
-                    technical=inputs.technical,
-                    fundamental=inputs.fundamental,
-                    sentiment=inputs.sentiment,
-                    sector=inputs.sector,
-                )
-                stock_data.append((stock, inputs, formula_result, llm_input))
-
-            if not stock_data:
-                print("[WARN] 全部股票行情拉取失败，无可用预测")
-                return []
-            
-            batch_results = predict_batch([sd[3] for sd in stock_data])
-            if batch_results:
-                results = []
-                all_success = True
-                for (stock, inputs, formula_result, _), llm_r in zip(stock_data, batch_results):
-                    if llm_r:
-                        results.append(self._blend_with_llm(stock, inputs, formula_result, llm_r))
-                    else:
-                        # 某只股票 LLM 解析失败 → 该只用公式结果
-                        all_success = False
-                        print(f"[LLM] {stock.name} 批量结果解析失败，该只仅用公式")
-                        results.append(formula_result)
-                
-                if all_success:
-                    print(f"[LLM] 批量叠加成功: {len(results)}/{len(stocks)} 只")
-                
-                results.sort(key=lambda x: x.final_score, reverse=True)
-                return results
-            
-            print("[LLM] 批量预测整体失败，降级到逐只预测")
-        
         # ── 逐只预测（每只独立尝试 LLM 叠加，失败则公式）──
         results = []
         for stock in stocks:
