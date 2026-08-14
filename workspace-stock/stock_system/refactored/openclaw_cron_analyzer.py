@@ -113,21 +113,16 @@ def _push_via_webhook(text: str, title: str = "") -> bool:
 
 
 def push_to_wecom(text: str, title: str = "") -> bool:
-    """推送文本到企微(thinkway)。
+    """推送文本到企微(thinkway)，直接复用 openclaw 已配好的 wecom 通道。
 
-    通道优先级：
-    1) 群机器人 webhook（WECOM_WEBHOOK_URL，确定性、绕过 aibot 5s ack 超时）——
-       定时冷启动场景下最可靠，配了即用。
-    2) 回退 openclaw message send（受 aibot 5s ack 约束，睡眠唤醒冷启动时易失败，
-       故加长冷启动等待 60s + 长退避 [15,45,90,180]s 尽力重试）。
+    主通道：openclaw `message send --channel wecom`（复用 ~/.openclaw 的 wecom 配置，
+    无需任何额外凭据/URL）。受 aibot 5s ack 约束，睡眠唤醒冷启动时易失败，故加长
+    冷启动等待 60s + 长退避 [15,45,90,180]s 尽力重试。
+    兜底：仅当用户显式配置 WECOM_WEBHOOK_URL（群机器人 webhook）时，openclaw 全失败后
+    再尝试一次 webhook 直发（绕过 aibot ack）。此为可选增强，非必须。
     文本超长按企微单条上限分片发送。
     """
-    # 1) 确定性通道：webhook 直发（无 aibot ack 超时）
-    if os.environ.get("WECOM_WEBHOOK_URL"):
-        print("📡 走企微 webhook 直发(绕过 aibot 5s ack)...")
-        return _push_via_webhook(text, title)
-
-    # 2) 回退：openclaw message send（受 aibot 5s ack 约束，长退避重试）
+    # 主通道：复用 openclaw 已配好的 wecom 配置推送
     try:
         from llm_predictor import _find_openclaw_bin
     except Exception:
@@ -170,7 +165,13 @@ def push_to_wecom(text: str, title: str = "") -> bool:
         if not sent:
             ok_all = False
             print(f"❌ 企微推送最终失败(分片 {idx+1}/{len(chunks)})")
-    return ok_all
+    if ok_all:
+        return True
+    # 兜底：仅当用户提供 webhook URL（可选增强）时再试一次确定性通道
+    if os.environ.get("WECOM_WEBHOOK_URL"):
+        print("📡 openclaw 通道失败，回退企微 webhook 直发(可选增强)...")
+        return _push_via_webhook(text, title)
+    return False
 
 
 def _record_push_status(base_dir: str, ok: bool) -> None:
