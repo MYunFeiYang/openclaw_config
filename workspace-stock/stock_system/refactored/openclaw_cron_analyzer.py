@@ -292,21 +292,38 @@ def main():
         # 全部个股行情拉取/分析均失败 → 本次分析失败（exit 1）
         if analyzed == 0:
             print("❌ 无可用预测（全部股票数据缺失），本次分析失败")
+            fail_text = (
+                f"❌ 早盘完全失败：全部股票数据缺失，今日无任何早报信号。\n"
+                f"请勿依据旧信号交易。建议检查行情源(akshare/新浪)或手动重跑。"
+            )
+            if degraded_alert:
+                fail_text = degraded_alert + "\n\n" + fail_text
+            _warn_if_push_repeatedly_failing(str(base_dir))
+            ok = push_to_wecom(fail_text, title=f"❌ A股早盘完全失败 {now.strftime('%Y-%m-%d')}")
+            _record_push_status(str(base_dir), ok)
             return 1
 
         # 部分股票缺失 → 不视为成功，避免企微误报"成功"（exit 2）
+        # 缺失比例高才升级为企微告警，少量缺失属正常波动、避免告警疲劳
         total = result.get('total_stocks', analyzed)
         if analyzed < total:
-            print(f"⚠️ 部分股票数据缺失（{total - analyzed}/{total} 只未分析），本次视为部分失败")
-            miss_text = (
-                f"⚠️ 早盘部分失败：{total - analyzed}/{total} 只股票数据缺失，"
-                f"早报未推送完整结果。请检查行情源(akshare/新浪)。"
-            )
-            if degraded_alert:
-                miss_text = degraded_alert + "\n\n" + miss_text
-            _warn_if_push_repeatedly_failing(str(base_dir))
-            ok = push_to_wecom(miss_text, title=f"⚠️ A股早盘部分失败 {now.strftime('%Y-%m-%d')}")
-            _record_push_status(str(base_dir), ok)
+            missing = total - analyzed
+            miss_ratio = missing / total if total else 1.0
+            print(f"⚠️ 部分股票数据缺失（{missing}/{total} 只未分析，缺失率 {miss_ratio:.0%}），本次视为部分失败")
+            if miss_ratio >= 0.2 or missing >= 5:
+                miss_text = (
+                    f"⚠️ 早盘部分失败：{missing}/{total} 只股票数据缺失，缺失率 {miss_ratio:.0%}，\n"
+                    f"早报信号不完整、参考价值低，请勿据此交易。\n"
+                    f"建议手动重跑（openclaw cron run 早盘任务）或等次日早盘。\n"
+                    f"请检查行情源(akshare/新浪)。"
+                )
+                if degraded_alert:
+                    miss_text = degraded_alert + "\n\n" + miss_text
+                _warn_if_push_repeatedly_failing(str(base_dir))
+                ok = push_to_wecom(miss_text, title=f"⚠️ A股早盘部分失败 {now.strftime('%Y-%m-%d')}")
+                _record_push_status(str(base_dir), ok)
+            else:
+                print(f"   缺失 {missing} 只(<20% 且 <5只)，属正常波动，仅日志提示、不推送企微。")
             return 2
 
         # 推送前检查：若企微已连续多次失败，打印告警（仍尝试本次推送）
