@@ -27,6 +27,10 @@ data/iteration_state.json
 # 保留：reconcile_history.jsonl 是准确率记分牌（append-only 小文件，跨克隆需保留）
 !data/reconcile_history.jsonl
 
+# 运行时状态（自动再生，非配置；strategy_status=策略失效标记，push_status=推送成败累计）
+data/strategy_status.json
+data/push_status.json
+
 # 根目录 txt（保留 requirements.txt）
 *.txt
 !requirements.txt

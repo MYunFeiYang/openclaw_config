@@ -126,6 +126,43 @@ def push_to_wecom(text: str, title: str = "") -> bool:
     return ok_all
 
 
+def _record_push_status(base_dir: str, ok: bool) -> None:
+    """记录推送成败到 data/push_status.json（跨运行累计连续失败，供早盘告警）。"""
+    p = Path(base_dir) / "data" / "push_status.json"
+    try:
+        st = json.loads(p.read_text(encoding="utf-8")) if p.exists() else {}
+    except Exception:
+        st = {}
+    iso = datetime.now().isoformat()
+    if ok:
+        st["consecutive_failures"] = 0
+        st["last_success_at"] = iso
+    else:
+        st["consecutive_failures"] = int(st.get("consecutive_failures", 0)) + 1
+        st["last_fail_at"] = iso
+    try:
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(json.dumps(st, ensure_ascii=False, indent=2), encoding="utf-8")
+    except Exception:
+        pass
+
+
+def _warn_if_push_repeatedly_failing(base_dir: str) -> None:
+    """若企微推送已连续多次失败，打印醒目告警（不阻断本次运行）。"""
+    p = Path(base_dir) / "data" / "push_status.json"
+    if not p.exists():
+        return
+    try:
+        st = json.loads(p.read_text(encoding="utf-8"))
+    except Exception:
+        return
+    cf = int(st.get("consecutive_failures", 0))
+    if cf >= 3:
+        print(f"\n🚨 企微推送已连续 {cf} 次失败！请检查 openclaw gateway 是否在线"
+              f"（curl -s -o /dev/null -w '%{{http_code}}' http://127.0.0.1:18789/）。"
+              f"本次仍会尝试推送。")
+
+
 def main():
     """主函数 - 支持命令行参数指定分析类型"""
     
@@ -198,7 +235,9 @@ def main():
         degraded_alert_pc = _read_strategy_degraded_text(str(base_dir))
         if degraded_alert_pc:
             review_text = degraded_alert_pc + "\n\n" + review_text
-        push_to_wecom(review_text, title=f"📊 A股收盘复盘与汇总 {day}")
+        _warn_if_push_repeatedly_failing(str(base_dir))
+        ok = push_to_wecom(review_text, title=f"📊 A股收盘复盘与汇总 {day}")
+        _record_push_status(str(base_dir), ok)
         # post_close 的核心产出是 day_review（汇总 + 自校准）。
         # reconcile 需要早盘文件，缺失属于警告场景，不应让定时任务失败。
         return rc_d
@@ -259,13 +298,25 @@ def main():
         total = result.get('total_stocks', analyzed)
         if analyzed < total:
             print(f"⚠️ 部分股票数据缺失（{total - analyzed}/{total} 只未分析），本次视为部分失败")
+            miss_text = (
+                f"⚠️ 早盘部分失败：{total - analyzed}/{total} 只股票数据缺失，"
+                f"早报未推送完整结果。请检查行情源(akshare/新浪)。"
+            )
+            if degraded_alert:
+                miss_text = degraded_alert + "\n\n" + miss_text
+            _warn_if_push_repeatedly_failing(str(base_dir))
+            ok = push_to_wecom(miss_text, title=f"⚠️ A股早盘部分失败 {now.strftime('%Y-%m-%d')}")
+            _record_push_status(str(base_dir), ok)
             return 2
 
+        # 推送前检查：若企微已连续多次失败，打印告警（仍尝试本次推送）
+        _warn_if_push_repeatedly_failing(str(base_dir))
         # 推送早报到企微（脚本内自管等待+重试，绕过框架 5s ack 超时）
         push_text = result['summary_report']
         if degraded_alert:
             push_text = degraded_alert + "\n\n" + push_text
-        push_to_wecom(push_text, title=f"📊 A股早盘分析 {now.strftime('%Y-%m-%d')}")
+        ok = push_to_wecom(push_text, title=f"📊 A股早盘分析 {now.strftime('%Y-%m-%d')}")
+        _record_push_status(str(base_dir), ok)
 
         return 0
         
