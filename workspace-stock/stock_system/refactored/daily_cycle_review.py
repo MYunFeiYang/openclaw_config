@@ -527,6 +527,9 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
     dir_hit = dir_miss = hold_hit = hold_miss = 0
     fdir_hit = fdir_miss = 0  # A/B：纯公式路径方向性计数
     buy_rets: List[float] = []  # 买入信号股的当日区间收益（真实收益口径）
+    sell_rets: List[float] = []  # 卖出信号股的当日区间收益（负=信号有效）
+    hold_rets: List[float] = []  # 持有信号股的当日区间收益
+    sell_hit = sell_miss = 0  # 卖出信号单独方向性计数
     for r in rows:
         if r.get("session_return_pct") is None or r.get("direction_match") is None:
             continue
@@ -539,11 +542,18 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
                 dir_miss += 1
             if exp == 1:  # 买入信号
                 buy_rets.append(float(r["session_return_pct"]))
+            elif exp == -1:  # 卖出信号
+                sell_rets.append(float(r["session_return_pct"]))
+                if ok:
+                    sell_hit += 1
+                else:
+                    sell_miss += 1
         else:  # 持有信号
             if ok:
                 hold_hit += 1
             else:
                 hold_miss += 1
+            hold_rets.append(float(r["session_return_pct"]))
         # A/B 公式路径（纯公式信号的方向性对照）
         fexp = int(r.get("formula_expected_direction", 0) or 0)
         fok = r.get("formula_direction_match")
@@ -557,6 +567,10 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
     hold_samples = hold_hit + hold_miss
     hold_hit_rate = round(hold_hit / hold_samples, 4) if hold_samples else None
     buy_mean_return = round(sum(buy_rets) / len(buy_rets), 4) if buy_rets else None
+    sell_samples = sell_hit + sell_miss
+    sell_hit_rate = round(sell_hit / sell_samples, 4) if sell_samples else None
+    sell_mean_return = round(sum(sell_rets) / len(sell_rets), 4) if sell_rets else None
+    hold_mean_return = round(sum(hold_rets) / len(hold_rets), 4) if hold_rets else None
     fdir_samples = fdir_hit + fdir_miss
     formula_directional_hit_rate = round(fdir_hit / fdir_samples, 4) if fdir_samples else None
 
@@ -590,6 +604,10 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
             "hold_misses": hold_miss,
             "hold_hit_rate": hold_hit_rate,
             "buy_signal_mean_return_pct": buy_mean_return,
+            "sell_signal_mean_return_pct": sell_mean_return,
+            "hold_signal_mean_return_pct": hold_mean_return,
+            "sell_samples": sell_samples,
+            "sell_hit_rate": sell_hit_rate,
             "formula_directional_samples": fdir_samples,
             "formula_directional_hit_rate": formula_directional_hit_rate,
         },
@@ -628,6 +646,8 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
         "【方向性一致率（仅买入+卖出信号，真实预测能力口径）】",
         f"  一致 {dir_hit} / 样本 {dir_samples} = {directional_hit_rate!s}",
         f"  买入信号股当日平均区间收益: {buy_mean_return!s}%",
+        f"  卖出信号股当日平均区间收益: {sell_mean_return!s}%  (负=卖出信号有效)",
+        f"  持有信号股当日平均区间收益: {hold_mean_return!s}%",
         "",
         "【持有命中率（非预测能力，多数交易日波动<中性带天然判对）】",
         f"  一致 {hold_hit} / 样本 {hold_samples} = {hold_hit_rate!s}",
