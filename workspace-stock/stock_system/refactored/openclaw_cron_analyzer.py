@@ -75,12 +75,59 @@ def _latest_report(base_dir: str, prefix: str, day: str):
     return fs[-1] if fs else None
 
 
-def push_to_wecom(text: str, title: str = "") -> bool:
-    """通过 openclaw gateway 推送文本到企微(thinkway)。
+def _push_via_webhook(text: str, title: str = "") -> bool:
+    """企微群机器人 webhook 直发（fire-and-forget，绕过 aibot 5s ack 超时）。
 
-    针对唤醒补跑时 gateway 冷启动导致的 5s ack 超时：先 sleep 等网关就绪，
-    失败按 0/5/10/20s 退避重试最多 4 次。文本超长按企微单条上限分片发送。
+    需环境变量 WECOM_WEBHOOK_URL（企微群机器人 Webhook 地址）。
+    直接 HTTP POST 到企微服务器，不经过 gateway / aibot，无 5s ack 约束，
+    是定时冷启动场景下的确定性通道。返回是否成功。
     """
+    import urllib.request
+    import urllib.error
+    url = os.environ.get("WECOM_WEBHOOK_URL")
+    if not url:
+        return False
+    content = (title + "\n\n" + text) if title else text
+    payload = json.dumps(
+        {"msgtype": "text", "text": {"content": content}},
+        ensure_ascii=False,
+    ).encode("utf-8")
+    req = urllib.request.Request(
+        url, data=payload, headers={"Content-Type": "application/json"}
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            body = resp.read().decode("utf-8", "ignore")
+        try:
+            j = json.loads(body)
+            if int(j.get("errcode", -1)) == 0:
+                print("✅ 企微 webhook 推送成功")
+                return True
+            print(f"⚠️ 企微 webhook 返回非0: {body[:200]}")
+        except Exception:
+            print(f"✅ 企微 webhook 推送成功(响应 {body[:80]})")
+            return True
+    except Exception as e:
+        print(f"⚠️ 企微 webhook 推送异常: {e}")
+    return False
+
+
+def push_to_wecom(text: str, title: str = "") -> bool:
+    """推送文本到企微(thinkway)。
+
+    通道优先级：
+    1) 群机器人 webhook（WECOM_WEBHOOK_URL，确定性、绕过 aibot 5s ack 超时）——
+       定时冷启动场景下最可靠，配了即用。
+    2) 回退 openclaw message send（受 aibot 5s ack 约束，睡眠唤醒冷启动时易失败，
+       故加长冷启动等待 60s + 长退避 [15,45,90,180]s 尽力重试）。
+    文本超长按企微单条上限分片发送。
+    """
+    # 1) 确定性通道：webhook 直发（无 aibot ack 超时）
+    if os.environ.get("WECOM_WEBHOOK_URL"):
+        print("📡 走企微 webhook 直发(绕过 aibot 5s ack)...")
+        return _push_via_webhook(text, title)
+
+    # 2) 回退：openclaw message send（受 aibot 5s ack 约束，长退避重试）
     try:
         from llm_predictor import _find_openclaw_bin
     except Exception:
@@ -94,14 +141,14 @@ def push_to_wecom(text: str, title: str = "") -> bool:
     bin_dir = os.path.dirname(bin_path)
     env = dict(os.environ)
     env["PATH"] = bin_dir + os.pathsep + env.get("PATH", "")
-    # 等待 gateway 冷启动（唤醒补跑场景，gateway 可能刚起）
-    print("⏳ 等待 gateway 就绪(25s)...")
-    time.sleep(25)
+    # 等待 gateway / aibot 回暖（唤醒补跑场景，aibot 冷启动可能需数分钟才肯 ack）
+    print("⏳ 等待 gateway/aibot 回暖(60s)...")
+    time.sleep(60)
     full = (title + "\n\n" + text) if title else text
     # 企微单条文本上限约 2048 字节，按 1900 字符分片（中文安全）
     chunks = [full[i:i + 1900] for i in range(0, len(full), 1900)] or [full]
     ok_all = True
-    backoff = [0, 5, 10, 20]
+    backoff = [15, 45, 90, 180]
     for idx, chunk in enumerate(chunks):
         sent = False
         for attempt in range(4):
