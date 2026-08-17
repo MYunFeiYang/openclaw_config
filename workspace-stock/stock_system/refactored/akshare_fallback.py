@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """
-行情直取 fallback —— 当 OpenClaw Agent 不可用时，直接通过 HTTP 调用新浪财经
-实时行情接口拉取 A 股现价与涨跌幅。
+行情直取 fallback —— 当 OpenClaw Agent 不可用时，直接通过 HTTP 调用行情接口
+拉取 A 股现价与涨跌幅。
 
-两层策略：
-  1. 新浪财经 HTTP（零依赖，py3 内置 urllib）—— 批量单次可查多只
-  2. akshare（可选，安装后自动优先）
+三层策略（逐源补齐，单源故障不致全废）：
+  1. akshare（可选，安装后自动优先）
+  2. 新浪财经 HTTP（零依赖，py3 内置 urllib）—— 批量单次可查多只
+  3. 腾讯财经 HTTP（零依赖，同 urllib）—— 新浪不可达时兜底
 
 环境变量：
   STOCK_FALLBACK_CACHE_SEC  单股缓存秒数，默认 60
@@ -152,6 +153,78 @@ def _fetch_sina_batch(codes: list) -> Dict[str, Tuple[float, float]]:
             code, price, pct = parsed
             result[code] = (price, pct)
     return result
+
+
+def _fetch_tencent_batch(codes: list) -> Dict[str, Tuple[float, float]]:
+    """腾讯财经 HTTP 直连兜底（零依赖）。新浪不可达时补位。
+
+    接口 qt.gtimg.cn：v_sh600519="1~名称~代码~现价~昨收~今开~..."（~ 分隔）。
+    涨跌幅按 (现价-昨收)/昨收 计算，与新浪口径一致。
+    """
+    if not codes:
+        return {}
+    syms = ",".join(
+        ("sh" if c.strip().zfill(6)[0] in "69" else "sz") + c.strip().zfill(6)
+        for c in codes
+    )
+    url = f"https://qt.gtimg.cn/q={syms}"
+    try:
+        req = urllib.request.Request(url, headers={"Referer": "https://finance.qq.com"})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            raw = resp.read().decode("gbk", errors="replace")
+    except Exception:
+        return {}
+
+    result: Dict[str, Tuple[float, float]] = {}
+    for line in raw.strip().split("\n"):
+        m = re.match(r"v_(\w+)=\"(.+)\"", line)
+        if not m:
+            continue
+        sym = m.group(1)          # e.g. "sh600519"
+        fields = m.group(2).split("~")
+        if len(fields) < 5:
+            continue
+        code = sym[2:]
+        try:
+            price = float(fields[3])     # 现价
+            prev_close = float(fields[4])  # 昨收
+        except (ValueError, TypeError):
+            continue
+        if price > 0 and prev_close > 0:
+            pct = round((price - prev_close) / prev_close * 100, 2)
+            result[code] = (price, pct)
+    return result
+
+
+def _fetch_quote_batch(codes: list) -> Dict[str, Tuple[float, float]]:
+    """统一行情抓取：优先 akshare → 新浪 → 腾讯，逐源补齐缺失代码。
+
+    任一单源故障（超时/被封/空响应）都不会导致整批失效——后续源自动兜底。
+    返回 {代码: (现价, 涨跌幅%)}。
+    """
+    if not codes:
+        return {}
+    data: Dict[str, Tuple[float, float]] = {}
+
+    def _missing() -> list:
+        return [c for c in codes if c not in data]
+
+    if _akshare_available():
+        try:
+            data.update(_fetch_akshare_batch(codes))
+        except Exception:
+            pass
+    if _missing():
+        try:
+            data.update(_fetch_sina_batch(_missing()))
+        except Exception:
+            pass
+    if _missing():
+        try:
+            data.update(_fetch_tencent_batch(_missing()))
+        except Exception:
+            pass
+    return data
 
 
 # ── Layer 2: akshare（可选增强）───────────────────────────────────────
@@ -377,10 +450,9 @@ class AkshareFallbackProvider:
             retries = int(os.environ.get("STOCK_FETCH_RETRIES") or "3")
         retries = max(1, retries)
 
-        via_akshare = _akshare_available()
         for attempt in range(retries):
             try:
-                data = _fetch_akshare_batch([code]) if via_akshare else _fetch_sina_batch([code])
+                data = _fetch_quote_batch([code])
             except Exception:
                 data = {}
             if data.get(code) is not None:
