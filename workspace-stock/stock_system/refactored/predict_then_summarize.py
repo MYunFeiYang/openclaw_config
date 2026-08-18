@@ -159,6 +159,40 @@ def _use_llm() -> bool:
 
 # ==================== 预测引擎 ====================
 
+def _load_low_confidence_symbols() -> Dict[str, float]:
+    """读 data/iteration_briefing.txt 的【需加严复核的标的】段，
+    提取近期方向多次不一致的标的及其方向不一致率(miss_rate=M/N)。
+    用于早盘低置信降权（股神风控：不跟已知会错的信号硬刚）。
+    无文件/无段时返回空 dict（不影响正常预测）。"""
+    import re
+    from pathlib import Path
+    p = Path(__file__).resolve().parent.parent / "data" / "iteration_briefing.txt"
+    if not p.exists():
+        return {}
+    try:
+        text = p.read_text(encoding="utf-8")
+    except Exception:
+        return {}
+    lines = text.splitlines()
+    in_section = False
+    result: Dict[str, float] = {}
+    # 仅匹配段内 "近N次中不一致M次" 格式，避免误抓第6行概览
+    sym_re = re.compile(r'近(\d+)次中不一致\s*(\d+)\s*次')
+    for line in lines:
+        if '需加严复核的标的' in line:
+            in_section = True
+            continue
+        if in_section:
+            if not line.strip() or line.strip().startswith('说明'):
+                break
+            code_m = re.search(r'\((\d{6})\)', line)
+            m = sym_re.search(line)
+            if code_m and m:
+                n = int(m.group(1)); miss = int(m.group(2))
+                result[code_m.group(1)] = round(miss / n, 3) if n > 0 else 1.0
+    return result
+
+
 class PredictionEngine:
     """预测引擎 - 核心预测逻辑"""
     
@@ -384,8 +418,44 @@ class PredictionEngine:
             print("[WARN] 全部股票分析失败，无可用预测")
             return []
 
+        # ── 低置信降权（股神风控：防止近期方向多次反向的标的被误推买入）──
+        self._apply_low_confidence(results)
+
         results.sort(key=lambda x: x.final_score, reverse=True)
         return results
+
+    def _apply_low_confidence(self, results: List[PredictionResult]) -> None:
+        """低置信降权：仅拦截原本会进入买入推荐的标的（final_score>=买入阈值），
+        将其压到买入区以下；本就不买入的标的保持原信号，避免制造卖出误信号。
+        降权幅度按当日方向不一致率自适应，命中率回升则自动解除（非永久剔除）。"""
+        low_conf = _load_low_confidence_symbols()
+        if not low_conf:
+            return
+        LOW_CONF_MAX_PENALTY = 1.5
+        try:
+            b_line = ConfigManager.get_signal_thresholds().get('buy', 5.8)
+        except Exception:
+            b_line = 5.8
+        for r in results:
+            mr = low_conf.get(r.stock.symbol)
+            if mr is None:
+                continue
+            # 本就不会被买入推荐：不降权，保留原信号（不制造卖出误信号）
+            if r.final_score < b_line:
+                continue
+            penalty = round(min(mr, 1.0) * LOW_CONF_MAX_PENALTY, 1)
+            if penalty <= 0:
+                continue
+            old_score = r.final_score
+            new_score = round(r.final_score - penalty, 2)
+            if new_score >= b_line:
+                new_score = round(b_line - 0.1, 2)
+            r.final_score = max(1.0, new_score)
+            r.reasons.append(f"低置信·近期方向多次不一致(买入拦截, 降至{r.final_score})")
+            # 仅重算 signal 字符串保持与分数一致，不覆盖 reasons/confidence
+            r.signal = self.signal_generator.generate_signal(r.final_score, r.stock, None)[0]
+            print(f"[低置信买入拦截] {r.stock.name}({r.stock.symbol}) "
+                  f"{old_score}→{r.final_score} (miss_rate={mr})")
 
 
 # ==================== 评分引擎 ====================
