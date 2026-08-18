@@ -380,7 +380,7 @@ def main():
         push_text = result['summary_report']
         if degraded_alert:
             push_text = degraded_alert + "\n\n" + push_text
-        ok = push_to_wecom(push_text, title=f"📊 A股早盘分析 {now.strftime('%Y-%m-%d')}")
+        ok = push_to_wecom(push_text, title=f"📊 A股早盘信号观察(研究参考) {now.strftime('%Y-%m-%d')}")
         _record_push_status(str(base_dir), ok)
 
         return 0

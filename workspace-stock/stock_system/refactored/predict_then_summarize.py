@@ -1043,11 +1043,22 @@ class ReportGenerator:
         """生成预测报告"""
         
         report_lines = []
-        report_lines.append(f"【A股{get_analysis_type_name(analysis_type)}预测报告】")
+        is_morning = (analysis_type == "morning")
+        if is_morning:
+            report_lines.append("【A股早盘信号观察 · 研究参考】")
+        else:
+            report_lines.append(f"【A股{get_analysis_type_name(analysis_type)}预测报告】")
         report_lines.append("=" * 60)
         report_lines.append(f"预测时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         report_lines.append(f"分析类型: {get_analysis_type_name(analysis_type)}")
         report_lines.append("=" * 60)
+        if is_morning:
+            report_lines.append(
+                "⚠️ 风险提示：以下为公式信号的日常观察，非买卖建议。"
+                "历史回测(8-13~8-17 共3个交易日、22笔买入信号)显示："
+                "买入信号等权组合收益率为负(日内约 -0.22%/笔、隔日约 -0.88%/笔)，"
+                "买入胜率仅约 31%~41%，低于抛硬币。请勿据此实盘操作，仅作研究参考。"
+            )
         report_lines.extend(self._morning_iteration_briefing_lines(analysis_type))
         
         th = ConfigManager.get_signal_thresholds()
