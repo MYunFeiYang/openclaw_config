@@ -672,6 +672,16 @@ def run_reconcile(base_dir: Optional[str] = None, ymd: Optional[str] = None) -> 
                 f"中性±{r['neutral_band_pct']}% | 方向一致={'是' if r['direction_match'] else '否'}"
             )
 
+    # ── 信号回测判据（股神淘汰线）：收盘复盘后自动跑，判据写进复盘报告 ──
+    # run_backtest() 重算全量回测并写 data/backtest_report.json；再取 verdict 附到本报告。
+    try:
+        from backtest_signals import run_backtest, verdict_lines_from_dict
+        _bt = run_backtest()
+        lines.extend(verdict_lines_from_dict(_bt.get("verdict")))
+    except Exception as e:
+        lines.append("")
+        lines.append(f"【信号回测判据】计算跳过: {e}")
+
     text = "\n".join(lines)
     tpath = reports_dir / f"reconcile_report_{day}_{ts}.txt"
     with open(tpath, "w", encoding="utf-8") as f:
@@ -812,6 +822,14 @@ def run_day_review(base_dir: Optional[str] = None, ymd: Optional[str] = None) ->
         "",
         "说明: 汇总不调用大模型；迭代与规则自校准依据 reconcile_history.jsonl；阈值/权重见 config/calibration_overrides.json。",
     ]
+    # ── 信号回测判据（股神淘汰线）并入汇总报告，随企微推送可见 ──
+    try:
+        from backtest_signals import verdict_section_lines
+        lines.extend(verdict_section_lines())
+    except Exception as e:
+        lines.append("")
+        lines.append(f"【信号回测判据】计算跳过: {e}")
+
     text = "\n".join(lines)
     tpath = reports_dir / f"day_review_report_{day}_{ts}.txt"
     with open(tpath, "w", encoding="utf-8") as f:
