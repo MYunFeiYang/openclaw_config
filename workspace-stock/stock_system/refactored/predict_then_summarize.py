@@ -204,6 +204,8 @@ class PredictionEngine:
         self._llm_consec_fail = 0  # LLM 连续失败计数：达阈值整批降级纯公式
         self._market_status: Optional[Dict] = None
         self._market_regime: str = "range"  # 默认震荡市（中性）
+        self._index_closes: Optional[List[float]] = None  # 上证指数收盘序列（路线A闸门用）
+        self._market_gate: str = "normal"  # 路线A: down_trend / normal
 
     def _detect_market_status(self) -> Dict:
         """检测当前市场状态（基于上证指数 K 线，缓存避免重复请求）。"""
@@ -217,13 +219,57 @@ class PredictionEngine:
         try:
             from akshare_fallback import fetch_index_klines
             from data_providers import detect_market_status
-            klines = fetch_index_klines("sh000001", 60)
-            status = detect_market_status(klines)
+            # 多取 5 根(65)供 60DMA 平滑；内部 regime 仍用最后 60 根，行为不变
+            klines = fetch_index_klines("sh000001", 65)
+            if klines and len(klines) >= 60:
+                status = detect_market_status(klines[-60:])
+                self._index_closes = [float(k.get("close") or 0) for k in klines if k.get("close")]
+            else:
+                status = default_status
         except Exception:
             status = default_status
         self._market_status = status
         self._market_regime = status.get("regime", "range")
         return status
+
+    def _detect_index_trend_gate(self) -> str:
+        """路线 A 大盘趋势闸门（股神 8-24 批准）：干净的上证 20/60 DMA 多空信号。
+
+        明确下跌趋势 = 收盘 < 60DMA 且 20DMA < 60DMA → 'down_trend'；否则 'normal'。
+        绝不用系统内部 regime（其 trending_up 反预示亏损，walk-forward 已证滞后/追高）。
+        取数失败/数据不足(<60 根) → 'normal'（fail-open，不阻断现有行为）。"""
+        closes = self._index_closes
+        if not closes or len(closes) < 60:
+            return "normal"
+        try:
+            last = closes[-1]
+            ma20 = sum(closes[-20:]) / 20.0
+            ma60 = sum(closes[-60:]) / 60.0
+            if last < ma60 and ma20 < ma60:
+                return "down_trend"
+        except Exception:
+            return "normal"
+        return "normal"
+
+    def _apply_market_trend_gate(self, results: List[PredictionResult]) -> None:
+        """路线 A 落地：明确下跌趋势时，把买入/强烈买入降级为持有（仅停多，不开空）；
+        ranging/上涨市保留。降级同时压 final_score 到买入线以下，使报告统计与信号一致。
+        无指数数据/取数失败 → gate=normal，不改动（向后兼容）。"""
+        gate = self._detect_index_trend_gate()
+        self._market_gate = gate
+        if gate != "down_trend":
+            return
+        try:
+            b_line = ConfigManager.get_signal_thresholds().get("buy", 5.8)
+        except Exception:
+            b_line = 5.8
+        for r in results:
+            if r.signal in (SignalType.BUY.value, SignalType.STRONG_BUY.value):
+                old = r.signal
+                r.final_score = max(1.0, round(b_line - 0.1, 2))
+                r.signal = SignalType.HOLD.value
+                r.reasons.append("大盘下跌趋势闸门:买入信号暂停(仅持有, 不跟跌)")
+                print(f"[大盘闸门] {r.stock.name}({r.stock.symbol}) {old}→持有 (上证20/60DMA空头)")
     
     def _blend_with_llm(self, stock: StockConfig, inputs, formula_result: PredictionResult, llm_r: dict) -> PredictionResult:
         """
@@ -420,6 +466,9 @@ class PredictionEngine:
 
         # ── 低置信降权（股神风控：防止近期方向多次反向的标的被误推买入）──
         self._apply_low_confidence(results)
+
+        # ── 路线 A 大盘趋势过滤（股神 8-24 批准）：下跌趋势时买入→持有 ──
+        self._apply_market_trend_gate(results)
 
         results.sort(key=lambda x: x.final_score, reverse=True)
         return results
@@ -684,7 +733,7 @@ class SummaryEngine:
         sector_analysis = self._generate_sector_analysis(predictions)
         
         # 风险提示
-        risk_alerts = self._generate_risk_alerts(predictions)
+        risk_alerts = self._generate_risk_alerts(predictions, market_status)
         
         # 下一步行动
         next_actions = self._generate_next_actions(analysis_type, predictions)
@@ -738,6 +787,8 @@ class SummaryEngine:
             overview['market_volatility'] = market_status.get('volatility', 0.0)
             overview['market_trend_strength'] = market_status.get('trend_strength', 0.0)
             overview['market_status_desc'] = market_status.get('description', '')
+            if market_status.get('index_trend_gate') == 'down_trend':
+                overview['index_trend_gate'] = '下跌趋势·买入信号已暂停(仅持有)'
         return overview
     
     def _generate_sector_analysis(self, predictions: List[PredictionResult]) -> Dict:
@@ -761,10 +812,14 @@ class SummaryEngine:
         
         return sector_analysis
     
-    def _generate_risk_alerts(self, predictions: List[PredictionResult]) -> List[str]:
+    def _generate_risk_alerts(self, predictions: List[PredictionResult], market_status: Optional[Dict] = None) -> List[str]:
         """生成风险提示"""
         
         alerts = []
+        
+        # 路线 A 大盘闸门：下跌趋势时主动提示（买入已暂停）
+        if market_status and market_status.get("index_trend_gate") == "down_trend":
+            alerts.append("大盘处于下跌趋势（上证20/60DMA空头），买入信号已暂停，仅作持有观察")
         
         # 检查是否有大量卖出信号
         sell_count = len([p for p in predictions if p.final_score < 5])
@@ -1058,7 +1113,8 @@ class ReportGenerator:
                 "有效性尚未得到验证——回测样本严重不足(仅3个交易日/22笔买入)，"
                 "当前收益点估计为负(日内 -0.22%/笔、隔日 -0.88%/笔、胜率31%~41%)，"
                 "但统计上与0无差异(隔日 t=-1.76，未达显著)，既不能证明有效、也不能证明无效。"
-                "另需注意：本公式结构性只产出买入/持有信号，从不产出卖出信号，无下跌市主动规避路径。"
+                "下跌市主动规避路径：路线 A 大盘趋势过滤（上证20/60DMA空头时买入信号降级为持有，仅停多不开空）已启用，"
+                "系统性下跌市不再给出买入建议；但个股选择本身无 alpha（walk-forward 回测证为纯市场 beta），系统定位仍为研究观察 feed。"
                 "请勿据此实盘操作，仅作研究参考。"
             )
         report_lines.extend(self._morning_iteration_briefing_lines(analysis_type))
@@ -1305,8 +1361,11 @@ class StockAnalyzer:
         print("📋 第二步: 生成总结报告...")
         
         # 第二步: 总结阶段 - 基于所有预测结果生成总结
+        # 把路线 A 闸门状态并入 market_status，供报告如实展示
+        ms = dict(self.prediction_engine._market_status or {})
+        ms["index_trend_gate"] = getattr(self.prediction_engine, "_market_gate", "normal")
         summary = self.summary_engine.generate_summary(
-            predictions, analysis_type, market_status=self.prediction_engine._market_status
+            predictions, analysis_type, market_status=ms
         )
         
         print("✅ 总结报告生成完成")
