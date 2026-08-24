@@ -165,16 +165,21 @@ def _agg(rows):
     }
 
 
-def compute_verdict(buy_next_pcts, buy_intra_pcts):
+def compute_verdict(buy_next_pcts, buy_intra_pcts, full_population=False):
     """计算股神淘汰判据（基于隔日买入组合 P&L 的 t 检验）。
 
-    返回 dict：n / mean_pct / std_pct / t / significant / remaining / verdict。
+    full_population=True 用于 walk-forward 完整历史回放：样本已一次性充足，
+    不再"滚动累积"，故不显著时直接下"无 detectable edge"的确定性结论，
+    而非"再观察至 60 笔"。
+
+    返回 dict：n / mean_pct / std_pct / t / significant / remaining / verdict / full_population。
     """
     n = len(buy_next_pcts)
     if n < 2:
         return {
             "usable": False, "n": n,
             "metric": "隔日买入组合 P&L",
+            "full_population": full_population,
             "verdict": "样本不足(<2笔)，暂无法判决",
         }
     m = mean(buy_next_pcts)
@@ -185,6 +190,8 @@ def compute_verdict(buy_next_pcts, buy_intra_pcts):
     remaining = max(0, ELIM_N - n)
     # 检出该效应所需样本(80% power, alpha=.05)：n = (1.96+0.84)^2 * sd^2 / m^2
     need = (POWER_COEF ** 2) * (sd ** 2) / (m ** 2) if abs(m) > 1e-9 else float("inf")
+    # 完整回放或已累积到充足样本：不再用"还差多少笔"措辞
+    sufficient = full_population or n >= 60
     v = {
         "usable": True,
         "metric": "隔日买入组合 P&L（持有至下一交易日收盘）",
@@ -194,8 +201,9 @@ def compute_verdict(buy_next_pcts, buy_intra_pcts):
         "t": round(t, 2),
         "significant": sig,
         "elim_n": ELIM_N,
-        "remaining": remaining,
-        "need_total": round(need) if need != float("inf") else None,
+        "remaining": 0 if sufficient else remaining,
+        "need_total": (None if sufficient else (round(need) if need != float("inf") else None)),
+        "full_population": full_population,
         "verdict": "",
     }
     if n >= ELIM_N:
@@ -206,6 +214,14 @@ def compute_verdict(buy_next_pcts, buy_intra_pcts):
                 + ("判定无 edge — 建议停止推送买卖倾向、降为纯数据 feed"
                    if m < 0 else
                    "判定有 edge — 建议进入大盘趋势过滤(A)优化")
+            )
+        elif sufficient:
+            src = ("完整历史 walk-forward 回放样本已充足"
+                   if full_population else "样本已累积至 60 笔")
+            v["verdict"] = (
+                f"无 detectable edge：{src}(n={n})，隔日买入组合均值 {m:+.2f}% "
+                f"但 |t|={abs(t):.2f}<=2 不显著；公式 P&L 由市场 beta 主导，"
+                f"无可分离的股票选择 alpha"
             )
         else:
             v["verdict"] = (
@@ -250,14 +266,20 @@ def verdict_lines_from_dict(v):
     """把 verdict dict 格式化成复盘报告文本块（list[str]）。"""
     if not v.get("usable"):
         return ["【信号回测判据】" + (v.get("verdict") or "样本不足，暂无法判决")]
+    if v.get("full_population"):
+        elim_line = "  口径: 完整历史 walk-forward 回放（样本已充足，非实时滚动累积）"
+    else:
+        elim_line = (
+            f"  淘汰线: 满 {v['elim_n']} 笔判决，当前还差 {v['remaining']} 笔"
+            + (f"（约 {round(v['remaining']/AVG_BUY_PER_DAY)} 个交易日）" if v['remaining'] else "")
+        )
     return [
         "",
         "【信号回测判据（股神淘汰线）】",
         "  主指标: 隔日买入组合 P&L（持有至下一交易日收盘）",
         f"  样本 n={v['n']} | 均值={v['mean_pct']:+.2f}% | t={v['t']:+.2f} | "
         f"显著={'是' if v['significant'] else '否'}",
-        f"  淘汰线: 满 {v['elim_n']} 笔判决，当前还差 {v['remaining']} 笔"
-        + (f"（约 {round(v['remaining']/AVG_BUY_PER_DAY)} 个交易日）" if v['remaining'] else ""),
+        elim_line,
         f"  判定: {v['verdict']}",
     ]
 

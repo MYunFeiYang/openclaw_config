@@ -1,0 +1,248 @@
+{
+  "generated_at": "2026-08-24T09:19:03",
+  "method": "walk_forward_replay",
+  "alignment": {
+    "stock_window": 60,
+    "index_window": 60,
+    "index_symbol": "sh000001",
+    "entry": "close(anchor_day) == 生产早盘的上一交易日收盘锚",
+    "low_confidence_penalty_applied": false,
+    "note": "口径与 backtest_signals.py 一致，可交叉验证；未来函数已逐项排除"
+  },
+  "range": {
+    "start": "2025-08-26",
+    "end": "2026-08-20",
+    "trading_days": 239
+  },
+  "counts": {
+    "scored": 4774,
+    "buy": 1090,
+    "sell": 596,
+    "hold": 3088
+  },
+  "per_trade": {
+    "buy": {
+      "intraday": {
+        "n": 1090,
+        "t": 0.76,
+        "significant": false,
+        "win_rate_pct": 45.0,
+        "mean_pct": 0.069,
+        "sd_pct": 3.0048
+      },
+      "next_day": {
+        "n": 1090,
+        "t": 0.55,
+        "significant": false,
+        "win_rate_pct": 44.0,
+        "mean_pct": 0.0684,
+        "sd_pct": 4.1411
+      }
+    },
+    "sell": {
+      "intraday": {
+        "n": 596,
+        "t": -0.26,
+        "significant": false,
+        "win_rate_pct": 44.6,
+        "mean_pct": -0.0226,
+        "sd_pct": 2.1064
+      },
+      "next_day": {
+        "n": 596,
+        "t": -0.69,
+        "significant": false,
+        "win_rate_pct": 42.1,
+        "mean_pct": -0.08,
+        "sd_pct": 2.8122
+      }
+    },
+    "hold": {
+      "intraday": {
+        "n": 3088,
+        "t": -1.63,
+        "significant": false,
+        "win_rate_pct": 44.5,
+        "mean_pct": -0.0552,
+        "sd_pct": 1.8789
+      },
+      "next_day": {
+        "n": 3088,
+        "t": -1.82,
+        "significant": false,
+        "win_rate_pct": 44.7,
+        "mean_pct": -0.086,
+        "sd_pct": 2.6263
+      }
+    }
+  },
+  "per_day": {
+    "buy_portfolio_intraday": {
+      "n": 237,
+      "mean": 0.0062,
+      "sd": 1.8304,
+      "t": 0.05,
+      "significant": false
+    },
+    "buy_portfolio_next_day": {
+      "n": 237,
+      "mean": 0.1151,
+      "sd": 2.4972,
+      "t": 0.71,
+      "significant": false
+    }
+  },
+  "by_regime_next_day": {
+    "range": {
+      "per_trade": {
+        "n": 742,
+        "t": 1.2,
+        "significant": false,
+        "win_rate_pct": 46.6,
+        "mean_pct": 0.1914,
+        "sd_pct": 4.35
+      },
+      "per_day": {
+        "n": 157,
+        "mean": 0.3579,
+        "sd": 2.6736,
+        "t": 1.68,
+        "significant": false
+      }
+    },
+    "trend": {
+      "per_trade": {
+        "n": 348,
+        "t": -0.99,
+        "significant": false,
+        "win_rate_pct": 38.5,
+        "mean_pct": -0.1938,
+        "sd_pct": 3.6479
+      },
+      "per_day": {
+        "n": 80,
+        "mean": -0.3614,
+        "sd": 2.0412,
+        "t": -1.58,
+        "significant": false
+      }
+    }
+  },
+  "by_status_next_day": {
+    "ranging": {
+      "per_trade": {
+        "n": 742,
+        "t": 1.2,
+        "significant": false,
+        "win_rate_pct": 46.6,
+        "mean_pct": 0.1914,
+        "sd_pct": 4.35
+      },
+      "per_day": {
+        "n": 157,
+        "mean": 0.3579,
+        "sd": 2.6736,
+        "t": 1.68,
+        "significant": false
+      }
+    },
+    "trending_down": {
+      "per_trade": {
+        "n": 160,
+        "t": -0.27,
+        "significant": false,
+        "win_rate_pct": 43.1,
+        "mean_pct": -0.0676,
+        "sd_pct": 3.1783
+      },
+      "per_day": {
+        "n": 29,
+        "mean": 0.0062,
+        "sd": 1.7716,
+        "t": 0.02,
+        "significant": false
+      }
+    },
+    "trending_up": {
+      "per_trade": {
+        "n": 188,
+        "t": -1.03,
+        "significant": false,
+        "win_rate_pct": 34.6,
+        "mean_pct": -0.3013,
+        "sd_pct": 4.0099
+      },
+      "per_day": {
+        "n": 51,
+        "mean": -0.5703,
+        "sd": 2.1685,
+        "t": -1.88,
+        "significant": false
+      }
+    }
+  },
+  "by_market_direction_next_day": {
+    "大盘上涨日": {
+      "per_trade": {
+        "n": 604,
+        "t": 4.62,
+        "significant": true,
+        "win_rate_pct": 51.0,
+        "mean_pct": 0.7326,
+        "sd_pct": 3.8952
+      },
+      "per_day": {
+        "n": 129,
+        "mean": 0.6673,
+        "sd": 2.376,
+        "t": 3.19,
+        "significant": true
+      }
+    },
+    "大盘下跌日": {
+      "per_trade": {
+        "n": 486,
+        "t": -3.89,
+        "significant": true,
+        "win_rate_pct": 35.4,
+        "mean_pct": -0.757,
+        "sd_pct": 4.2905
+      },
+      "per_day": {
+        "n": 108,
+        "mean": -0.5444,
+        "sd": 2.4888,
+        "t": -2.27,
+        "significant": true
+      }
+    }
+  },
+  "verdict_per_day": {
+    "usable": true,
+    "metric": "隔日买入组合 P&L（持有至下一交易日收盘）",
+    "n": 237,
+    "mean_pct": 0.115,
+    "std_pct": 2.5,
+    "t": 0.71,
+    "significant": false,
+    "elim_n": 40,
+    "remaining": 0,
+    "need_total": null,
+    "full_population": true,
+    "verdict": "无 detectable edge：完整历史 walk-forward 回放样本已充足(n=237)，隔日买入组合均值 +0.12% 但 |t|=0.71<=2 不显著；公式 P&L 由市场 beta 主导，无可分离的股票选择 alpha"
+  },
+  "verdict_per_trade": {
+    "usable": true,
+    "metric": "隔日买入组合 P&L（持有至下一交易日收盘）",
+    "n": 1090,
+    "mean_pct": 0.068,
+    "std_pct": 4.14,
+    "t": 0.55,
+    "significant": false,
+    "elim_n": 40,
+    "remaining": 0,
+    "need_total": null,
+    "full_population": true,
+    "verdict": "无 detectable edge：完整历史 walk-forward 回放样本已充足(n=1090)，隔日买入组合均值 +0.07% 但 |t|=0.55<=2 不显著；公式 P&L 由市场 beta 主导，无可分离的股票选择 alpha"
+  }
+}
