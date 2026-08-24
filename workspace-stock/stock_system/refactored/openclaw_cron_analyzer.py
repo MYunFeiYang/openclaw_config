@@ -351,13 +351,14 @@ def main():
             _record_push_status(str(base_dir), ok)
             return 1
 
-        # 部分股票缺失 → 不视为成功，避免企微误报"成功"（exit 2）
-        # 缺失比例高才升级为企微告警，少量缺失属正常波动、避免告警疲劳
+        # 部分股票缺失处理：
+        #  - 显著缺失(>=5只 或 >=20%) → 视为部分失败(exit 2)，推部分失败告警
+        #  - 少量缺失(<5只 且 <20%) → 属正常波动，仍推送完整早报(exit 0)，避免单只瞬缺饿死整份早报
         total = result.get('total_stocks', analyzed)
         if analyzed < total:
             missing = total - analyzed
             miss_ratio = missing / total if total else 1.0
-            print(f"⚠️ 部分股票数据缺失（{missing}/{total} 只未分析，缺失率 {miss_ratio:.0%}），本次视为部分失败")
+            print(f"⚠️ 部分股票数据缺失（{missing}/{total} 只未分析，缺失率 {miss_ratio:.0%}）")
             if miss_ratio >= 0.2 or missing >= 5:
                 miss_text = (
                     f"⚠️ 早盘部分失败：{missing}/{total} 只股票数据缺失，缺失率 {miss_ratio:.0%}，\n"
@@ -370,9 +371,10 @@ def main():
                 _warn_if_push_repeatedly_failing(str(base_dir))
                 ok = push_to_wecom(miss_text, title=f"⚠️ A股早盘部分失败 {now.strftime('%Y-%m-%d')}")
                 _record_push_status(str(base_dir), ok)
+                return 2
             else:
-                print(f"   缺失 {missing} 只(<20% 且 <5只)，属正常波动，仅日志提示、不推送企微。")
-            return 2
+                print(f"   缺失 {missing} 只(<20% 且 <5只)，属正常波动，推送完整早报、不另发部分失败告警。")
+            # 正常波动级缺失：不 return，继续向下走正常早报推送（exit 0），避免单只瞬缺饿死整份早报
 
         # 推送前检查：若企微已连续多次失败，打印告警（仍尝试本次推送）
         _warn_if_push_repeatedly_failing(str(base_dir))
