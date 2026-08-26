@@ -230,11 +230,20 @@ def compute_verdict(buy_next_pcts, buy_intra_pcts, full_population=False):
             )
     else:
         est_days = round(remaining / AVG_BUY_PER_DAY) if remaining else 0
-        v["verdict"] = (
-            f"观察中：样本 {n}/{ELIM_N}，距判决还差 {remaining} 笔"
-            + (f"（约 {est_days} 个交易日）" if est_days else "")
-            + f"；当前点估计 {m:+.2f}% 但 |t|={abs(t):.2f} 不显著，统计上与0无差异"
-        )
+        if sig:
+            v["verdict"] = (
+                f"观察中(预警)：样本 {n}/{ELIM_N}，距判决还差 {remaining} 笔"
+                + (f"（约 {est_days} 个交易日）" if est_days else "")
+                + f"；但 |t|={abs(t):.2f}>2 已显著，当前点估计 {m:+.2f}% 显著"
+                + ("为负" if m < 0 else "为正")
+                + f"，按规则满 {ELIM_N} 笔正式判决"
+            )
+        else:
+            v["verdict"] = (
+                f"观察中：样本 {n}/{ELIM_N}，距判决还差 {remaining} 笔"
+                + (f"（约 {est_days} 个交易日）" if est_days else "")
+                + f"；当前点估计 {m:+.2f}% 且 |t|={abs(t):.2f} 不显著，统计上与0无差异"
+            )
     return v
 
 
