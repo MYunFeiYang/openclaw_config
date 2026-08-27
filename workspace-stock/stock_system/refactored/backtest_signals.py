@@ -47,6 +47,7 @@ ELIM_N = 40
 T_THRESHOLD = 2.0          # 双尾 alpha=0.05
 POWER_COEF = 2.80          # (1.96+0.84)^2，80% power 样本量系数
 AVG_BUY_PER_DAY = 7.3      # 估算：每个交易日约 7.3 笔买入信号
+A_LAUNCH_DATE = "2026-08-24"  # 路线A(大盘趋势过滤)上线日；此前无闸门，其后买入信号含闸门调整
 
 
 def _sym(code: str) -> str:
@@ -247,11 +248,74 @@ def compute_verdict(buy_next_pcts, buy_intra_pcts, full_population=False):
     return v
 
 
+def _index_closes_history(symbol: str = "sh000001", lookback: int = 400) -> dict:
+    """取上证(默认)日线收盘序列 {date: close}，用于反事实闸门重算。
+
+    复用 fetch_index_klines（akshare 优先、新浪兜底）。取大窗口以覆盖历史预测日，
+    失败返回空 dict（调用方降级为 gate=normal）。
+    """
+    try:
+        from akshare_fallback import fetch_index_klines
+        kls = fetch_index_klines(symbol, lookback)
+        return {k["day"]: float(k["close"]) for k in kls if k.get("close")}
+    except Exception:
+        return {}
+
+
+def _index_gate_for_date(closes_map: dict, date: str) -> str:
+    """按 date 当日及之前收盘算上证 20/60DMA 多空（与 predict_then_summarize._detect_index_trend_gate 同口径）。
+
+    close < 60DMA 且 20DMA < 60DMA → 'down_trend'；否则 'normal'。
+    数据不足(<60根) → 'normal'（fail-open）。
+    """
+    dates = sorted(d for d in closes_map if d <= date)
+    if len(dates) < 60:
+        return "normal"
+    series = [closes_map[d] for d in dates]
+    last = series[-1]
+    ma20 = sum(series[-20:]) / 20.0
+    ma60 = sum(series[-60:]) / 60.0
+    return "down_trend" if (last < ma60 and ma20 < ma60) else "normal"
+
+
+def _counterfactual_a(rows):
+    """反事实：若 A(大盘下跌趋势闸门)从最早交易日即在线。
+
+    公式本要买入(formula_signal='买入')的标的中，落在下跌趋势日(gate='down_trend')的
+    会被压为持有——其隔日实际盈亏即 A 帮你避掉/少赚的部分。
+    """
+    would_suppress = [r for r in rows if r["formula_signal"] == "买入" and r["gate"] == "down_trend"]
+    would_take = [r for r in rows if r["formula_signal"] == "买入" and r["gate"] != "down_trend"]
+
+    def agg(g):
+        if not g:
+            return None
+        rets = [r["ret_next"] for r in g]
+        return {"n": len(g), "mean_next_pct": round(sum(rets) / len(rets), 2)}
+
+    return {
+        "total_buy_intent": len(would_suppress) + len(would_take),
+        "suppressed_in_downtrend": agg(would_suppress),
+        "taken_in_nondowntrend": agg(would_take),
+    }
+
+
 def compute_verdict_from_files():
-    """静默版：直接读历史 predictions + 行情，返回 verdict dict（不打印、不写文件）。"""
+    """静默版：读历史 predictions + 行情，返回 era-split + 反事实 verdict 结构。
+
+    返回 dict:
+      overall / pre_a / post_a: 各为 compute_verdict 的 verdict dict（或 None）
+      counterfactual: 若 A 从最早交易日即在线，下跌趋势日被压买入的隔日盈亏
+      a_launch: A 上线日
+    注：混合判据(n=39)会被旧公式(36笔)主导而误导，故拆 pre_a/post_a 分段判决。
+    """
     daily = _load_daily_files()
-    all_rows = []
+    idx_closes = _index_closes_history()  # 反事实闸门用；空→gate 全 normal
+
+    rows = []
     for day in sorted(daily.keys()):
+        era = "pre_a" if day < A_LAUNCH_DATE else "post_a"
+        gate = _index_gate_for_date(idx_closes, day) if idx_closes else "normal"
         for p in daily[day]:
             code = p["stock"]["symbol"]
             entry = p.get("current_price")
@@ -265,16 +329,32 @@ def compute_verdict_from_files():
             if i + 1 >= len(days):
                 continue
             close_next = kl[days[i + 1]]
-            all_rows.append({"day": day, "signal": p["signal"],
-                             "ret": (close_next / entry - 1) * 100})
-    buy_next = [r["ret"] for r in all_rows if r["signal"] == "买入"]
-    return compute_verdict(buy_next, [])
+            fsig = p.get("formula_signal") or p.get("signal")  # 旧文件无 formula_signal→原始信号
+            rows.append({
+                "day": day, "era": era, "signal": p["signal"],
+                "formula_signal": fsig, "gate": gate,
+                "ret_next": (close_next / entry - 1) * 100,
+            })
+
+    def buys_by(pred):
+        return [r["ret_next"] for r in rows if pred(r)]
+
+    overall = compute_verdict(buys_by(lambda r: r["signal"] == "买入"), [])
+    pre = compute_verdict(buys_by(lambda r: r["era"] == "pre_a" and r["signal"] == "买入"), [])
+    post = compute_verdict(buys_by(lambda r: r["era"] == "post_a" and r["signal"] == "买入"), [])
+    return {
+        "overall": overall,
+        "pre_a": pre if pre.get("usable") else None,
+        "post_a": post if post.get("usable") else None,
+        "counterfactual": _counterfactual_a(rows) if rows else None,
+        "a_launch": A_LAUNCH_DATE,
+    }
 
 
-def verdict_lines_from_dict(v):
-    """把 verdict dict 格式化成复盘报告文本块（list[str]）。"""
+def _verdict_core_lines(v):
+    """单个 verdict dict 的核心文本行（不含段标题）。供 verdict_lines_from_dict / verdict_lines_era 复用。"""
     if not v.get("usable"):
-        return ["【信号回测判据】" + (v.get("verdict") or "样本不足，暂无法判决")]
+        return ["  样本不足(<2笔)，暂不可判"]
     if v.get("full_population"):
         elim_line = "  口径: 完整历史 walk-forward 回放（样本已充足，非实时滚动累积）"
     else:
@@ -283,14 +363,64 @@ def verdict_lines_from_dict(v):
             + (f"（约 {round(v['remaining']/AVG_BUY_PER_DAY)} 个交易日）" if v['remaining'] else "")
         )
     return [
-        "",
-        "【信号回测判据（股神淘汰线）】",
         "  主指标: 隔日买入组合 P&L（持有至下一交易日收盘）",
         f"  样本 n={v['n']} | 均值={v['mean_pct']:+.2f}% | t={v['t']:+.2f} | "
         f"显著={'是' if v['significant'] else '否'}",
         elim_line,
         f"  判定: {v['verdict']}",
     ]
+
+
+def verdict_lines_from_dict(v):
+    """把单个 verdict dict 格式化成复盘报告文本块（list[str]）。保留给 walk-forward / run_backtest 用。"""
+    if not v.get("usable"):
+        return ["【信号回测判据】" + (v.get("verdict") or "样本不足，暂无法判决")]
+    return ["", "【信号回测判据（股神淘汰线）】"] + _verdict_core_lines(v)
+
+
+def verdict_lines_era(v):
+    """era-split + 反事实 的判据文本块（list[str]）。供收盘复盘报告引用。"""
+    a = v.get("a_launch", A_LAUNCH_DATE)
+    lines = []
+    overall = v.get("overall")
+    if overall and overall.get("usable"):
+        lines += ["", "【信号回测判据（股神淘汰线）· 全样本混合】"] + _verdict_core_lines(overall)
+        lines.append("  ⚠️ 以上混合 A 前旧公式与 A 后体系，仅供总览；正式判决以分段为准")
+    pre = v.get("pre_a")
+    lines += ["", f"【A 前体系 · {a} 之前 · 旧公式(无闸门)】"]
+    if pre:
+        lines += _verdict_core_lines(pre)
+        lines.append("  → 此为 A 上线前的旧公式表现，不代表 A 调整后体系")
+    else:
+        lines.append("  样本不足，暂不可判")
+    post = v.get("post_a")
+    lines += ["", f"【A 后体系 · {a} 及之后 · 含大盘趋势闸门】"]
+    if post:
+        lines += _verdict_core_lines(post)
+    else:
+        lines.append("  样本不足(<2笔)，暂不可判 — A 后买入信号稀少(下跌市被闸门压为持有)属正常")
+    # 反事实
+    cf = v.get("counterfactual")
+    lines += ["", "【反事实 · 若 A 从最早交易日即在线】"]
+    if not cf:
+        lines.append("  无数据")
+    else:
+        tot = cf.get("total_buy_intent", 0)
+        sup = cf.get("suppressed_in_downtrend")
+        tak = cf.get("taken_in_nondowntrend")
+        lines.append(f"  公式本要买入的信号共 {tot} 笔")
+        if sup:
+            lines.append(f"    - 下跌趋势日(闸门会压为持有): {sup['n']} 笔，隔日实际均值 {sup['mean_next_pct']:+.2f}%（即 A 帮你避掉的下行暴露）")
+        else:
+            lines.append("    - 下跌趋势日被压的买入: 0 笔")
+        if tak:
+            lines.append(f"    - 非下跌趋势日(闸门保留买入): {tak['n']} 笔，隔日实际均值 {tak['mean_next_pct']:+.2f}%")
+        else:
+            lines.append("    - 非下跌趋势日保留的买入: 0 笔")
+        lines.append("  → 本窗口处下跌市，反事实主要说明 A 会'避跌'(压掉多数买入)；")
+        lines.append("    因保留样本极少(仅数笔)，反事实不构成 A 有无 edge 的结论——")
+        lines.append("    看上方【A 后体系】实际买入与【A 前】的方向反转更直观。")
+    return lines
 
 
 def run_backtest():
@@ -403,7 +533,7 @@ def run_backtest():
 def verdict_section_lines():
     """供 daily_cycle_review 复盘报告引用的判据文本块（list[str]），静默计算。"""
     try:
-        return verdict_lines_from_dict(compute_verdict_from_files())
+        return verdict_lines_era(compute_verdict_from_files())
     except Exception as e:
         return [f"⚠️ 回测判据计算失败: {e}"]
 
