@@ -19,6 +19,58 @@ from predict_then_summarize import StockAnalyzer
 from data_providers import get_analysis_type_name
 
 
+class _LogTee:
+    """把 stdout/stderr 同时写回原终端（供 gateway 捕获）和本地日志文件。
+
+    解决可观测性缺口：此前 cron 运行诊断只存在 gateway 内存（lastDiagnosticSummary，
+    截断且被下次运行覆盖），logs/ 目录长期无 cron 运行日志，排障只能靠 cron get。
+    """
+
+    def __init__(self, stream, logf):
+        self._stream = stream
+        self._logf = logf
+
+    def write(self, data):
+        try:
+            self._stream.write(data)
+        except Exception:
+            pass
+        try:
+            self._logf.write(data)
+            self._logf.flush()
+        except Exception:
+            pass
+        return len(data)
+
+    def flush(self):
+        try:
+            self._stream.flush()
+        except Exception:
+            pass
+        try:
+            self._logf.flush()
+        except Exception:
+            pass
+
+
+def _install_log_tee(base_dir: Path, now: datetime) -> Path | None:
+    """把本次 cron 运行的全部 stdout/stderr 落盘 logs/cron_YYYY-MM-DD.log（append）。
+
+    morning/evening/post_close 等共用同日文件；返回日志路径，失败返回 None（不阻断）。
+    """
+    try:
+        log_dir = base_dir / "logs"
+        log_dir.mkdir(parents=True, exist_ok=True)
+        log_path = log_dir / f"cron_{now.strftime('%Y-%m-%d')}.log"
+        logf = open(log_path, "a", encoding="utf-8")
+        sys.stdout = _LogTee(sys.stdout, logf)
+        sys.stderr = _LogTee(sys.stderr, logf)
+        return log_path
+    except Exception as e:
+        print(f"⚠️ 日志落盘初始化失败（不影响主流程）: {e}")
+        return None
+
+
 def _is_trading_day(dt: datetime) -> bool:
     """A 股交易日判断。
 
@@ -245,6 +297,9 @@ def main():
             str(Path(__file__).resolve().parent.parent),
         )
     )
+
+    # 落盘运行日志到 logs/cron_YYYY-MM-DD.log（可观测性；gateway 内存诊断不可靠）
+    _install_log_tee(base_dir, now)
 
     if analysis_type == "reconcile":
         from daily_cycle_review import run_reconcile

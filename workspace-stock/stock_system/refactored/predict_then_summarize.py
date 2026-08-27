@@ -206,15 +206,16 @@ class PredictionEngine:
         self._market_regime: str = "range"  # 默认震荡市（中性）
         self._index_closes: Optional[List[float]] = None  # 上证指数收盘序列（路线A闸门用）
         self._market_gate: str = "normal"  # 路线A: down_trend / normal
+        self._skipped_stocks: List[str] = []  # 行情源瞬时失败未纳入的个股（报告正文标注用）
 
     def _detect_market_status(self) -> Dict:
         """检测当前市场状态（基于上证指数 K 线，缓存避免重复请求）。"""
         if self._market_status is not None:
             return self._market_status
         default_status = {
-            "status": "ranging", "regime": "range", "volatility": 0.0,
-            "trend_strength": 0.0, "bollinger_bandwidth": 0.0,
-            "description": "市场状态检测失败，使用默认震荡市",
+            "status": "unknown", "regime": "unknown", "volatility": None,
+            "trend_strength": None, "bollinger_bandwidth": None,
+            "description": "市场状态检测失败（行情源瞬时抖动），状态未知（非震荡市，勿据此判断）",
         }
         try:
             from akshare_fallback import fetch_index_klines
@@ -449,6 +450,7 @@ class PredictionEngine:
         单只行情/解析失败（单股异常被 try/except 跳过，不影响其余）。"""
         
         self._detect_market_status()
+        self._skipped_stocks = []
 
         # ── 逐只预测（每只独立尝试 LLM 叠加，失败则公式）──
         results = []
@@ -456,7 +458,9 @@ class PredictionEngine:
             try:
                 result = self.predict_stock(stock, analysis_type)
             except Exception as e:
+                reason = f"{stock.name}({stock.symbol}): 行情源瞬时失败未纳入"
                 print(f"[WARN] 跳过 {stock.name}（分析失败: {e}），不参与本次分析")
+                self._skipped_stocks.append(reason)
                 continue
             results.append(result)
 
@@ -1310,10 +1314,14 @@ class ReportGenerator:
         report_lines.append(f"持有推荐: {market_overview['hold_count']}只 | 平均评分: {market_overview['avg_hold_score']}")
         report_lines.append(f"市场情绪: {market_overview['market_sentiment']}")
         if market_overview.get("market_status"):
+            vol = market_overview.get("market_volatility")
+            trend = market_overview.get("market_trend_strength")
+            if vol is None or trend is None:
+                detail = "状态未知（行情源瞬时抖动，非震荡市）"
+            else:
+                detail = f"vol≈{vol*100:.0f}%, 20日动量≈{trend*100:+.1f}%"
             report_lines.append(
-                f"市场状态: {market_overview['market_status_desc']} "
-                f"(vol≈{market_overview['market_volatility']*100:.0f}%, "
-                f"20日动量≈{market_overview['market_trend_strength']*100:+.1f}%)"
+                f"市场状态: {market_overview['market_status_desc']} ({detail})"
             )
     
     def _add_sector_analysis_summary(self, sector_analysis: Dict, report_lines: List[str]):
@@ -1374,6 +1382,17 @@ class StockAnalyzer:
         # 第三步: 生成文本报告
         prediction_report = self.report_generator.generate_prediction_report(predictions, analysis_type)
         summary_report = self.report_generator.generate_summary_report(summary)
+
+        # ── #3 行情源瞬时失败未纳入的个股：报告正文标注（覆盖 .txt 与企微推送）──
+        skipped = list(getattr(self.prediction_engine, "_skipped_stocks", []) or [])
+        if skipped:
+            summary_report = (
+                summary_report.rstrip()
+                + "\n\n【行情源瞬时失败未纳入】\n  "
+                + "；".join(skipped)
+                + f"\n  （共 {len(skipped)} 只：因行情源偶发抖动缺数据未分析，非系统剔除，"
+                  f"次日行情恢复即自动回归；不影响其余信号）"
+            )
         
         print("✅ 文本报告生成完成")
         print("💾 第四步: 保存结果...")

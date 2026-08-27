@@ -140,6 +140,28 @@ def _winrate(xs: list) -> float:
     return round(100.0 * sum(1 for x in xs if x > 0) / len(xs), 1) if xs else 0.0
 
 
+def _ma(closes: list, n: int) -> float | None:
+    """简单移动平均；窗口不足返回 None。"""
+    if len(closes) < n:
+        return None
+    return sum(closes[-n:]) / n
+
+
+def _index_down_trend(idx_window: list) -> bool:
+    """上证 20/60DMA 下跌趋势闸门（与 predict_then_summarize._detect_index_trend_gate 同口径）。
+
+    收盘 < 60DMA 且 20DMA < 60DMA 判 down_trend。
+    """
+    closes = [float(k["close"]) for k in idx_window if float(k.get("close") or 0) > 0]
+    if len(closes) < 60:
+        return False
+    ma20 = _ma(closes, 20)
+    ma60 = _ma(closes, 60)
+    if ma20 is None or ma60 is None:
+        return False
+    return closes[-1] < ma60 and ma20 < ma60
+
+
 def _summarize(rows: list, key: str) -> dict:
     xs = [r[key] for r in rows if r.get(key) is not None]
     s = _tstat(xs)
@@ -162,13 +184,14 @@ def _by_day_series(rows: list, key: str) -> list:
 
 # ──────────────────────── 主回放逻辑 ────────────────────────
 
-def run_walkforward(replay_days: int | None = None, fetch_days: int = 300) -> dict:
+def run_walkforward(replay_days: int | None = None, fetch_days: int = 300,
+                   gated: bool = False) -> dict:
     stocks = ConfigManager.get_core_stocks()
     scoring = ScoringEngine()
     siggen = SignalGenerator()
 
     print(f"【Walk-forward 历史回放】股票池 {len(stocks)} 只 | 取数 {fetch_days} 根 | "
-          f"窗口 {WIN} 根（与生产一致）")
+          f"窗口 {WIN} 根（与生产一致）" + (" | [闸门版] 下跌趋势日买入→持有" if gated else ""))
 
     # 1) 指数：预先算好每个锚日的 market_status（避免逐股重算）
     idx_kl = fetch_ohlcv(INDEX_SYMBOL, fetch_days)
@@ -178,8 +201,10 @@ def run_walkforward(replay_days: int | None = None, fetch_days: int = 300) -> di
     idx_close = {k["day"]: float(k["close"]) for k in idx_kl}
 
     mstat_by_day: dict[str, dict] = {}
+    gate_by_day: dict[str, bool] = {}   # 上证 20/60DMA 下跌趋势闸门（预计算，--gated 用）
     for j in range(INDEX_WIN - 1, len(idx_kl)):
         mstat_by_day[idx_days[j]] = detect_market_status(idx_kl[j - INDEX_WIN + 1: j + 1])
+        gate_by_day[idx_days[j]] = _index_down_trend(idx_kl[j - INDEX_WIN + 1: j + 1])
 
     # 预测日的指数涨跌（仅用于事后 regime 分层分析，不参与决策）
     idx_ret = {}
@@ -235,6 +260,14 @@ def run_walkforward(replay_days: int | None = None, fetch_days: int = 300) -> di
                 tech_s, fund_s, sent_s, sector_s, weights=weights
             )
             signal, _conf, _reasons = siggen.generate_signal(final, stock, technical)
+            orig_signal = signal  # 闸门前的原始信号（用于 ungated 基线对照）
+
+            # ── 路线 A 闸门（仅 --gated）：下跌趋势日把买入/强烈买入压成持有 ──
+            gate_down = gate_by_day.get(idx_days[j], False)
+            a_suppressed = False
+            if gated and gate_down and signal in BUY_SIGNALS:
+                signal = "持有"
+                a_suppressed = True
 
             entry = closes[i]
             if entry <= 0:
@@ -245,9 +278,12 @@ def run_walkforward(replay_days: int | None = None, fetch_days: int = 300) -> di
                 "symbol": stock.symbol,
                 "name": stock.name,
                 "signal": signal,
+                "orig_signal": orig_signal,
                 "final_score": final,
                 "regime": mstat.get("regime", "range"),
                 "status": mstat.get("status", "ranging"),
+                "gate_down": gate_down,
+                "a_suppressed": a_suppressed,
                 "ret_intra": round((closes[i + 1] / entry - 1) * 100, 4),
                 "ret_next": round((closes[i + 2] / entry - 1) * 100, 4),
                 "idx_ret_pct": round((idx_ret.get(days[i + 1]) or 0.0) * 100, 4),
@@ -262,13 +298,17 @@ def run_walkforward(replay_days: int | None = None, fetch_days: int = 300) -> di
 
     # 3) 聚合
     all_days = sorted({r["pred_day"] for r in rows})
-    buy = [r for r in rows if r["signal"] in BUY_SIGNALS]
+    buy = [r for r in rows if r["signal"] in BUY_SIGNALS]          # 闸门后实际放行
+    buy_all = [r for r in rows if r["orig_signal"] in BUY_SIGNALS]  # 原始公式买入意图
     sell = [r for r in rows if r["signal"] in SELL_SIGNALS]
     hold = [r for r in rows if r["signal"] not in BUY_SIGNALS + SELL_SIGNALS]
 
     print("\n" + "=" * 66)
     print(f"回放区间: {all_days[0]} ~ {all_days[-1]}（{len(all_days)} 个交易日）")
-    print(f"总打分次数: {len(rows)} | 买入 {len(buy)} | 卖出 {len(sell)} | 持有 {len(hold)}")
+    print(f"总打分次数: {len(rows)} | 买入(放行) {len(buy)} | 卖出 {len(sell)} | 持有 {len(hold)}")
+    if gated:
+        print(f"  （路线 A 闸门：原公式买入意图 {len(buy_all)} 笔 → "
+              f"下跌趋势日压掉 {len(buy_all) - len(buy)} 笔 → 实际放行 {len(buy)} 笔）")
     print("=" * 66)
 
     def _line(label, group):
@@ -341,6 +381,54 @@ def run_walkforward(replay_days: int | None = None, fetch_days: int = 300) -> di
         [r["ret_next"] for r in buy], [r["ret_intra"] for r in buy],
         full_population=True,
     )
+
+    # 5b) 闸门版（路线 A 体系）统计：仅 --gated 时计算并展示
+    gated_out = None
+    if gated:
+        suppressed = [r for r in rows if r.get("a_suppressed")]
+        # 未闸门（原始公式）判据 —— 对照基线（用 orig_signal 还原真实买入意图）
+        base_day_next = _by_day_series(buy_all, "ret_next")
+        base_day_intra = _by_day_series(buy_all, "ret_intra")
+        base_v_day = compute_verdict(base_day_next, base_day_intra, full_population=True)
+        base_v_trade = compute_verdict(
+            [r["ret_next"] for r in buy_all], [r["ret_intra"] for r in buy_all],
+            full_population=True,
+        )
+        supp_next = [r["ret_next"] for r in suppressed]
+        supp_day_next = _by_day_series(suppressed, "ret_next")
+        print("\n" + "=" * 66)
+        print("【路线 A 体系（闸门版）· 未闸门原始公式 vs A 放行对比】")
+        print(f"  原公式买入意图 {len(buy_all)} 笔 → 闸门压掉 {len(suppressed)} 笔 "
+              f"→ A 实际放行 {len(buy)} 笔")
+        print("  ── 未闸门（原始公式）判据（对照基线）──")
+        for ln in verdict_lines_from_dict(base_v_day):
+            if ln.strip():
+                print(ln)
+        print("  ── A 体系判据（已放行买入）──")
+        for ln in verdict_lines_from_dict(verdict_per_day):
+            if ln.strip():
+                print(ln)
+        if supp_next:
+            ss = _tstat(supp_day_next)
+            print(f"  被压掉的买入（下跌趋势日下行暴露，A 帮你避掉）: "
+                  f"笔数={len(suppressed)} | 隔日均值={st.mean(supp_next):+.3f}%/笔 "
+                  f"| 按天 n={ss['n']} 均值={ss['mean']:+.3f}%/日 t={ss['t']:+.2f}")
+        else:
+            print("  被压掉的买入: 0 笔")
+        gated_out = {
+            "orig_buy_count": len(buy_all),
+            "suppressed_count": len(suppressed),
+            "a_buy_count": len(buy),
+            "a_buy_per_day": _tstat(buy_day_next),
+            "a_buy_per_trade": _summarize(buy, "ret_next"),
+            "baseline_per_day": base_v_day,
+            "baseline_per_trade": base_v_trade,
+            "suppressed_next_day": (_tstat(supp_day_next) if supp_next else None),
+            "suppressed_mean_per_trade": round(st.mean(supp_next), 4) if supp_next else None,
+            "verdict_per_day": verdict_per_day,
+            "verdict_per_trade": verdict_per_trade,
+        }
+
     print("\n" + "=" * 66)
     print("【判据 · 按天口径（主）】")
     for ln in verdict_lines_from_dict(verdict_per_day):
@@ -381,6 +469,7 @@ def run_walkforward(replay_days: int | None = None, fetch_days: int = 300) -> di
         "by_market_direction_next_day": market_split,
         "verdict_per_day": verdict_per_day,
         "verdict_per_trade": verdict_per_trade,
+        "gated": gated_out,
     }
     path = os.path.join(DATA_DIR, "walkforward_report.json")
     with open(path, "w", encoding="utf-8") as f:
@@ -395,8 +484,11 @@ def main():
                     help="每只股票回放最近多少个决策日（默认全部可用）")
     ap.add_argument("--fetch", type=int, default=300,
                     help="取多少根历史日K（默认 300）")
+    ap.add_argument("--gated", action="store_true",
+                    help="闸门版重放：下跌趋势日（上证20/60DMA空头）把买入压成持有，"
+                         "直接算路线 A 体系的历史 edge")
     args = ap.parse_args()
-    run_walkforward(replay_days=args.days, fetch_days=args.fetch)
+    run_walkforward(replay_days=args.days, fetch_days=args.fetch, gated=args.gated)
 
 
 if __name__ == "__main__":
