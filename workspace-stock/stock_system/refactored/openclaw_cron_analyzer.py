@@ -392,8 +392,30 @@ def main():
         print(f"  持有推荐: {hold_count}只")
         print(f"  分析股票: {analyzed}只")
         
-        # 全部个股行情拉取/分析均失败 → 本次分析失败（exit 1）
+        # 全部个股行情拉取/分析均失败
         if analyzed == 0:
+            # ── pre-open 未就绪守卫（股神 8-28 拍板，技术专家落地）──
+            # 早盘本应盘前产出，但 gateway 心跳延迟常把它推到盘中；若被推到 09:30 开盘前
+            # （集合竞价时段行情源无最新成交价），整池被 fetch 抛错跳过属「行情未就绪」，
+            # 非源故障。此场景不报 error、不推空报告，改推「跳过」提示并 exit 0，
+            # 杜绝每日 pre-open 误报 error + 空推送噪音；开盘后重跑即拿真实价。
+            if analysis_type == "morning" and (now.hour * 60 + now.minute) < (9 * 60 + 30):
+                skipped = list(getattr(analyzer.prediction_engine, "_skipped_stocks", []) or [])
+                skip_text = (
+                    f"⏸️ 早盘跳过：当前 {now.strftime('%Y-%m-%d %H:%M')} 尚未开盘"
+                    f"（集合竞价时段行情源无最新成交价），行情未就绪，本次不产出早报。\n"
+                    f"全池 {len(skipped)} 只均因无最新价跳过（非源故障）。\n"
+                    f"开盘后（09:30 起）重跑即拿真实价，无需人工干预。"
+                )
+                print(skip_text)
+                _warn_if_push_repeatedly_failing(str(base_dir))
+                ok = push_to_wecom(
+                    skip_text,
+                    title=f"⏸️ A股早盘跳过(行情未就绪) {now.strftime('%Y-%m-%d')}",
+                )
+                _record_push_status(str(base_dir), ok)
+                return 0
+            # 其余场景（盘中/盘后全失败，或 09:30 后源真故障）→ 视为完全失败（exit 1）
             print("❌ 无可用预测（全部股票数据缺失），本次分析失败")
             fail_text = (
                 f"❌ 早盘完全失败：全部股票数据缺失，今日无任何早报信号。\n"
